@@ -1,0 +1,570 @@
+<!DOCTYPE html>
+<html lang="vi" xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout">
+<head>
+    <title th:text="${product != null ? 'Chỉnh sửa sản phẩm' : 'Thêm sản phẩm mới'} - Electronic Store Admin</title>
+    
+    <style>
+        .form-card {
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+            border: none;
+            overflow: hidden;
+        }
+        
+        .form-header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 2rem;
+            text-align: center;
+        }
+        
+        .form-body {
+            padding: 2rem;
+        }
+        
+        .form-control-modern {
+            border: 2px solid #e9ecef;
+            border-radius: 10px;
+            padding: 0.75rem 1rem;
+            transition: all 0.3s ease;
+        }
+        
+        .form-control-modern:focus {
+            border-color: #667eea;
+            box-shadow: 0 0 0 0.2rem rgba(102, 126, 234, 0.15);
+        }
+        
+        .form-label-modern {
+            font-weight: 600;
+            color: #495057;
+            margin-bottom: 0.5rem;
+        }
+        
+        .btn-modern {
+            border-radius: 10px;
+            padding: 0.75rem 1.5rem;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            border: none;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        
+        .btn-primary-modern {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+        
+        .btn-primary-modern:hover {
+            background: linear-gradient(135deg, #5a6fd8 0%, #6a4190 100%);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
+            color: white;
+        }
+        
+        .btn-secondary-modern {
+            background: linear-gradient(135deg, #6c757d 0%, #5a6268 100%);
+            color: white;
+        }
+        
+        .btn-secondary-modern:hover {
+            background: linear-gradient(135deg, #5a6268 0%, #495057 100%);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 15px rgba(108, 117, 125, 0.3);
+            color: white;
+        }
+        
+        .form-section {
+            background: #f8f9fa;
+            border-radius: 10px;
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+        }
+        
+        .form-section h6 {
+            color: #495057;
+            font-weight: 600;
+            margin-bottom: 1rem;
+            border-bottom: 2px solid #dee2e6;
+            padding-bottom: 0.5rem;
+        }
+        
+        .image-upload-area {
+            border: 2px dashed #dee2e6;
+            border-radius: 10px;
+            padding: 2rem;
+            text-align: center;
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+        
+        .image-upload-area:hover {
+            border-color: #667eea;
+            background: #f8f9fa;
+        }
+        
+        .image-upload-area.dragover {
+            border-color: #667eea;
+            background: #e3f2fd;
+        }
+        
+        .image-preview {
+            width: 100px;
+            height: 100px;
+            object-fit: cover;
+            border-radius: 8px;
+            margin: 0.5rem;
+            border: 2px solid #e9ecef;
+        }
+        
+        .image-preview:hover {
+            border-color: #667eea;
+        }
+        
+        .price-input-group {
+            position: relative;
+        }
+        
+        .price-input-group .form-control {
+            padding-left: 2.5rem;
+        }
+        
+        .price-symbol {
+            position: absolute;
+            left: 1rem;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #6c757d;
+            font-weight: 600;
+        }
+        
+        .form-check-modern {
+            background: #f8f9fa;
+            border-radius: 8px;
+            padding: 1rem;
+            margin-bottom: 1rem;
+        }
+        
+        .form-check-modern .form-check-input {
+            margin-top: 0.25rem;
+        }
+        
+        .form-check-modern .form-check-label {
+            font-weight: 500;
+            color: #495057;
+        }
+        
+        .alert-modern {
+            border: none;
+            border-radius: 10px;
+            padding: 1rem 1.5rem;
+            margin-bottom: 1.5rem;
+        }
+        
+        .alert-success-modern {
+            background: linear-gradient(135deg, #d4edda, #c3e6cb);
+            color: #155724;
+        }
+        
+        .alert-danger-modern {
+            background: linear-gradient(135deg, #f8d7da, #f5c6cb);
+            color: #721c24;
+        }
+        
+        .required-field::after {
+            content: " *";
+            color: #dc3545;
+        }
+        
+        .help-text {
+            font-size: 0.875rem;
+            color: #6c757d;
+            margin-top: 0.25rem;
+        }
+        
+        .form-row {
+            display: flex;
+            gap: 1rem;
+        }
+        
+        .form-row .col {
+            flex: 1;
+        }
+        
+        @media (max-width: 768px) {
+            .form-row {
+                flex-direction: column;
+            }
+            
+            .form-body {
+                padding: 1rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div layout:decorate="~{admin/layout}">
+        <div layout:fragment="content">
+            <!-- Header -->
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <div>
+                    <h2 class="mb-1">
+                        <i class="fas fa-edit me-2 text-primary"></i>
+                        <span th:text="${product != null ? 'Chỉnh sửa sản phẩm' : 'Thêm sản phẩm mới'}">Form Title</span>
+                    </h2>
+                    <p class="text-muted mb-0" th:text="${product != null ? 'Cập nhật thông tin sản phẩm' : 'Thêm sản phẩm mới vào hệ thống'}">Form Description</p>
+                </div>
+                <div>
+                    <a th:href="@{/admin/products}" class="btn btn-secondary-modern btn-modern">
+                        <i class="fas fa-arrow-left me-1"></i>
+                        Quay lại
+                    </a>
+                </div>
+            </div>
+            
+            <!-- Success/Error Messages -->
+            <div th:if="${success}" class="alert alert-success-modern alert-modern">
+                <i class="fas fa-check-circle me-2"></i>
+                <span th:text="${success}">Success message</span>
+            </div>
+            
+            <div th:if="${error}" class="alert alert-danger-modern alert-modern">
+                <i class="fas fa-exclamation-circle me-2"></i>
+                <span th:text="${error}">Error message</span>
+            </div>
+            
+            <!-- Product Form -->
+            <div class="form-card">
+                <div class="form-header">
+                    <h4 class="mb-0">
+                        <i class="fas fa-box me-2"></i>
+                        <span th:text="${product != null ? 'Chỉnh sửa sản phẩm' : 'Thông tin sản phẩm mới'}">Form Header</span>
+                    </h4>
+                </div>
+                
+                <div class="form-body">
+                    <form th:action="${product != null ? '/admin/products/update/' + product.id : '/admin/products/save'}" 
+                          method="post" 
+                          enctype="multipart/form-data"
+                          id="productForm">
+                        
+                        <!-- Basic Information -->
+                        <div class="form-section">
+                            <h6><i class="fas fa-info-circle me-2"></i>Thông tin cơ bản</h6>
+                            
+                            <div class="row g-3">
+                                <div class="col-md-8">
+                                    <label class="form-label-modern required-field">Tên sản phẩm</label>
+                                    <input type="text" 
+                                           class="form-control form-control-modern" 
+                                           name="name" 
+                                           th:value="${product?.name}"
+                                           placeholder="Nhập tên sản phẩm"
+                                           required>
+                                    <div class="help-text">Tên sản phẩm sẽ hiển thị trên website</div>
+                                </div>
+                                
+                                <div class="col-md-4">
+                                    <label class="form-label-modern">SKU</label>
+                                    <input type="text" 
+                                           class="form-control form-control-modern" 
+                                           name="sku" 
+                                           th:value="${product?.sku}"
+                                           placeholder="Mã sản phẩm">
+                                    <div class="help-text">Mã định danh sản phẩm (tự động tạo nếu để trống)</div>
+                                </div>
+                            </div>
+                            
+                            <div class="row g-3 mt-3">
+                                <div class="col-md-6">
+                                    <label class="form-label-modern">Thương hiệu</label>
+                                    <input type="text" 
+                                           class="form-control form-control-modern" 
+                                           name="brand" 
+                                           th:value="${product?.brand}"
+                                           placeholder="Nhập thương hiệu">
+                                </div>
+                                
+                                <div class="col-md-6">
+                                    <label class="form-label-modern">Mẫu sản phẩm</label>
+                                    <input type="text" 
+                                           class="form-control form-control-modern" 
+                                           name="model" 
+                                           th:value="${product?.model}"
+                                           placeholder="Nhập mẫu sản phẩm">
+                                </div>
+                            </div>
+                            
+                            <div class="row g-3 mt-3">
+                                <div class="col-md-6">
+                                    <label class="form-label-modern">Danh mục</label>
+                                    <select class="form-select form-control-modern" name="categoryId" required>
+                                        <option value="">Chọn danh mục</option>
+                                        <option th:each="category : ${viewModel.categories}" 
+                                                th:value="${category.id}" 
+                                                th:text="${category.name}"
+                                                th:selected="${product?.category?.id == category.id}">
+                                        </option>
+                                    </select>
+                                </div>
+                                
+                                <div class="col-md-6">
+                                    <label class="form-label-modern">Bảo hành (tháng)</label>
+                                    <input type="number" 
+                                           class="form-control form-control-modern" 
+                                           name="warrantyPeriod" 
+                                           th:value="${product?.warrantyPeriod}"
+                                           placeholder="12"
+                                           min="0" max="60">
+                                </div>
+                            </div>
+                            
+                            <div class="mt-3">
+                                <label class="form-label-modern">Mô tả sản phẩm</label>
+                                <textarea class="form-control form-control-modern" 
+                                          name="description" 
+                                          rows="4" 
+                                          placeholder="Nhập mô tả chi tiết về sản phẩm"
+                                          th:text="${product?.description}"></textarea>
+                            </div>
+                        </div>
+                        
+                        <!-- Pricing Information -->
+                        <div class="form-section">
+                            <h6><i class="fas fa-dollar-sign me-2"></i>Thông tin giá cả</h6>
+                            
+                            <div class="row g-3">
+                                <div class="col-md-6">
+                                    <label class="form-label-modern required-field">Giá gốc</label>
+                                    <div class="price-input-group">
+                                        <span class="price-symbol">₫</span>
+                                        <input type="number" 
+                                               class="form-control form-control-modern" 
+                                               name="price" 
+                                               th:value="${product?.price}"
+                                               placeholder="0"
+                                               min="0" 
+                                               step="1000"
+                                               required>
+                                    </div>
+                                </div>
+                                
+                                <div class="col-md-6">
+                                    <label class="form-label-modern">Giá khuyến mãi</label>
+                                    <div class="price-input-group">
+                                        <span class="price-symbol">₫</span>
+                                        <input type="number" 
+                                               class="form-control form-control-modern" 
+                                               name="salePrice" 
+                                               th:value="${product?.salePrice}"
+                                               placeholder="0"
+                                               min="0" 
+                                               step="1000">
+                                    </div>
+                                    <div class="help-text">Để trống nếu không có khuyến mãi</div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Inventory Information -->
+                        <div class="form-section">
+                            <h6><i class="fas fa-warehouse me-2"></i>Thông tin tồn kho</h6>
+                            
+                            <div class="row g-3">
+                                <div class="col-md-6">
+                                    <label class="form-label-modern required-field">Số lượng tồn kho</label>
+                                    <input type="number" 
+                                           class="form-control form-control-modern" 
+                                           name="stockQuantity" 
+                                           th:value="${product?.stockQuantity}"
+                                           placeholder="0"
+                                           min="0"
+                                           required>
+                                </div>
+                                
+                                <div class="col-md-6">
+                                    <label class="form-label-modern">Lượt xem</label>
+                                    <input type="number" 
+                                           class="form-control form-control-modern" 
+                                           name="viewCount" 
+                                           th:value="${product?.viewCount}"
+                                           placeholder="0"
+                                           min="0"
+                                           readonly>
+                                    <div class="help-text">Tự động cập nhật khi khách hàng xem sản phẩm</div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Product Images -->
+                        <div class="form-section">
+                            <h6><i class="fas fa-images me-2"></i>Hình ảnh sản phẩm</h6>
+                            
+                            <div class="image-upload-area" onclick="document.getElementById('imageFiles').click()">
+                                <i class="fas fa-cloud-upload-alt fa-3x text-muted mb-3"></i>
+                                <h5>Thêm hình ảnh sản phẩm</h5>
+                                <p class="text-muted">Kéo thả hình ảnh vào đây hoặc click để chọn</p>
+                                <input type="file" 
+                                       id="imageFiles" 
+                                       name="imageFiles" 
+                                       multiple 
+                                       accept="image/*" 
+                                       style="display: none;"
+                                       onchange="previewImages(this)">
+                            </div>
+                            
+                            <!-- Image Previews -->
+                            <div id="imagePreviews" class="mt-3">
+                                <!-- Existing images -->
+                                <div th:each="imageUrl : ${product?.imageUrls}" class="d-inline-block me-2 mb-2">
+                                    <img th:src="${imageUrl}" class="image-preview" th:alt="${product?.name}">
+                                    <button type="button" class="btn btn-sm btn-outline-danger position-absolute" 
+                                            style="top: -5px; right: -5px; border-radius: 50%; width: 20px; height: 20px; padding: 0; font-size: 10px;"
+                                            onclick="removeImage(this)">
+                                        ×
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Product Settings -->
+                        <div class="form-section">
+                            <h6><i class="fas fa-cog me-2"></i>Cài đặt sản phẩm</h6>
+                            
+                            <div class="form-check-modern">
+                                <input class="form-check-input" 
+                                       type="checkbox" 
+                                       name="isActive" 
+                                       id="isActive"
+                                       th:checked="${product?.isActive}">
+                                <label class="form-check-label" for="isActive">
+                                    <i class="fas fa-toggle-on me-2"></i>
+                                    Sản phẩm đang hoạt động
+                                </label>
+                                <div class="help-text">Sản phẩm sẽ hiển thị trên website khi được kích hoạt</div>
+                            </div>
+                            
+                            <div class="form-check-modern">
+                                <input class="form-check-input" 
+                                       type="checkbox" 
+                                       name="isFeatured" 
+                                       id="isFeatured"
+                                       th:checked="${product?.isFeatured}">
+                                <label class="form-check-label" for="isFeatured">
+                                    <i class="fas fa-star me-2"></i>
+                                    Sản phẩm nổi bật
+                                </label>
+                                <div class="help-text">Sản phẩm sẽ hiển thị ở trang chủ và được ưu tiên</div>
+                            </div>
+                        </div>
+                        
+                        <!-- Form Actions -->
+                        <div class="d-flex justify-content-end gap-3 mt-4">
+                            <a th:href="@{/admin/products}" class="btn btn-secondary-modern btn-modern">
+                                <i class="fas fa-times me-1"></i>
+                                Hủy
+                            </a>
+                            <button type="submit" class="btn btn-primary-modern btn-modern">
+                                <i class="fas fa-save me-1"></i>
+                                <span th:text="${product != null ? 'Cập nhật sản phẩm' : 'Thêm sản phẩm'}">Save</span>
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        function previewImages(input) {
+            const previews = document.getElementById('imagePreviews');
+            
+            if (input.files) {
+                Array.from(input.files).forEach(file => {
+                    if (file.type.startsWith('image/')) {
+                        const reader = new FileReader();
+                        reader.onload = function(e) {
+                            const div = document.createElement('div');
+                            div.className = 'd-inline-block me-2 mb-2 position-relative';
+                            div.innerHTML = `
+                                <img src="${e.target.result}" class="image-preview" alt="Preview">
+                                <button type="button" class="btn btn-sm btn-outline-danger position-absolute" 
+                                        style="top: -5px; right: -5px; border-radius: 50%; width: 20px; height: 20px; padding: 0; font-size: 10px;"
+                                        onclick="removeImage(this)">
+                                    ×
+                                </button>
+                            `;
+                            previews.appendChild(div);
+                        };
+                        reader.readAsDataURL(file);
+                    }
+                });
+            }
+        }
+        
+        function removeImage(button) {
+            button.parentElement.remove();
+        }
+        
+        // Drag and drop functionality
+        const uploadArea = document.querySelector('.image-upload-area');
+        
+        uploadArea.addEventListener('dragover', function(e) {
+            e.preventDefault();
+            uploadArea.classList.add('dragover');
+        });
+        
+        uploadArea.addEventListener('dragleave', function(e) {
+            e.preventDefault();
+            uploadArea.classList.remove('dragover');
+        });
+        
+        uploadArea.addEventListener('drop', function(e) {
+            e.preventDefault();
+            uploadArea.classList.remove('dragover');
+            
+            const files = e.dataTransfer.files;
+            const input = document.getElementById('imageFiles');
+            input.files = files;
+            previewImages(input);
+        });
+        
+        // Form validation
+        document.getElementById('productForm').addEventListener('submit', function(e) {
+            const name = document.querySelector('input[name="name"]').value.trim();
+            const price = document.querySelector('input[name="price"]').value;
+            const stockQuantity = document.querySelector('input[name="stockQuantity"]').value;
+            const categoryId = document.querySelector('select[name="categoryId"]').value;
+            
+            if (!name) {
+                alert('Vui lòng nhập tên sản phẩm');
+                e.preventDefault();
+                return;
+            }
+            
+            if (!price || parseFloat(price) <= 0) {
+                alert('Vui lòng nhập giá sản phẩm hợp lệ');
+                e.preventDefault();
+                return;
+            }
+            
+            if (!stockQuantity || parseInt(stockQuantity) < 0) {
+                alert('Vui lòng nhập số lượng tồn kho hợp lệ');
+                e.preventDefault();
+                return;
+            }
+            
+            if (!categoryId) {
+                alert('Vui lòng chọn danh mục sản phẩm');
+                e.preventDefault();
+                return;
+            }
+        });
+    </script>
+</body>
+</html>

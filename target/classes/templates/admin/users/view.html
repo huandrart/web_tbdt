@@ -1,0 +1,517 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title th:text="'Chi tiết người dùng - ' + ${user.firstName} + ' ' + ${user.lastName} + ' - Cửa hàng điện tử'">Chi tiết người dùng</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <style>
+        .sidebar {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+        }
+        
+        .sidebar .nav-link {
+            color: rgba(255, 255, 255, 0.8);
+            transition: all 0.3s;
+            border-radius: 8px;
+            margin: 2px 0;
+        }
+        
+        .sidebar .nav-link:hover,
+        .sidebar .nav-link.active {
+            color: white;
+            background: rgba(255, 255, 255, 0.1);
+            transform: translateX(5px);
+        }
+        
+        .main-content {
+            background-color: #f8f9fa;
+            min-height: 100vh;
+        }
+        
+        .card {
+            border: none;
+            border-radius: 15px;
+            box-shadow: 0 0 20px rgba(0,0,0,0.1);
+        }
+        
+        .user-avatar-large {
+            width: 100px;
+            height: 100px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+            font-size: 2.5rem;
+            margin-bottom: 20px;
+        }
+        
+        .badge-role {
+            font-size: 0.9em;
+            padding: 0.6em 1.2em;
+            border-radius: 25px;
+        }
+        
+        .role-admin { background-color: #dc3545; color: #fff; }
+        .role-user { background-color: #28a745; color: #fff; }
+        
+        .badge-status {
+            font-size: 0.9em;
+            padding: 0.6em 1.2em;
+            border-radius: 25px;
+        }
+        
+        .status-active { background-color: #28a745; color: #fff; }
+        .status-blocked { background-color: #dc3545; color: #fff; }
+        
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border: none;
+            border-radius: 20px;
+        }
+        
+        .info-row {
+            border-bottom: 1px solid #e9ecef;
+            padding: 12px 0;
+        }
+        
+        .info-row:last-child {
+            border-bottom: none;
+        }
+        
+        .info-label {
+            font-weight: 600;
+            color: #495057;
+            width: 150px;
+            display: inline-block;
+        }
+        
+        .order-card {
+            transition: transform 0.2s;
+            cursor: pointer;
+        }
+        
+        .order-card:hover {
+            transform: translateY(-2px);
+        }
+        
+        .stats-card {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border-radius: 15px;
+            text-align: center;
+        }
+        
+        .stats-number {
+            font-size: 2rem;
+            font-weight: bold;
+        }
+        
+        .activity-timeline {
+            position: relative;
+        }
+        
+        .activity-timeline::before {
+            content: '';
+            position: absolute;
+            left: 20px;
+            top: 0;
+            bottom: 0;
+            width: 2px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        }
+        
+        .activity-item {
+            position: relative;
+            padding-left: 60px;
+            padding-bottom: 20px;
+        }
+        
+        .activity-icon {
+            position: absolute;
+            left: 0;
+            top: 0;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 3px 10px rgba(102, 126, 234, 0.3);
+        }
+    </style>
+</head>
+<body>
+    <div class="container-fluid">
+        <div class="row">
+            <!-- Sidebar -->
+            <nav class="col-md-2 d-none d-md-block sidebar">
+                <div class="position-sticky pt-3">
+                    <div class="text-center mb-4">
+                        <h4 class="text-white">
+                            <i class="fas fa-laptop"></i> Admin Panel
+                        </h4>
+                    </div>
+                    <ul class="nav flex-column">
+                        <li class="nav-item mb-1">
+                            <a class="nav-link" th:href="@{/admin/dashboard}">
+                                <i class="fas fa-tachometer-alt me-2"></i> Dashboard
+                            </a>
+                        </li>
+                        <li class="nav-item mb-1">
+                            <a class="nav-link" th:href="@{/admin/categories}">
+                                <i class="fas fa-list me-2"></i> Danh mục
+                            </a>
+                        </li>
+                        <li class="nav-item mb-1">
+                            <a class="nav-link" th:href="@{/admin/products}">
+                                <i class="fas fa-box me-2"></i> Sản phẩm
+                            </a>
+                        </li>
+                        <li class="nav-item mb-1">
+                            <a class="nav-link" th:href="@{/admin/orders}">
+                                <i class="fas fa-shopping-cart me-2"></i> Đơn hàng
+                            </a>
+                        </li>
+                        <li class="nav-item mb-1">
+                            <a class="nav-link active" th:href="@{/admin/users}">
+                                <i class="fas fa-users me-2"></i> Người dùng
+                            </a>
+                        </li>
+                        <li class="nav-item mt-4">
+                            <a class="nav-link" th:href="@{/}">
+                                <i class="fas fa-home me-2"></i> Về trang chủ
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" th:href="@{/logout}">
+                                <i class="fas fa-sign-out-alt me-2"></i> Đăng xuất
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+            </nav>
+
+            <!-- Main content -->
+            <main class="col-md-10 ms-sm-auto main-content">
+                <div class="p-4">
+                    <!-- Header -->
+                    <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pb-2 mb-3 border-bottom">
+                        <h1 class="h2">
+                            <i class="fas fa-user me-2"></i>
+                            Chi tiết người dùng
+                        </h1>
+                        <div class="btn-toolbar mb-2 mb-md-0">
+                            <div class="btn-group me-2">
+                                <a th:href="@{/admin/users}" class="btn btn-secondary">
+                                    <i class="fas fa-arrow-left me-1"></i> Quay lại
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <!-- User Profile -->
+                        <div class="col-md-4">
+                            <div class="card mb-4">
+                                <div class="card-body text-center">
+                                    <div class="user-avatar-large mx-auto">
+                                        <span th:text="${#strings.substring(user.firstName, 0, 1).toUpperCase()}"></span>
+                                    </div>
+                                    <h3 th:text="${user.firstName + ' ' + user.lastName}"></h3>
+                                    <p class="text-muted mb-3" th:text="${user.email}"></p>
+                                    
+                                    <div class="mb-3">
+                                        <span class="badge badge-role me-2" 
+                                              th:classappend="'role-' + ${#strings.toLowerCase(user.role)}"
+                                              th:text="${user.role == 'ADMIN' ? 'Administrator' : 'Người dùng'}">
+                                        </span>
+                                        <span class="badge badge-status" 
+                                              th:classappend="${user.isActive} ? 'status-active' : 'status-blocked'"
+                                              th:text="${user.isActive} ? 'Hoạt động' : 'Bị khóa'">
+                                        </span>
+                                    </div>
+                                    
+                                    <div class="d-grid gap-2">
+                                        <!-- Status Actions -->
+                                        <div th:if="${!user.isActive}">
+                                            <a th:href="@{/admin/users/update-status/{id}(id=${user.id}, active=true)}" 
+                                               class="btn btn-success w-100"
+                                               onclick="return confirm('Bạn có chắc muốn kích hoạt tài khoản này?')">
+                                                <i class="fas fa-unlock me-1"></i> Kích hoạt tài khoản
+                                            </a>
+                                        </div>
+                                        <div th:if="${user.isActive && user.role != 'ADMIN'}">
+                                            <a th:href="@{/admin/users/update-status/{id}(id=${user.id}, active=false)}" 
+                                               class="btn btn-danger w-100"
+                                               onclick="return confirm('Bạn có chắc muốn khóa tài khoản này?')">
+                                                <i class="fas fa-lock me-1"></i> Khóa tài khoản
+                                            </a>
+                                        </div>
+                                        
+                                        <!-- Role Actions -->
+                                        <div th:if="${user.role != 'ADMIN'}">
+                                            <a th:href="@{/admin/users/update-role/{id}(id=${user.id}, role='ADMIN')}" 
+                                               class="btn btn-warning w-100"
+                                               onclick="return confirm('Bạn có chắc muốn cấp quyền Admin cho người dùng này?')">
+                                                <i class="fas fa-user-shield me-1"></i> Cấp quyền Admin
+                                            </a>
+                                        </div>
+                                        <div th:if="${user.role == 'ADMIN'}">
+                                            <a th:href="@{/admin/users/update-role/{id}(id=${user.id}, role='USER')}" 
+                                               class="btn btn-outline-warning w-100"
+                                               onclick="return confirm('Bạn có chắc muốn thu hồi quyền Admin của người dùng này?')">
+                                                <i class="fas fa-user me-1"></i> Thu hồi quyền Admin
+                                            </a>
+                                        </div>
+                                        
+                                        <!-- Other Actions -->
+                                        <a th:href="@{/admin/users/reset-password/{id}(id=${user.id})}" 
+                                           class="btn btn-outline-primary w-100"
+                                           onclick="return confirm('Bạn có chắc muốn đặt lại mật khẩu cho người dùng này?')">
+                                            <i class="fas fa-key me-1"></i> Đặt lại mật khẩu
+                                        </a>
+                                        
+                                        <a th:href="@{/admin/orders(search=${user.email})}" 
+                                           class="btn btn-outline-info w-100">
+                                            <i class="fas fa-shopping-cart me-1"></i> Xem đơn hàng
+                                        </a>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <!-- Statistics -->
+                            <div class="row">
+                                <div class="col-6 mb-3">
+                                    <div class="card stats-card">
+                                        <div class="card-body">
+                                            <div class="stats-number" th:text="${user.orders != null ? user.orders.size() : 0}">0</div>
+                                            <small>Đơn hàng</small>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-6 mb-3">
+                                    <div class="card stats-card">
+                                        <div class="card-body">
+                                            <div class="stats-number" th:text="${user.reviews != null ? user.reviews.size() : 0}">0</div>
+                                            <small>Đánh giá</small>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- User Details -->
+                        <div class="col-md-8">
+                            <!-- Personal Information -->
+                            <div class="card mb-4">
+                                <div class="card-header bg-transparent">
+                                    <h5 class="mb-0">
+                                        <i class="fas fa-info-circle me-2"></i>
+                                        Thông tin cá nhân
+                                    </h5>
+                                </div>
+                                <div class="card-body">
+                                    <div class="row">
+                                        <div class="col-md-6">
+                                            <div class="info-row">
+                                                <span class="info-label">ID:</span>
+                                                <span th:text="'#' + ${user.id}"></span>
+                                            </div>
+                                            <div class="info-row">
+                                                <span class="info-label">Họ tên:</span>
+                                                <span th:text="${user.firstName + ' ' + user.lastName}"></span>
+                                            </div>
+                                            <div class="info-row">
+                                                <span class="info-label">Email:</span>
+                                                <a th:href="'mailto:' + ${user.email}" th:text="${user.email}"></a>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <div class="info-row">
+                                                <span class="info-label">Số điện thoại:</span>
+                                                <span th:if="${user.phoneNumber != null}">
+                                                    <a th:href="'tel:' + ${user.phoneNumber}" th:text="${user.phoneNumber}"></a>
+                                                </span>
+                                                <span th:if="${user.phoneNumber == null}" class="text-muted">Chưa cập nhật</span>
+                                            </div>
+                                            <div class="info-row">
+                                                <span class="info-label">Địa chỉ:</span>
+                                                <span th:if="${user.address != null}" th:text="${user.address}"></span>
+                                                <span th:if="${user.address == null}" class="text-muted">Chưa cập nhật</span>
+                                            </div>
+                                            <div class="info-row">
+                                                <span class="info-label">Ngày sinh:</span>
+                                                <span th:if="${user.dateOfBirth != null}" 
+                                                      th:text="${#temporals.format(user.dateOfBirth, 'dd/MM/yyyy')}"></span>
+                                                <span th:if="${user.dateOfBirth == null}" class="text-muted">Chưa cập nhật</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Account Information -->
+                            <div class="card mb-4">
+                                <div class="card-header bg-transparent">
+                                    <h5 class="mb-0">
+                                        <i class="fas fa-user-cog me-2"></i>
+                                        Thông tin tài khoản
+                                    </h5>
+                                </div>
+                                <div class="card-body">
+                                    <div class="row">
+                                        <div class="col-md-6">
+                                            <div class="info-row">
+                                                <span class="info-label">Vai trò:</span>
+                                                <span class="badge badge-role" 
+                                                      th:classappend="'role-' + ${#strings.toLowerCase(user.role)}"
+                                                      th:text="${user.role == 'ADMIN' ? 'Administrator' : 'Người dùng'}">
+                                                </span>
+                                            </div>
+                                            <div class="info-row">
+                                                <span class="info-label">Trạng thái:</span>
+                                                <span class="badge badge-status" 
+                                                      th:classappend="${user.isActive} ? 'status-active' : 'status-blocked'"
+                                                      th:text="${user.isActive} ? 'Hoạt động' : 'Bị khóa'">
+                                                </span>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <div class="info-row">
+                                                <span class="info-label">Ngày tham gia:</span>
+                                                <span th:text="${#temporals.format(user.createdAt, 'dd/MM/yyyy HH:mm')}"></span>
+                                            </div>
+                                            <div class="info-row">
+                                                <span class="info-label">Cập nhật lần cuối:</span>
+                                                <span th:if="${user.updatedAt != null}" 
+                                                      th:text="${#temporals.format(user.updatedAt, 'dd/MM/yyyy HH:mm')}"></span>
+                                                <span th:if="${user.updatedAt == null}" class="text-muted">Chưa có</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Recent Orders -->
+                            <div class="card mb-4" th:if="${user.orders != null && !user.orders.isEmpty()}">
+                                <div class="card-header bg-transparent d-flex justify-content-between align-items-center">
+                                    <h5 class="mb-0">
+                                        <i class="fas fa-shopping-cart me-2"></i>
+                                        Đơn hàng gần đây
+                                    </h5>
+                                    <a th:href="@{/admin/orders(search=${user.email})}" class="btn btn-outline-primary btn-sm">
+                                        Xem tất cả
+                                    </a>
+                                </div>
+                                <div class="card-body">
+                                    <div class="row">
+                                        <div class="col-md-6 mb-3" 
+                                             th:each="order, iterStat : ${user.orders}" 
+                                             th:if="${iterStat.count <= 4}">
+                                            <div class="card order-card h-100" 
+                                                 th:onclick="'window.location.href=\'/admin/orders/view/' + ${order.id} + '\''">
+                                                <div class="card-body">
+                                                    <div class="d-flex justify-content-between align-items-start mb-2">
+                                                        <h6 class="mb-0" th:text="'#' + ${order.id}"></h6>
+                                                        <span class="badge" 
+                                                              th:classappend="${order.status == 'DELIVERED'} ? 'bg-success' : 
+                                                                           ${order.status == 'CANCELLED'} ? 'bg-danger' :
+                                                                           ${order.status == 'SHIPPING'} ? 'bg-info' : 'bg-warning'"
+                                                              th:text="${order.status == 'PENDING' ? 'Chờ xử lý' :
+                                                                      order.status == 'CONFIRMED' ? 'Đã xác nhận' :
+                                                                      order.status == 'PROCESSING' ? 'Đang xử lý' :
+                                                                      order.status == 'SHIPPING' ? 'Đang giao' :
+                                                                      order.status == 'DELIVERED' ? 'Đã giao' :
+                                                                      order.status == 'CANCELLED' ? 'Đã hủy' :
+                                                                      order.status == 'RETURNED' ? 'Trả lại' : order.status}">
+                                                        </span>
+                                                    </div>
+                                                    <p class="text-success mb-2" th:text="${#numbers.formatCurrency(order.totalAmount)}"></p>
+                                                    <small class="text-muted" 
+                                                           th:text="${#temporals.format(order.createdAt, 'dd/MM/yyyy')}"></small>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Activity Timeline -->
+                            <div class="card">
+                                <div class="card-header bg-transparent">
+                                    <h5 class="mb-0">
+                                        <i class="fas fa-history me-2"></i>
+                                        Hoạt động gần đây
+                                    </h5>
+                                </div>
+                                <div class="card-body">
+                                    <div class="activity-timeline">
+                                        <div class="activity-item">
+                                            <div class="activity-icon">
+                                                <i class="fas fa-user-plus"></i>
+                                            </div>
+                                            <div>
+                                                <h6 class="mb-1">Tham gia hệ thống</h6>
+                                                <small class="text-muted" 
+                                                       th:text="${#temporals.format(user.createdAt, 'dd/MM/yyyy HH:mm')}">
+                                                </small>
+                                                <p class="mb-0 mt-1">
+                                                    <small>Tài khoản được tạo và kích hoạt thành công.</small>
+                                                </p>
+                                            </div>
+                                        </div>
+                                        
+                                        <div class="activity-item" 
+                                             th:if="${user.orders != null && !user.orders.isEmpty()}">
+                                            <div class="activity-icon">
+                                                <i class="fas fa-shopping-cart"></i>
+                                            </div>
+                                            <div>
+                                                <h6 class="mb-1">Đặt hàng lần đầu</h6>
+                                                <small class="text-muted" 
+                                                       th:text="${user.orders != null && !user.orders.isEmpty()} ? 
+                                                               ${#temporals.format(user.orders[0].createdAt, 'dd/MM/yyyy HH:mm')} : ''">
+                                                </small>
+                                                <p class="mb-0 mt-1">
+                                                    <small>Khách hàng đã thực hiện đơn hàng đầu tiên.</small>
+                                                </p>
+                                            </div>
+                                        </div>
+                                        
+                                        <div class="activity-item" th:if="${user.updatedAt != null}">
+                                            <div class="activity-icon">
+                                                <i class="fas fa-edit"></i>
+                                            </div>
+                                            <div>
+                                                <h6 class="mb-1">Cập nhật thông tin</h6>
+                                                <small class="text-muted" 
+                                                       th:text="${#temporals.format(user.updatedAt, 'dd/MM/yyyy HH:mm')}">
+                                                </small>
+                                                <p class="mb-0 mt-1">
+                                                    <small>Thông tin tài khoản được cập nhật.</small>
+                                                </p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </main>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+</body>
+</html>

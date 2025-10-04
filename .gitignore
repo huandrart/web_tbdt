@@ -1,0 +1,29 @@
+# Build
+target/
+build/
+out/
+*.class
+*.log
+# IDE
+.idea/
+.vscode/
+*.iml
+# Maven/Gradle
+.gradle/
+# Node
+node_modules/
+dist/
+# OS rac
+.DS_Store
+Thumbs.db
+# Secrets and config
+.env
+application-*.yml
+application-*.properties
+*.jks
+*.p12
+*.pem
+*.key
+# Runtime data
+uploads/
+storage/

@@ -1,0 +1,715 @@
+<!DOCTYPE html>
+<html lang="vi" xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head>
+    <title>Dashboard - Electronic Store Admin</title>
+    
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Font Awesome -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f8f9fa;
+            line-height: 1.6;
+            margin: 0;
+            padding: 0;
+            overflow-x: hidden;
+        }
+        
+        .admin-container {
+            display: flex;
+            min-height: 100vh;
+            position: relative;
+        }
+        
+        /* Sidebar */
+        .sidebar {
+            width: 250px;
+            background: linear-gradient(180deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            position: fixed;
+            height: 100vh;
+            overflow-y: auto;
+            z-index: 1050;
+            transition: all 0.3s ease;
+            left: 0;
+            top: 0;
+            box-shadow: 2px 0 10px rgba(0,0,0,0.1);
+            display: block !important;
+        }
+        
+        .sidebar-header {
+            padding: 2rem 1.5rem 1.5rem 1.5rem;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .sidebar-header h4 {
+            margin: 0;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            font-size: 1.25rem;
+            color: white;
+            letter-spacing: 0.5px;
+        }
+        
+        .sidebar-header i {
+            font-size: 1.5rem;
+            color: white;
+        }
+        
+        .sidebar-nav {
+            padding: 0.5rem 0;
+        }
+        
+        .nav-item {
+            margin: 0;
+        }
+        
+        .nav-link {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            padding: 0.875rem 1.5rem;
+            color: white !important;
+            text-decoration: none;
+            transition: all 0.3s ease;
+            border-radius: 0;
+            position: relative;
+            font-weight: 500;
+            font-size: 0.95rem;
+            margin: 0.125rem 0;
+            letter-spacing: 0.3px;
+        }
+        
+        .nav-link:hover {
+            background-color: rgba(255, 255, 255, 0.1);
+            color: white !important;
+        }
+        
+        .nav-link.active {
+            background-color: rgba(255, 255, 255, 0.15);
+            color: white !important;
+            border-radius: 8px;
+            margin: 0.125rem 1rem;
+            width: calc(100% - 2rem);
+            position: relative;
+            font-weight: 600;
+        }
+        
+        .nav-link.active::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 0;
+            bottom: 0;
+            width: 4px;
+            background: white;
+            border-radius: 0 4px 4px 0;
+            opacity: 0.8;
+        }
+        
+        .nav-link i {
+            width: 24px;
+            text-align: center;
+            font-size: 1.1rem;
+            color: white;
+            opacity: 0.9;
+            transition: opacity 0.3s ease;
+        }
+        
+        .nav-link:hover i {
+            opacity: 1;
+        }
+        
+        .nav-link.active i {
+            opacity: 1;
+            color: white;
+        }
+        
+        /* Main Content */
+        .main-content {
+            flex: 1;
+            margin-left: 250px;
+            background-color: #f8f9fa;
+            min-height: 100vh;
+            width: calc(100% - 250px);
+        }
+        
+        .main-header {
+            background: white;
+            padding: 1rem 2rem;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .header-left {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+        
+        .sidebar-toggle {
+            background: none;
+            border: none;
+            font-size: 1.2rem;
+            color: #6c757d;
+            cursor: pointer;
+            padding: 0.5rem;
+            border-radius: 4px;
+            transition: background-color 0.3s ease;
+        }
+        
+        .sidebar-toggle:hover {
+            background-color: #f8f9fa;
+        }
+        
+        .header-left h2 {
+            margin: 0;
+            color: #2c3e50;
+            font-size: 1.5rem;
+            font-weight: 600;
+        }
+        
+        .header-right {
+            display: flex;
+            align-items: center;
+        }
+        
+        .user-info {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+        
+        .user-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 1.1rem;
+        }
+        
+        .user-details {
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .user-name {
+            font-weight: 600;
+            color: #2c3e50;
+            font-size: 0.9rem;
+        }
+        
+        .user-role {
+            font-size: 0.8rem;
+            color: #6c757d;
+        }
+        
+        .page-content {
+            padding: 2rem;
+        }
+        
+        /* Dashboard Specific Styles */
+        .dashboard-header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 2rem 0;
+            margin-bottom: 2rem;
+            border-radius: 0 0 20px 20px;
+        }
+        
+        .dashboard-title {
+            font-size: 2.5rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+        }
+        
+        .dashboard-subtitle {
+            font-size: 1.1rem;
+            opacity: 0.9;
+            margin-bottom: 0.25rem;
+        }
+        
+        .dashboard-welcome {
+            font-size: 1rem;
+            opacity: 0.8;
+        }
+        
+        .stats-card {
+            background: white;
+            border-radius: 15px;
+            padding: 1.5rem;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            border: none;
+            height: 100%;
+        }
+        
+        .stats-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 25px rgba(0,0,0,0.15);
+        }
+        
+        .stats-icon {
+            width: 60px;
+            height: 60px;
+            border-radius: 15px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            color: white;
+            margin-bottom: 1rem;
+        }
+        
+        .stats-icon.purple { background: linear-gradient(135deg, #667eea, #764ba2); }
+        .stats-icon.green { background: linear-gradient(135deg, #4facfe, #00f2fe); }
+        .stats-icon.blue { background: linear-gradient(135deg, #43e97b, #38f9d7); }
+        .stats-icon.orange { background: linear-gradient(135deg, #fa709a, #fee140); }
+        
+        .stats-number {
+            font-size: 2rem;
+            font-weight: 700;
+            color: #2c3e50;
+            margin-bottom: 0.5rem;
+        }
+        
+        .stats-label {
+            font-size: 0.9rem;
+            color: #6c757d;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 0.5rem;
+        }
+        
+        .stats-change {
+            font-size: 0.85rem;
+            font-weight: 600;
+        }
+        
+        .stats-change.positive {
+            color: #28a745;
+        }
+        
+        .stats-change.negative {
+            color: #dc3545;
+        }
+        
+        .action-card {
+            background: white;
+            border-radius: 15px;
+            padding: 1.5rem;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            transition: all 0.3s ease;
+            border: none;
+            height: 100%;
+            cursor: pointer;
+        }
+        
+        .action-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 25px rgba(0,0,0,0.15);
+        }
+        
+        .action-icon {
+            width: 50px;
+            height: 50px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.25rem;
+            color: white;
+            margin-bottom: 1rem;
+        }
+        
+        .action-icon.purple { background: linear-gradient(135deg, #667eea, #764ba2); }
+        .action-icon.green { background: linear-gradient(135deg, #4facfe, #00f2fe); }
+        .action-icon.blue { background: linear-gradient(135deg, #43e97b, #38f9d7); }
+        .action-icon.orange { background: linear-gradient(135deg, #fa709a, #fee140); }
+        
+        .action-title {
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: #2c3e50;
+            margin-bottom: 0.5rem;
+        }
+        
+        .action-description {
+            font-size: 0.9rem;
+            color: #6c757d;
+            line-height: 1.4;
+        }
+        
+        .section-title {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: #2c3e50;
+            margin-bottom: 1.5rem;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+        
+        .section-title i {
+            color: #667eea;
+        }
+        
+        .recent-orders {
+            background: white;
+            border-radius: 15px;
+            padding: 1.5rem;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+        }
+        
+        .order-item {
+            display: flex;
+            align-items: center;
+            padding: 1rem 0;
+            border-bottom: 1px solid #f8f9fa;
+        }
+        
+        .order-item:last-child {
+            border-bottom: none;
+        }
+        
+        .order-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: 600;
+            margin-right: 1rem;
+        }
+        
+        .order-info {
+            flex: 1;
+        }
+        
+        .order-customer {
+            font-weight: 600;
+            color: #2c3e50;
+            margin-bottom: 0.25rem;
+        }
+        
+        .order-details {
+            font-size: 0.9rem;
+            color: #6c757d;
+        }
+        
+        .order-amount {
+            font-weight: 700;
+            color: #28a745;
+            font-size: 1.1rem;
+        }
+        
+        .order-status {
+            padding: 0.25rem 0.75rem;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+        
+        .order-status.pending {
+            background: #fff3cd;
+            color: #856404;
+        }
+        
+        .order-status.completed {
+            background: #d4edda;
+            color: #155724;
+        }
+        
+        .order-status.processing {
+            background: #cce5ff;
+            color: #004085;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="admin-container">
+        <!-- Sidebar -->
+        <div class="sidebar">
+            <div class="sidebar-header">
+                <h4>
+                    <i class="fas fa-laptop"></i>
+                    Admin Panel
+                </h4>
+            </div>
+            
+            <nav class="sidebar-nav">
+                <div class="nav-item">
+                    <a href="/admin" class="nav-link active">
+                        <i class="fas fa-tachometer-alt"></i>
+                        Dashboard
+                    </a>
+                </div>
+                
+                <div class="nav-item">
+                    <a href="/admin/categories" class="nav-link">
+                        <i class="fas fa-list"></i>
+                        Danh mục
+                    </a>
+                </div>
+                
+                <div class="nav-item">
+                    <a href="/admin/products" class="nav-link">
+                        <i class="fas fa-box"></i>
+                        Sản phẩm
+                    </a>
+                </div>
+                
+                <div class="nav-item">
+                    <a href="/admin/orders" class="nav-link">
+                        <i class="fas fa-shopping-cart"></i>
+                        Đơn hàng
+                    </a>
+                </div>
+                
+                <div class="nav-item">
+                    <a href="/admin/users" class="nav-link">
+                        <i class="fas fa-users"></i>
+                        Người dùng
+                    </a>
+                </div>
+                
+                <div class="nav-item">
+                    <a href="/" class="nav-link">
+                        <i class="fas fa-home"></i>
+                        Về trang chủ
+                    </a>
+                </div>
+                
+                <div class="nav-item">
+                    <a href="/logout" class="nav-link">
+                        <i class="fas fa-sign-out-alt"></i>
+                        Đăng xuất
+                    </a>
+                </div>
+            </nav>
+        </div>
+        
+        <!-- Main Content -->
+        <div class="main-content">
+            <!-- Header -->
+            <div class="main-header">
+                <div class="header-left">
+                    <button class="sidebar-toggle d-md-none" onclick="toggleSidebar()">
+                        <i class="fas fa-bars"></i>
+                    </button>
+                    <h2>Dashboard</h2>
+                </div>
+                
+                <div class="header-right">
+                    <div class="user-info">
+                        <div class="user-avatar">
+                            <i class="fas fa-user"></i>
+                        </div>
+                        <div class="user-details">
+                            <div class="user-name" sec:authentication="name">Admin</div>
+                            <div class="user-role">Quản trị viên</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Page Content -->
+            <div class="page-content">
+        <!-- Dashboard Header -->
+        <div class="dashboard-header">
+            <div class="container-fluid">
+                <div class="row align-items-center">
+                    <div class="col-md-8">
+                        <h1 class="dashboard-title">Dashboard</h1>
+                        <p class="dashboard-subtitle">Tổng quan hệ thống quản lý cửa hàng điện tử</p>
+                        <p class="dashboard-welcome">Chào mừng trở lại! Admin Panel</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="container-fluid">
+            <!-- Statistics Cards -->
+            <div class="row mb-4">
+                <div class="col-lg-3 col-md-6 mb-4">
+                    <div class="stats-card">
+                        <div class="stats-icon purple">
+                            <i class="fas fa-shopping-cart"></i>
+                        </div>
+                        <div class="stats-number">7</div>
+                        <div class="stats-label">TỔNG ĐƠN HÀNG</div>
+                        <div class="stats-change positive">+12% so với tháng trước</div>
+                    </div>
+                </div>
+                
+                <div class="col-lg-3 col-md-6 mb-4">
+                    <div class="stats-card">
+                        <div class="stats-icon green">
+                            <i class="fas fa-dollar-sign"></i>
+                        </div>
+                        <div class="stats-number">₫15.2M</div>
+                        <div class="stats-label">DOANH THU THÁNG NÀY</div>
+                        <div class="stats-change positive">+8.5% so với tháng trước</div>
+                    </div>
+                </div>
+                
+                <div class="col-lg-3 col-md-6 mb-4">
+                    <div class="stats-card">
+                        <div class="stats-icon blue">
+                            <i class="fas fa-box"></i>
+                        </div>
+                        <div class="stats-number">23</div>
+                        <div class="stats-label">TỔNG SẢN PHẨM</div>
+                        <div class="stats-change positive">+3 sản phẩm mới</div>
+                    </div>
+                </div>
+                
+                <div class="col-lg-3 col-md-6 mb-4">
+                    <div class="stats-card">
+                        <div class="stats-icon orange">
+                            <i class="fas fa-users"></i>
+                        </div>
+                        <div class="stats-number">8</div>
+                        <div class="stats-label">KHÁCH HÀNG</div>
+                        <div class="stats-change positive">+2 khách hàng mới</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Quick Actions -->
+            <div class="row mb-4">
+                <div class="col-lg-3 col-md-6 mb-3">
+                    <div class="action-card" onclick="window.location.href='/admin/products/new'">
+                        <div class="action-icon purple">
+                            <i class="fas fa-plus"></i>
+                        </div>
+                        <div class="action-title">Thêm sản phẩm</div>
+                        <div class="action-description">Tạo sản phẩm mới cho cửa hàng</div>
+                    </div>
+                </div>
+                
+                <div class="col-lg-3 col-md-6 mb-3">
+                    <div class="action-card" onclick="window.location.href='/admin/categories/new'">
+                        <div class="action-icon green">
+                            <i class="fas fa-tags"></i>
+                        </div>
+                        <div class="action-title">Thêm danh mục</div>
+                        <div class="action-description">Tạo danh mục sản phẩm mới</div>
+                    </div>
+                </div>
+                
+                <div class="col-lg-3 col-md-6 mb-3">
+                    <div class="action-card" onclick="window.location.href='/admin/orders'">
+                        <div class="action-icon blue">
+                            <i class="fas fa-shopping-bag"></i>
+                        </div>
+                        <div class="action-title">Xem đơn hàng</div>
+                        <div class="action-description">Quản lý đơn hàng và vận chuyển</div>
+                    </div>
+                </div>
+                
+                <div class="col-lg-3 col-md-6 mb-3">
+                    <div class="action-card" onclick="window.location.href='/admin/users'">
+                        <div class="action-icon orange">
+                            <i class="fas fa-user-cog"></i>
+                        </div>
+                        <div class="action-title">Quản lý người dùng</div>
+                        <div class="action-description">Quản lý tài khoản khách hàng</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Recent Orders -->
+            <div class="row">
+                <div class="col-12">
+                    <h2 class="section-title">
+                        <i class="fas fa-clock"></i>
+                        Đơn hàng gần đây
+                    </h2>
+                    <div class="recent-orders">
+                        <div class="order-item">
+                            <div class="order-avatar">NV</div>
+                            <div class="order-info">
+                                <div class="order-customer">Nguyễn Văn A</div>
+                                <div class="order-details">iPhone 15 Pro Max - 2 sản phẩm</div>
+                            </div>
+                            <div class="order-amount">₫31,990,000</div>
+                            <div class="order-status pending">Đang chờ</div>
+                        </div>
+                        
+                        <div class="order-item">
+                            <div class="order-avatar">TT</div>
+                            <div class="order-info">
+                                <div class="order-customer">Trần Thị B</div>
+                                <div class="order-details">MacBook Pro 16" - 1 sản phẩm</div>
+                            </div>
+                            <div class="order-amount">₫45,990,000</div>
+                            <div class="order-status completed">Hoàn thành</div>
+                        </div>
+                        
+                        <div class="order-item">
+                            <div class="order-avatar">LH</div>
+                            <div class="order-info">
+                                <div class="order-customer">Lê Hoàng C</div>
+                                <div class="order-details">Samsung Galaxy S24 - 1 sản phẩm</div>
+                            </div>
+                            <div class="order-amount">₫25,990,000</div>
+                            <div class="order-status processing">Đang xử lý</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        // Mobile sidebar toggle
+        function toggleSidebar() {
+            document.querySelector('.sidebar').classList.toggle('show');
+        }
+        
+        // Auto-hide sidebar on mobile when clicking outside
+        document.addEventListener('click', function(e) {
+            if (window.innerWidth <= 768) {
+                const sidebar = document.querySelector('.sidebar');
+                const toggleBtn = document.querySelector('.sidebar-toggle');
+                
+                if (!sidebar.contains(e.target) && !toggleBtn?.contains(e.target)) {
+                    sidebar.classList.remove('show');
+                }
+            }
+        });
+        
+        // Auto-hide sidebar on desktop resize
+        window.addEventListener('resize', function() {
+            if (window.innerWidth > 768) {
+                document.querySelector('.sidebar').classList.remove('show');
+            }
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,703 @@
+<!DOCTYPE html>
+<html lang="vi" xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head>
+
+<head>    <meta charset="UTF-8">
+
+    <meta charset="UTF-8">    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">    <title th:text="'Chi tiết danh mục - ' + ${category.name} + ' - Cửa hàng điện tử'">Chi tiết danh mục</title>
+
+    <meta name="_csrf" th:content="${_csrf.token}"/>    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+
+    <meta name="_csrf_header" th:content="${_csrf.headerName}"/>    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+
+    <title th:text="'Chi tiết danh mục - ' + ${category.name} + ' - Electronic Store'">Chi tiết danh mục</title>    <style>
+
+            .sidebar {
+
+    <!-- Bootstrap CSS -->            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">            min-height: 100vh;
+
+    <!-- Font Awesome -->        }
+
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">        
+
+            .sidebar .nav-link {
+
+    <style>            color: rgba(255, 255, 255, 0.8);
+
+        .sidebar {            transition: all 0.3s;
+
+            min-height: 100vh;            border-radius: 8px;
+
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);            margin: 2px 0;
+
+        }        }
+
+                
+
+        .sidebar .nav-link {        .sidebar .nav-link:hover,
+
+            color: rgba(255, 255, 255, 0.8);        .sidebar .nav-link.active {
+
+            transition: all 0.3s;            color: white;
+
+            border-radius: 8px;            background: rgba(255, 255, 255, 0.1);
+
+            margin: 2px 0;            transform: translateX(5px);
+
+        }        }
+
+                
+
+        .sidebar .nav-link:hover,        .main-content {
+
+        .sidebar .nav-link.active {            background-color: #f8f9fa;
+
+            color: white;            min-height: 100vh;
+
+            background: rgba(255, 255, 255, 0.1);        }
+
+            transform: translateX(5px);        
+
+        }        .card {
+
+                    border: none;
+
+        .main-content {            border-radius: 15px;
+
+            background-color: #f8f9fa;            box-shadow: 0 0 20px rgba(0,0,0,0.1);
+
+            min-height: 100vh;        }
+
+        }        
+
+                .btn-primary {
+
+        .card {            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+
+            border: none;            border: none;
+
+            border-radius: 15px;            border-radius: 20px;
+
+            box-shadow: 0 0 20px rgba(0,0,0,0.1);        }
+
+        }        
+
+                .btn-secondary {
+
+        .btn-primary {            background: linear-gradient(135deg, #6c757d 0%, #495057 100%);
+
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);            border: none;
+
+            border: none;            border-radius: 20px;
+
+            border-radius: 20px;        }
+
+        }        
+
+                .btn-warning {
+
+        .btn-secondary {            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+
+            background: linear-gradient(135deg, #6c757d 0%, #495057 100%);            border: none;
+
+            border: none;            border-radius: 20px;
+
+            border-radius: 20px;        }
+
+        }        
+
+                .badge {
+
+        .info-item {            border-radius: 20px;
+
+            border-bottom: 1px solid #dee2e6;            padding: 8px 15px;
+
+            padding: 15px 0;        }
+
+        }        
+
+                .info-label {
+
+        .info-item:last-child {            font-weight: 600;
+
+            border-bottom: none;            color: #495057;
+
+        }        }
+
+                
+
+        .category-image {        .table th {
+
+            max-height: 300px;            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+
+            border-radius: 10px;            color: white;
+
+        }            border: none;
+
+    </style>            font-weight: 600;
+
+</head>        }
+
+<body>        
+
+<div class="container-fluid">        .table td {
+
+    <div class="row">            vertical-align: middle;
+
+        <!-- Sidebar -->            border-color: #dee2e6;
+
+        <div class="col-md-2 sidebar p-3">        }
+
+            <div class="d-flex align-items-center mb-4">    </style>
+
+                <i class="fas fa-laptop text-white fs-2 me-2"></i></head>
+
+                <h4 class="text-white mb-0">Admin Panel</h4><body>
+
+            </div>    <div class="container-fluid">
+
+                    <div class="row">
+
+            <nav class="nav flex-column">            <!-- Sidebar -->
+
+                <a class="nav-link" th:href="@{/admin/dashboard}">            <nav class="col-md-2 d-none d-md-block sidebar">
+
+                    <i class="fas fa-tachometer-alt me-2"></i> Dashboard                <div class="position-sticky pt-3">
+
+                </a>                    <div class="text-center mb-4">
+
+                <a class="nav-link active" th:href="@{/admin/categories}">                        <h4 class="text-white">
+
+                    <i class="fas fa-list me-2"></i> Danh mục                            <i class="fas fa-laptop"></i> Admin Panel
+
+                </a>                        </h4>
+
+                <a class="nav-link" th:href="@{/admin/products}">                    </div>
+
+                    <i class="fas fa-box me-2"></i> Sản phẩm                    <ul class="nav flex-column">
+
+                </a>                        <li class="nav-item mb-1">
+
+                <a class="nav-link" th:href="@{/admin/orders}">                            <a class="nav-link" th:href="@{/admin/dashboard}">
+
+                    <i class="fas fa-shopping-cart me-2"></i> Đơn hàng                                <i class="fas fa-tachometer-alt me-2"></i> Dashboard
+
+                </a>                            </a>
+
+                <a class="nav-link" th:href="@{/admin/users}">                        </li>
+
+                    <i class="fas fa-users me-2"></i> Người dùng                        <li class="nav-item mb-1">
+
+                </a>                            <a class="nav-link active" th:href="@{/admin/categories}">
+
+                <hr class="text-white-50">                                <i class="fas fa-list me-2"></i> Danh mục
+
+                <a class="nav-link" th:href="@{/}">                            </a>
+
+                    <i class="fas fa-home me-2"></i> Về trang chủ                        </li>
+
+                </a>                        <li class="nav-item mb-1">
+
+                <a class="nav-link" th:href="@{/logout}">                            <a class="nav-link" th:href="@{/admin/products}">
+
+                    <i class="fas fa-sign-out-alt me-2"></i> Đăng xuất                                <i class="fas fa-box me-2"></i> Sản phẩm
+
+                </a>                            </a>
+
+            </nav>                        </li>
+
+        </div>                        <li class="nav-item mb-1">
+
+                            <a class="nav-link" th:href="@{/admin/orders}">
+
+        <!-- Main Content -->                                <i class="fas fa-shopping-cart me-2"></i> Đơn hàng
+
+        <div class="col-md-10 main-content p-4">                            </a>
+
+            <!-- Header -->                        </li>
+
+            <div class="d-flex justify-content-between align-items-center mb-4">                        <li class="nav-item mb-1">
+
+                <h1 class="h2">                            <a class="nav-link" th:href="@{/admin/users}">
+
+                    <i class="fas fa-eye me-2 text-primary"></i>                                <i class="fas fa-users me-2"></i> Người dùng
+
+                    Chi tiết danh mục: <span th:text="${category.name}">Category Name</span>                            </a>
+
+                </h1>                        </li>
+
+                <div class="d-flex align-items-center">                        <li class="nav-item mt-4">
+
+                    <a th:href="@{/admin/categories}" class="btn btn-secondary me-2">                            <a class="nav-link" th:href="@{/}">
+
+                        <i class="fas fa-arrow-left me-1"></i>Quay lại                                <i class="fas fa-home me-2"></i> Về trang chủ
+
+                    </a>                            </a>
+
+                    <a th:href="@{/admin/categories/edit/{id}(id=${category.id})}" class="btn btn-primary me-3">                        </li>
+
+                        <i class="fas fa-edit me-1"></i>Chỉnh sửa                        <li class="nav-item">
+
+                    </a>                            <a class="nav-link" th:href="@{/logout}">
+
+                    <span class="badge bg-warning text-dark">                                <i class="fas fa-sign-out-alt me-2"></i> Đăng xuất
+
+                        <i class="fas fa-crown me-1"></i>ADMIN                            </a>
+
+                    </span>                        </li>
+
+                </div>                    </ul>
+
+            </div>                </div>
+
+            </nav>
+
+            <!-- Category Details -->
+
+            <div class="row">            <!-- Main content -->
+
+                <div class="col-md-8">            <main class="col-md-10 ms-sm-auto main-content">
+
+                    <div class="card">                <div class="p-4">
+
+                        <div class="card-header bg-primary text-white">                    <!-- Header -->
+
+                            <h5 class="mb-0">                    <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pb-2 mb-3 border-bottom">
+
+                                <i class="fas fa-info-circle me-2"></i>Thông tin chi tiết                        <h1 class="h2">
+
+                            </h5>                            <i class="fas fa-eye me-2"></i>
+
+                        </div>                            Chi tiết danh mục
+
+                        <div class="card-body">                        </h1>
+
+                            <div class="info-item">                        <div class="btn-group">
+
+                                <div class="row">                            <a th:href="@{/admin/categories}" class="btn btn-secondary">
+
+                                    <div class="col-sm-3">                                <i class="fas fa-arrow-left me-1"></i> Quay lại
+
+                                        <strong><i class="fas fa-hashtag text-primary me-1"></i>ID:</strong>                            </a>
+
+                                    </div>                            <a th:href="@{/admin/categories/edit/{id}(id=${category.id})}" class="btn btn-warning">
+
+                                    <div class="col-sm-9">                                <i class="fas fa-edit me-1"></i> Chỉnh sửa
+
+                                        <span th:text="${category.id}" class="badge bg-secondary">1</span>                            </a>
+
+                                    </div>                        </div>
+
+                                </div>                    </div>
+
+                            </div>
+
+                                                <div class="row">
+
+                            <div class="info-item">                        <!-- Category Info -->
+
+                                <div class="row">                        <div class="col-md-8">
+
+                                    <div class="col-sm-3">                            <div class="card">
+
+                                        <strong><i class="fas fa-tag text-primary me-1"></i>Tên danh mục:</strong>                                <div class="card-header bg-transparent">
+
+                                    </div>                                    <h5 class="card-title mb-0">
+
+                                    <div class="col-sm-9">                                        <i class="fas fa-info-circle me-2"></i>
+
+                                        <h5 class="mb-0" th:text="${category.name}">Category Name</h5>                                        Thông tin danh mục
+
+                                    </div>                                    </h5>
+
+                                </div>                                </div>
+
+                            </div>                                <div class="card-body">
+
+                                                                <div class="row">
+
+                            <div class="info-item">                                        <div class="col-md-6 mb-3">
+
+                                <div class="row">                                            <span class="info-label">ID:</span><br>
+
+                                    <div class="col-sm-3">                                            <code th:text="${category.id}"></code>
+
+                                        <strong><i class="fas fa-align-left text-primary me-1"></i>Mô tả:</strong>                                        </div>
+
+                                    </div>                                        <div class="col-md-6 mb-3">
+
+                                    <div class="col-sm-9">                                            <span class="info-label">Tên danh mục:</span><br>
+
+                                        <p class="mb-0" th:if="${category.description != null and !category.description.isEmpty()}"                                             <strong th:text="${category.name}"></strong>
+
+                                           th:text="${category.description}">Description here</p>                                        </div>
+
+                                        <span class="text-muted" th:unless="${category.description != null and !category.description.isEmpty()}">                                    </div>
+
+                                            <i class="fas fa-info-circle me-1"></i>Chưa có mô tả                                    
+
+                                        </span>                                    <div class="row">
+
+                                    </div>                                        <div class="col-md-12 mb-3">
+
+                                </div>                                            <span class="info-label">Mô tả:</span><br>
+
+                            </div>                                            <p th:text="${category.description != null ? category.description : 'Không có mô tả'}"
+
+                                                                           th:class="${category.description == null} ? 'text-muted'"></p>
+
+                            <div class="info-item">                                        </div>
+
+                                <div class="row">                                    </div>
+
+                                    <div class="col-sm-3">                                    
+
+                                        <strong><i class="fas fa-toggle-on text-primary me-1"></i>Trạng thái:</strong>                                    <div class="row">
+
+                                    </div>                                        <div class="col-md-6 mb-3">
+
+                                    <div class="col-sm-9">                                            <span class="info-label">Danh mục cha:</span><br>
+
+                                        <span th:if="${category.isActive}" class="badge bg-success fs-6">                                            <span th:if="${category.parent != null}" th:text="${category.parent.name}"></span>
+
+                                            <i class="fas fa-check-circle me-1"></i>Hoạt động                                            <span th:if="${category.parent == null}" class="text-muted">Danh mục gốc</span>
+
+                                        </span>                                        </div>
+
+                                        <span th:unless="${category.isActive}" class="badge bg-danger fs-6">                                        <div class="col-md-6 mb-3">
+
+                                            <i class="fas fa-times-circle me-1"></i>Không hoạt động                                            <span class="info-label">Trạng thái:</span><br>
+
+                                        </span>                                            <span th:if="${category.isActive}" class="badge bg-success">
+
+                                    </div>                                                <i class="fas fa-check-circle me-1"></i> Hoạt động
+
+                                </div>                                            </span>
+
+                            </div>                                            <span th:if="${!category.isActive}" class="badge bg-danger">
+
+                                                                            <i class="fas fa-times-circle me-1"></i> Không hoạt động
+
+                            <div class="info-item" th:if="${category.products != null}">                                            </span>
+
+                                <div class="row">                                        </div>
+
+                                    <div class="col-sm-3">                                    </div>
+
+                                        <strong><i class="fas fa-box text-primary me-1"></i>Số sản phẩm:</strong>                                    
+
+                                    </div>                                    <div class="row">
+
+                                    <div class="col-sm-9">                                        <div class="col-md-6 mb-3">
+
+                                        <span class="badge bg-info fs-6" th:text="${category.products.size()}">0</span>                                            <span class="info-label">Ngày tạo:</span><br>
+
+                                        <small class="text-muted">sản phẩm</small>                                            <span th:text="${#temporals.format(category.createdAt, 'dd/MM/yyyy HH:mm:ss')}"></span>
+
+                                    </div>                                        </div>
+
+                                </div>                                        <div class="col-md-6 mb-3" th:if="${category.updatedAt != null}">
+
+                            </div>                                            <span class="info-label">Cập nhật lần cuối:</span><br>
+
+                                                                        <span th:text="${#temporals.format(category.updatedAt, 'dd/MM/yyyy HH:mm:ss')}"></span>
+
+                            <div class="info-item" th:if="${category.createdAt != null}">                                        </div>
+
+                                <div class="row">                                    </div>
+
+                                    <div class="col-sm-3">                                </div>
+
+                                        <strong><i class="fas fa-calendar-plus text-primary me-1"></i>Ngày tạo:</strong>                            </div>
+
+                                    </div>                        </div>
+
+                                    <div class="col-sm-9">
+
+                                        <span th:text="${#temporals.format(category.createdAt, 'dd/MM/yyyy HH:mm:ss')}">01/01/2023 10:00:00</span>                        <!-- Statistics -->
+
+                                    </div>                        <div class="col-md-4">
+
+                                </div>                            <div class="card">
+
+                            </div>                                <div class="card-header bg-transparent">
+
+                                                                <h5 class="card-title mb-0">
+
+                            <div class="info-item" th:if="${category.updatedAt != null}">                                        <i class="fas fa-chart-bar me-2"></i>
+
+                                <div class="row">                                        Thống kê
+
+                                    <div class="col-sm-3">                                    </h5>
+
+                                        <strong><i class="fas fa-calendar-edit text-primary me-1"></i>Cập nhật lần cuối:</strong>                                </div>
+
+                                    </div>                                <div class="card-body text-center">
+
+                                    <div class="col-sm-9">                                    <div class="mb-4">
+
+                                        <span th:text="${#temporals.format(category.updatedAt, 'dd/MM/yyyy HH:mm:ss')}">01/01/2023 10:00:00</span>                                        <h3 class="text-primary mb-0" th:text="${category.products != null ? category.products.size() : 0}">0</h3>
+
+                                    </div>                                        <small class="text-muted">Tổng số sản phẩm</small>
+
+                                </div>                                    </div>
+
+                            </div>                                    
+
+                        </div>                                    <div class="d-grid">
+
+                    </div>                                        <a th:href="@{/admin/products(category=${category.id})}" class="btn btn-outline-primary">
+
+                </div>                                            <i class="fas fa-box me-1"></i> Xem sản phẩm
+
+                                                        </a>
+
+                <div class="col-md-4">                                    </div>
+
+                    <!-- Category Image -->                                </div>
+
+                    <div class="card" th:if="${category.imageUrl != null and !category.imageUrl.isEmpty()}">                            </div>
+
+                        <div class="card-header bg-secondary text-white">
+
+                            <h6 class="mb-0">                            <!-- Child Categories -->
+
+                                <i class="fas fa-image me-2"></i>Hình ảnh danh mục                            <div class="card mt-3" th:if="${category.children != null && !category.children.empty}">
+
+                            </h6>                                <div class="card-header bg-transparent">
+
+                        </div>                                    <h5 class="card-title mb-0">
+
+                        <div class="card-body text-center">                                        <i class="fas fa-sitemap me-2"></i>
+
+                            <img th:src="${category.imageUrl}" class="img-fluid category-image"                                         Danh mục con
+
+                                 alt="Category Image" th:alt="${category.name}">                                    </h5>
+
+                        </div>                                </div>
+
+                    </div>                                <div class="card-body">
+
+                                                        <div class="list-group list-group-flush">
+
+                    <!-- Actions -->                                        <div class="list-group-item d-flex justify-content-between align-items-center"
+
+                    <div class="card mt-3">                                             th:each="child : ${category.children}">
+
+                        <div class="card-header bg-warning text-dark">                                            <div>
+
+                            <h6 class="mb-0">                                                <strong th:text="${child.name}"></strong>
+
+                                <i class="fas fa-cogs me-2"></i>Thao tác                                                <span th:if="${!child.isActive}" class="badge bg-danger ms-2">Inactive</span>
+
+                            </h6>                                            </div>
+
+                        </div>                                            <small class="text-muted" th:text="${child.products != null ? child.products.size() : 0} + ' SP'"></small>
+
+                        <div class="card-body">                                        </div>
+
+                            <div class="d-grid gap-2">                                    </div>
+
+                                <a th:href="@{/admin/categories/edit/{id}(id=${category.id})}"                                 </div>
+
+                                   class="btn btn-warning">                            </div>
+
+                                    <i class="fas fa-edit me-1"></i>Chỉnh sửa danh mục                        </div>
+
+                                </a>                    </div>
+
+                                
+
+                                <button type="button" class="btn btn-primary toggle-status"                    <!-- Products in this category -->
+
+                                        th:data-id="${category.id}">                    <div class="row mt-4" th:if="${category.products != null && !category.products.empty}">
+
+                                    <i th:class="${category.isActive} ? 'fas fa-toggle-off me-1' : 'fas fa-toggle-on me-1'"></i>                        <div class="col-md-12">
+
+                                    <span th:text="${category.isActive} ? 'Vô hiệu hóa' : 'Kích hoạt'">Toggle Status</span>                            <div class="card">
+
+                                </button>                                <div class="card-header bg-transparent">
+
+                                                                    <h5 class="card-title mb-0">
+
+                                <a th:href="@{/admin/categories/delete/{id}(id=${category.id})}"                                         <i class="fas fa-box me-2"></i>
+
+                                   class="btn btn-danger delete-category"                                        Sản phẩm trong danh mục này
+
+                                   th:data-name="${category.name}"                                        <span class="badge bg-secondary ms-2" th:text="${category.products.size()}"></span>
+
+                                   onclick="return confirm('Bạn có chắc chắn muốn xóa danh mục này?')">                                    </h5>
+
+                                    <i class="fas fa-trash me-1"></i>Xóa danh mục                                </div>
+
+                                </a>                                <div class="card-body">
+
+                            </div>                                    <div class="table-responsive">
+
+                        </div>                                        <table class="table table-hover">
+
+                    </div>                                            <thead>
+
+                                                                    <tr>
+
+                    <!-- Quick Stats -->                                                    <th>Tên sản phẩm</th>
+
+                    <div class="card mt-3">                                                    <th>Giá</th>
+
+                        <div class="card-header bg-info text-white">                                                    <th>Trạng thái</th>
+
+                            <h6 class="mb-0">                                                    <th>Ngày tạo</th>
+
+                                <i class="fas fa-chart-bar me-2"></i>Thống kê nhanh                                                    <th>Thao tác</th>
+
+                            </h6>                                                </tr>
+
+                        </div>                                            </thead>
+
+                        <div class="card-body">                                            <tbody>
+
+                            <div class="row text-center">                                                <tr th:each="product : ${category.products}">
+
+                                <div class="col-6">                                                    <td>
+
+                                    <div class="border-end">                                                        <strong th:text="${product.name}"></strong>
+
+                                        <h4 class="text-primary mb-1" th:text="${category.products != null ? category.products.size() : 0}">0</h4>                                                    </td>
+
+                                        <small class="text-muted">Sản phẩm</small>                                                    <td>
+
+                                    </div>                                                        <span class="text-danger fw-bold" 
+
+                                </div>                                                              th:text="${#numbers.formatDecimal(product.price, 0, 'COMMA', 0, 'POINT')} + ' ₫'"></span>
+
+                                <div class="col-6">                                                    </td>
+
+                                    <h4 class="text-success mb-1">                                                    <td>
+
+                                        <i th:class="${category.isActive} ? 'fas fa-check-circle' : 'fas fa-times-circle'"></i>                                                        <span th:if="${product.isActive}" class="badge bg-success">Hoạt động</span>
+
+                                    </h4>                                                        <span th:if="${!product.isActive}" class="badge bg-danger">Không hoạt động</span>
+
+                                    <small class="text-muted" th:text="${category.isActive} ? 'Đang hoạt động' : 'Không hoạt động'">Status</small>                                                    </td>
+
+                                </div>                                                    <td th:text="${#temporals.format(product.createdAt, 'dd/MM/yyyy')}"></td>
+
+                            </div>                                                    <td>
+
+                        </div>                                                        <div class="btn-group" role="group">
+
+                    </div>                                                            <a th:href="@{/admin/products/view/{id}(id=${product.id})}" 
+
+                </div>                                                               class="btn btn-sm btn-outline-info" title="Xem chi tiết">
+
+            </div>                                                                <i class="fas fa-eye"></i>
+
+        </div>                                                            </a>
+
+    </div>                                                            <a th:href="@{/admin/products/edit/{id}(id=${product.id})}" 
+
+</div>                                                               class="btn btn-sm btn-outline-warning" title="Chỉnh sửa">
+
+                                                                <i class="fas fa-edit"></i>
+
+<!-- Bootstrap JS -->                                                            </a>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>                                                        </div>
+
+                                                    </td>
+
+<script>                                                </tr>
+
+document.addEventListener('DOMContentLoaded', function() {                                            </tbody>
+
+    // Toggle Status functionality                                        </table>
+
+    const toggleButton = document.querySelector('.toggle-status');                                    </div>
+
+    if (toggleButton) {                                    
+
+        toggleButton.addEventListener('click', function() {                                    <div class="text-center mt-3">
+
+            const categoryId = this.dataset.id;                                        <a th:href="@{/admin/products(category=${category.id})}" class="btn btn-primary">
+
+            const icon = this.querySelector('i');                                            <i class="fas fa-plus me-1"></i> Xem tất cả sản phẩm
+
+            const span = this.querySelector('span');                                        </a>
+
+                                                </div>
+
+            fetch(`/admin/categories/toggle-status/${categoryId}`, {                                </div>
+
+                method: 'POST',                            </div>
+
+                headers: {                        </div>
+
+                    'Content-Type': 'application/json',                    </div>
+
+                    'X-Requested-With': 'XMLHttpRequest',
+
+                    [document.querySelector('meta[name="_csrf_header"]').content]:                     <!-- Empty products state -->
+
+                        document.querySelector('meta[name="_csrf"]').content                    <div class="row mt-4" th:if="${category.products == null || category.products.empty}">
+
+                }                        <div class="col-md-12">
+
+            })                            <div class="card">
+
+            .then(response => response.text())                                <div class="card-body text-center py-5">
+
+            .then(data => {                                    <i class="fas fa-inbox fa-3x text-muted mb-3"></i>
+
+                if (data === 'success') {                                    <h5 class="text-muted">Chưa có sản phẩm nào trong danh mục này</h5>
+
+                    // Reload page to update all status indicators                                    <a th:href="@{/admin/products/new(category=${category.id})}" class="btn btn-primary mt-2">
+
+                    window.location.reload();                                        <i class="fas fa-plus me-1"></i> Thêm sản phẩm đầu tiên
+
+                } else {                                    </a>
+
+                    alert('Có lỗi xảy ra khi thay đổi trạng thái!');                                </div>
+
+                }                            </div>
+
+            })                        </div>
+
+            .catch(error => {                    </div>
+
+                console.error('Error:', error);                </div>
+
+                alert('Có lỗi xảy ra khi thay đổi trạng thái!');            </main>
+
+            });        </div>
+
+        });    </div>
+
+    }
+
+        <!-- Scripts -->
+
+    // Delete confirmation    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+    const deleteButton = document.querySelector('.delete-category');    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+    if (deleteButton) {</body>
+
+        deleteButton.addEventListener('click', function(e) {</html>
+            e.preventDefault();
+            const categoryName = this.dataset.name;
+            
+            if (confirm(`Bạn có chắc chắn muốn xóa danh mục "${categoryName}"?\n\nHành động này không thể hoàn tác!`)) {
+                window.location.href = this.href;
+            }
+        });
+    }
+});
+</script>
+
+</body>
+</html>

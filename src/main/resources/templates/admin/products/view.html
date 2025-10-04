@@ -1,0 +1,501 @@
+<!DOCTYPE html>
+<html lang="vi" xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout">
+<head>
+    <title>Chi tiết sản phẩm - Electronic Store Admin</title>
+    
+    <style>
+        .product-detail-card {
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+            border: none;
+            overflow: hidden;
+        }
+        
+        .product-image-large {
+            width: 100%;
+            height: 400px;
+            object-fit: cover;
+            border-radius: 15px;
+        }
+        
+        .product-image-thumb {
+            width: 80px;
+            height: 80px;
+            object-fit: cover;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border: 2px solid transparent;
+        }
+        
+        .product-image-thumb:hover,
+        .product-image-thumb.active {
+            border-color: #667eea;
+            transform: scale(1.05);
+        }
+        
+        .product-info {
+            padding: 2rem;
+        }
+        
+        .product-title {
+            font-size: 2rem;
+            font-weight: 700;
+            color: #333;
+            margin-bottom: 1rem;
+        }
+        
+        .product-price {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: #28a745;
+            margin-bottom: 1rem;
+        }
+        
+        .product-sale-price {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: #dc3545;
+        }
+        
+        .product-original-price {
+            font-size: 1.2rem;
+            text-decoration: line-through;
+            color: #6c757d;
+            margin-left: 1rem;
+        }
+        
+        .product-sku {
+            background: #f8f9fa;
+            padding: 0.5rem 1rem;
+            border-radius: 20px;
+            font-family: monospace;
+            font-size: 0.9rem;
+            color: #495057;
+            display: inline-block;
+            margin-bottom: 1rem;
+        }
+        
+        .product-badge {
+            padding: 0.5rem 1rem;
+            border-radius: 20px;
+            font-weight: 500;
+            margin-right: 0.5rem;
+            margin-bottom: 0.5rem;
+            display: inline-block;
+        }
+        
+        .badge-category {
+            background: linear-gradient(135deg, #17a2b8, #138496);
+            color: white;
+        }
+        
+        .badge-status {
+            background: linear-gradient(135deg, #28a745, #20c997);
+            color: white;
+        }
+        
+        .badge-featured {
+            background: linear-gradient(135deg, #ffc107, #fd7e14);
+            color: white;
+        }
+        
+        .badge-stock {
+            background: linear-gradient(135deg, #6f42c1, #e83e8c);
+            color: white;
+        }
+        
+        .info-section {
+            background: #f8f9fa;
+            border-radius: 10px;
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+        }
+        
+        .info-section h6 {
+            color: #495057;
+            font-weight: 600;
+            margin-bottom: 1rem;
+            border-bottom: 2px solid #dee2e6;
+            padding-bottom: 0.5rem;
+        }
+        
+        .info-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0.5rem 0;
+            border-bottom: 1px solid #e9ecef;
+        }
+        
+        .info-item:last-child {
+            border-bottom: none;
+        }
+        
+        .info-label {
+            font-weight: 600;
+            color: #495057;
+        }
+        
+        .info-value {
+            color: #6c757d;
+        }
+        
+        .btn-modern {
+            border-radius: 10px;
+            padding: 0.75rem 1.5rem;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            border: none;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        
+        .btn-primary-modern {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+        
+        .btn-primary-modern:hover {
+            background: linear-gradient(135deg, #5a6fd8 0%, #6a4190 100%);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
+            color: white;
+        }
+        
+        .btn-warning-modern {
+            background: linear-gradient(135deg, #ffd43b 0%, #fab005 100%);
+            color: white;
+        }
+        
+        .btn-warning-modern:hover {
+            background: linear-gradient(135deg, #ffc107 0%, #e0a800 100%);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 15px rgba(255, 193, 7, 0.3);
+            color: white;
+        }
+        
+        .btn-danger-modern {
+            background: linear-gradient(135deg, #ff6b6b 0%, #ee5a6f 100%);
+            color: white;
+        }
+        
+        .btn-danger-modern:hover {
+            background: linear-gradient(135deg, #dc3545 0%, #c82333 100%);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 15px rgba(220, 53, 69, 0.3);
+            color: white;
+        }
+        
+        .btn-secondary-modern {
+            background: linear-gradient(135deg, #6c757d 0%, #5a6268 100%);
+            color: white;
+        }
+        
+        .btn-secondary-modern:hover {
+            background: linear-gradient(135deg, #5a6268 0%, #495057 100%);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 15px rgba(108, 117, 125, 0.3);
+            color: white;
+        }
+        
+        .action-buttons {
+            display: flex;
+            gap: 1rem;
+            flex-wrap: wrap;
+            margin-top: 2rem;
+        }
+        
+        .stock-indicator {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.5rem 1rem;
+            border-radius: 20px;
+            font-weight: 600;
+        }
+        
+        .stock-low {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+        
+        .stock-medium {
+            background: #fff3cd;
+            color: #856404;
+            border: 1px solid #ffeaa7;
+        }
+        
+        .stock-high {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+        
+        .description-text {
+            line-height: 1.6;
+            color: #495057;
+            white-space: pre-wrap;
+        }
+        
+        @media (max-width: 768px) {
+            .action-buttons {
+                flex-direction: column;
+            }
+            
+            .product-title {
+                font-size: 1.5rem;
+            }
+            
+            .product-price {
+                font-size: 1.2rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div layout:decorate="~{admin/layout}">
+        <div layout:fragment="content">
+            <!-- Header -->
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <div>
+                    <h2 class="mb-1">
+                        <i class="fas fa-eye me-2 text-primary"></i>
+                        Chi tiết sản phẩm
+                    </h2>
+                    <p class="text-muted mb-0">Thông tin chi tiết về sản phẩm</p>
+                </div>
+                <div>
+                    <a th:href="@{/admin/products}" class="btn btn-secondary-modern btn-modern">
+                        <i class="fas fa-arrow-left me-1"></i>
+                        Quay lại
+                    </a>
+                </div>
+            </div>
+            
+            <!-- Product Detail Card -->
+            <div class="product-detail-card">
+                <div class="row g-0">
+                    <!-- Product Images -->
+                    <div class="col-md-6">
+                        <div class="p-4">
+                            <div class="mb-3">
+                                <img th:src="${product.imageUrls != null && !product.imageUrls.isEmpty() ? product.imageUrls[0] : '/images/default-product.svg'}" 
+                                     class="product-image-large" 
+                                     th:alt="${product.name}"
+                                     id="mainImage">
+                            </div>
+                            
+                            <!-- Thumbnail Images -->
+                            <div th:if="${product.imageUrls != null && product.imageUrls.size() > 1}" class="d-flex gap-2 flex-wrap">
+                                <img th:each="imageUrl, iterStat : ${product.imageUrls}" 
+                                     th:src="${imageUrl}" 
+                                     class="product-image-thumb" 
+                                     th:alt="${product.name}"
+                                     th:onclick="'changeMainImage(\'' + ${imageUrl} + '\')'"
+                                     th:classappend="${iterStat.first} ? 'active' : ''">
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Product Information -->
+                    <div class="col-md-6">
+                        <div class="product-info">
+                            <!-- Product Title -->
+                            <h1 class="product-title" th:text="${product.name}">Tên sản phẩm</h1>
+                            
+                            <!-- SKU -->
+                            <div class="product-sku" th:text="'SKU: ' + ${product.sku}">SKU: PRD123456</div>
+                            
+                            <!-- Price -->
+                            <div class="mb-3">
+                                <div th:if="${product.salePrice != null && product.salePrice > 0}">
+                                    <span class="product-sale-price" th:text="${#numbers.formatCurrency(product.salePrice)}">Sale Price</span>
+                                    <span class="product-original-price" th:text="${#numbers.formatCurrency(product.price)}">Original Price</span>
+                                </div>
+                                <div th:unless="${product.salePrice != null && product.salePrice > 0}">
+                                    <span class="product-price" th:text="${#numbers.formatCurrency(product.price)}">Price</span>
+                                </div>
+                            </div>
+                            
+                            <!-- Badges -->
+                            <div class="mb-3">
+                                <span class="product-badge badge-category" th:text="${product.category?.name ?: 'Chưa phân loại'}">Danh mục</span>
+                                <span th:if="${product.isActive}" class="product-badge badge-status">
+                                    <i class="fas fa-check me-1"></i> Hoạt động
+                                </span>
+                                <span th:unless="${product.isActive}" class="product-badge badge-status" style="background: linear-gradient(135deg, #dc3545, #c82333);">
+                                    <i class="fas fa-pause me-1"></i> Tạm dừng
+                                </span>
+                                <span th:if="${product.isFeatured}" class="product-badge badge-featured">
+                                    <i class="fas fa-star me-1"></i> Nổi bật
+                                </span>
+                            </div>
+                            
+                            <!-- Stock Status -->
+                            <div class="mb-3">
+                                <span th:class="${product.stockQuantity <= 5} ? 'stock-indicator stock-low' : (${product.stockQuantity <= 20} ? 'stock-indicator stock-medium' : 'stock-indicator stock-high')">
+                                    <i class="fas fa-box me-1"></i>
+                                    <span th:text="${product.stockQuantity}">0</span> sản phẩm trong kho
+                                </span>
+                            </div>
+                            
+                            <!-- Action Buttons -->
+                            <div class="action-buttons">
+                                <a th:href="@{/admin/products/edit/{id}(id=${product.id})}" class="btn btn-warning-modern btn-modern">
+                                    <i class="fas fa-edit"></i>
+                                    Chỉnh sửa
+                                </a>
+                                <button th:onclick="'toggleStatus(' + ${product.id} + ')'" 
+                                        class="btn btn-primary-modern btn-modern">
+                                    <i th:class="${product.isActive} ? 'fas fa-toggle-on' : 'fas fa-toggle-off'"></i>
+                                    <span th:text="${product.isActive} ? 'Tạm dừng' : 'Kích hoạt'">Toggle Status</span>
+                                </button>
+                                <button th:onclick="'confirmDelete(' + ${product.id} + ')'" 
+                                        class="btn btn-danger-modern btn-modern">
+                                    <i class="fas fa-trash"></i>
+                                    Xóa sản phẩm
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Product Details -->
+            <div class="row mt-4">
+                <div class="col-md-6">
+                    <div class="info-section">
+                        <h6><i class="fas fa-info-circle me-2"></i>Thông tin cơ bản</h6>
+                        <div class="info-item">
+                            <span class="info-label">Thương hiệu:</span>
+                            <span class="info-value" th:text="${product.brand ?: 'Chưa cập nhật'}">Brand</span>
+                        </div>
+                        <div class="info-item">
+                            <span class="info-label">Mẫu sản phẩm:</span>
+                            <span class="info-value" th:text="${product.model ?: 'Chưa cập nhật'}">Model</span>
+                        </div>
+                        <div class="info-item">
+                            <span class="info-label">Bảo hành:</span>
+                            <span class="info-value" th:text="${product.warrantyPeriod ? (product.warrantyPeriod + ' tháng') : 'Chưa cập nhật'}">Warranty</span>
+                        </div>
+                        <div class="info-item">
+                            <span class="info-label">Lượt xem:</span>
+                            <span class="info-value" th:text="${product.viewCount ?: 0}">View Count</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="col-md-6">
+                    <div class="info-section">
+                        <h6><i class="fas fa-calendar me-2"></i>Thông tin hệ thống</h6>
+                        <div class="info-item">
+                            <span class="info-label">Ngày tạo:</span>
+                            <span class="info-value" th:text="${#temporals.format(product.createdAt, 'dd/MM/yyyy HH:mm')}">Created Date</span>
+                        </div>
+                        <div class="info-item">
+                            <span class="info-label">Cập nhật lần cuối:</span>
+                            <span class="info-value" th:text="${#temporals.format(product.updatedAt, 'dd/MM/yyyy HH:mm')}">Updated Date</span>
+                        </div>
+                        <div class="info-item">
+                            <span class="info-label">ID sản phẩm:</span>
+                            <span class="info-value" th:text="'#' + ${product.id}">Product ID</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Description -->
+            <div class="row mt-4" th:if="${product.description != null && !product.description.isEmpty()}">
+                <div class="col-12">
+                    <div class="info-section">
+                        <h6><i class="fas fa-align-left me-2"></i>Mô tả sản phẩm</h6>
+                        <div class="description-text" th:text="${product.description}">Product Description</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Delete Confirmation Modal -->
+    <div class="modal fade" id="deleteModal" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">
+                        <i class="fas fa-exclamation-triangle text-warning me-2"></i>
+                        Xác nhận xóa sản phẩm
+                    </h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <p>Bạn có chắc chắn muốn xóa sản phẩm này không?</p>
+                    <p class="text-muted">Hành động này không thể hoàn tác và sẽ ảnh hưởng đến các đơn hàng liên quan.</p>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
+                    <form th:action="@{/admin/products/delete/{id}(id=${product.id})}" method="post" id="deleteForm">
+                        <button type="submit" class="btn btn-danger-modern btn-modern">
+                            <i class="fas fa-trash me-1"></i> Xóa sản phẩm
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Toggle Status Modal -->
+    <div class="modal fade" id="toggleStatusModal" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">
+                        <i class="fas fa-toggle-on text-primary me-2"></i>
+                        Thay đổi trạng thái sản phẩm
+                    </h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <p id="toggleStatusMessage">Bạn có chắc chắn muốn thay đổi trạng thái sản phẩm này không?</p>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
+                    <form th:action="@{/admin/products/toggle-status/{id}(id=${product.id})}" method="post" id="toggleStatusForm">
+                        <button type="submit" class="btn btn-primary-modern btn-modern">
+                            <i class="fas fa-toggle-on me-1"></i> Xác nhận
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        function changeMainImage(imageUrl) {
+            document.getElementById('mainImage').src = imageUrl;
+            
+            // Update active thumbnail
+            document.querySelectorAll('.product-image-thumb').forEach(thumb => {
+                thumb.classList.remove('active');
+            });
+            event.target.classList.add('active');
+        }
+        
+        function confirmDelete(productId) {
+            document.getElementById('deleteForm').action = '/admin/products/delete/' + productId;
+            new bootstrap.Modal(document.getElementById('deleteModal')).show();
+        }
+        
+        function toggleStatus(productId) {
+            document.getElementById('toggleStatusForm').action = '/admin/products/toggle-status/' + productId;
+            new bootstrap.Modal(document.getElementById('toggleStatusModal')).show();
+        }
+    </script>
+</body>
+</html>

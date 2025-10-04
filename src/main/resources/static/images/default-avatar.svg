@@ -1,0 +1,10 @@
+<!-- Default User Avatar SVG -->
+<svg width="200" height="200" xmlns="http://www.w3.org/2000/svg">
+  <rect width="200" height="200" fill="#f8f9fa"/>
+  <circle cx="100" cy="100" r="80" fill="#dee2e6"/>
+  <circle cx="100" cy="80" r="25" fill="#6c757d"/>
+  <path d="M 100 120 Q 60 140 60 180 L 140 180 Q 140 140 100 120" fill="#6c757d"/>
+  <text x="100" y="190" text-anchor="middle" font-family="Arial" font-size="10" fill="#6c757d">
+    Người dùng
+  </text>
+</svg>
