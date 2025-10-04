@@ -1,13 +1,13 @@
 <!DOCTYPE html>
 <html lang="vi" xmlns:th="http://www.thymeleaf.org"
       xmlns:sec="http://www.thymeleaf.org/extras/spring-security"
-      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout">
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{admin/layout}">
 <head>
     <title>Quản lý đơn hàng - Electronic Store Admin</title>
 </head>
 <body>
-    <div layout:decorate="~{admin/layout}">
-        <div layout:fragment="content">
+    <div layout:fragment="content">
             <!-- Page Title -->
             <div th:with="pageTitle='Quản lý đơn hàng'"></div>
             
@@ -20,7 +20,7 @@
                                 <i class="fas fa-shopping-cart"></i>
                             </div>
                             <div>
-                                <div class="stats-number">7</div>
+                                <div class="stats-number" th:text="${totalItems}">0</div>
                                 <div class="stats-label">Tổng đơn hàng</div>
                             </div>
                         </div>
@@ -33,7 +33,7 @@
                                 <i class="fas fa-clock"></i>
                             </div>
                             <div>
-                                <div class="stats-number">1</div>
+                                <div class="stats-number" th:text="${pendingOrders}">0</div>
                                 <div class="stats-label">Chờ xử lý</div>
                             </div>
                         </div>
@@ -46,7 +46,7 @@
                                 <i class="fas fa-truck"></i>
                             </div>
                             <div>
-                                <div class="stats-number">2</div>
+                                <div class="stats-number" th:text="${shippingOrders}">0</div>
                                 <div class="stats-label">Đang giao</div>
                             </div>
                         </div>
@@ -59,7 +59,7 @@
                                 <i class="fas fa-check-circle"></i>
                             </div>
                             <div>
-                                <div class="stats-number">4</div>
+                                <div class="stats-number" th:text="${deliveredOrders}">0</div>
                                 <div class="stats-label">Đã hoàn thành</div>
                             </div>
                         </div>
@@ -186,111 +186,43 @@
                                 </tr>
                             </thead>
                             <tbody>
-                                <tr>
+                                <tr th:each="order : ${orders.content}">
                                     <td>
-                                        <span class="badge bg-light text-dark">#1</span>
+                                        <span class="badge bg-light text-dark" th:text="'#' + ${order.id}">#1</span>
                                     </td>
                                     <td>
-                                        <span class="fw-semibold">#ORD001</span>
-                                    </td>
-                                    <td>
-                                        <div>
-                                            <div class="fw-semibold">Nguyễn Văn A</div>
-                                            <small class="text-muted">nguyenvana@email.com</small>
-                                        </div>
-                                    </td>
-                                    <td>
-                                        <div class="fw-semibold text-success">₫2,500,000</div>
-                                    </td>
-                                    <td>
-                                        <span class="badge bg-success badge-modern">Đã giao</span>
-                                    </td>
-                                    <td>
-                                        <small>25/12/2024 14:30</small>
-                                    </td>
-                                    <td>
-                                        <div class="action-buttons">
-                                            <a href="/admin/orders/view/1" class="btn btn-outline-info btn-sm" title="Xem chi tiết">
-                                                <i class="fas fa-eye"></i>
-                                            </a>
-                                            <a href="/admin/orders/edit/1" class="btn btn-outline-warning btn-sm" title="Chỉnh sửa">
-                                                <i class="fas fa-edit"></i>
-                                            </a>
-                                            <button class="btn btn-outline-primary btn-sm" title="In hóa đơn">
-                                                <i class="fas fa-print"></i>
-                                            </button>
-                                        </div>
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <td>
-                                        <span class="badge bg-light text-dark">#2</span>
-                                    </td>
-                                    <td>
-                                        <span class="fw-semibold">#ORD002</span>
+                                        <span class="fw-semibold" th:text="${order.orderNumber}">#ORD001</span>
                                     </td>
                                     <td>
                                         <div>
-                                            <div class="fw-semibold">Trần Thị B</div>
-                                            <small class="text-muted">tranthib@email.com</small>
+                                            <div class="fw-semibold" th:text="${order.user.fullName}">Nguyễn Văn A</div>
+                                            <small class="text-muted" th:text="${order.user.email}">nguyenvana@email.com</small>
                                         </div>
                                     </td>
                                     <td>
-                                        <div class="fw-semibold text-success">₫1,800,000</div>
+                                        <div class="fw-semibold text-success" th:text="${#numbers.formatDecimal(order.totalAmount, 0, 'COMMA', 0, 'POINT')} + ' ₫'">₫2,500,000</div>
                                     </td>
                                     <td>
-                                        <span class="badge bg-warning badge-modern">Đang xử lý</span>
+                                        <span th:class="'badge badge-modern ' + ${order.status == 'PENDING' ? 'bg-warning' : (order.status == 'CONFIRMED' ? 'bg-info' : (order.status == 'SHIPPING' ? 'bg-primary' : (order.status == 'DELIVERED' ? 'bg-success' : 'bg-danger')))}" 
+                                              th:text="${order.status == 'PENDING' ? 'Chờ xử lý' : (order.status == 'CONFIRMED' ? 'Đã xác nhận' : (order.status == 'SHIPPING' ? 'Đang giao' : (order.status == 'DELIVERED' ? 'Đã giao' : 'Đã hủy')))}">Đã giao</span>
                                     </td>
                                     <td>
-                                        <small>24/12/2024 10:15</small>
+                                        <small th:text="${#temporals.format(order.createdAt, 'dd/MM/yyyy HH:mm')}">25/12/2024 14:30</small>
                                     </td>
                                     <td>
                                         <div class="action-buttons">
-                                            <a href="/admin/orders/view/2" class="btn btn-outline-info btn-sm" title="Xem chi tiết">
+                                            <a th:href="@{/admin/orders/view/{id}(id=${order.id})}" class="btn btn-outline-info btn-sm" title="Xem chi tiết">
                                                 <i class="fas fa-eye"></i>
                                             </a>
-                                            <a href="/admin/orders/edit/2" class="btn btn-outline-warning btn-sm" title="Chỉnh sửa">
-                                                <i class="fas fa-edit"></i>
-                                            </a>
-                                            <button class="btn btn-outline-primary btn-sm" title="In hóa đơn">
+                                            <a th:href="@{/admin/orders/print/{id}(id=${order.id})}" class="btn btn-outline-primary btn-sm" title="In hóa đơn">
                                                 <i class="fas fa-print"></i>
-                                            </button>
-                                        </div>
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <td>
-                                        <span class="badge bg-light text-dark">#3</span>
-                                    </td>
-                                    <td>
-                                        <span class="fw-semibold">#ORD003</span>
-                                    </td>
-                                    <td>
-                                        <div>
-                                            <div class="fw-semibold">Lê Văn C</div>
-                                            <small class="text-muted">levanc@email.com</small>
-                                        </div>
-                                    </td>
-                                    <td>
-                                        <div class="fw-semibold text-success">₫3,200,000</div>
-                                    </td>
-                                    <td>
-                                        <span class="badge bg-info badge-modern">Đang giao</span>
-                                    </td>
-                                    <td>
-                                        <small>23/12/2024 16:45</small>
-                                    </td>
-                                    <td>
-                                        <div class="action-buttons">
-                                            <a href="/admin/orders/view/3" class="btn btn-outline-info btn-sm" title="Xem chi tiết">
-                                                <i class="fas fa-eye"></i>
                                             </a>
-                                            <a href="/admin/orders/edit/3" class="btn btn-outline-warning btn-sm" title="Chỉnh sửa">
-                                                <i class="fas fa-edit"></i>
-                                            </a>
-                                            <button class="btn btn-outline-primary btn-sm" title="In hóa đơn">
-                                                <i class="fas fa-print"></i>
-                                            </button>
+                                            <form th:action="@{/admin/orders/delete/{id}(id=${order.id})}" method="post" style="display: inline;">
+                                                <button type="submit" class="btn btn-outline-danger btn-sm" title="Xóa" 
+                                                        onclick="return confirm('Bạn có chắc chắn muốn xóa đơn hàng này không?');">
+                                                    <i class="fas fa-trash"></i>
+                                                </button>
+                                            </form>
                                         </div>
                                     </td>
                                 </tr>

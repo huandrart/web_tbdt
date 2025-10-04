@@ -180,4 +180,12 @@ public class OrderService {
         // For now, just return all orders - can be enhanced with specific search logic
         return orderRepository.findAll(pageable);
     }
+    
+    public long count() {
+        return orderRepository.count();
+    }
+    
+    public long countByStatus(Order.OrderStatus status) {
+        return orderRepository.countOrdersByStatus(status);
+    }
 }

@@ -81,6 +81,17 @@ public class AdminOrderController {
         model.addAttribute("dateFrom", dateFrom);
         model.addAttribute("dateTo", dateTo);
         
+        // Thống kê
+        long totalOrders = orderService.count();
+        long pendingOrders = orderService.countByStatus(Order.OrderStatus.PENDING);
+        long shippingOrders = orderService.countByStatus(Order.OrderStatus.SHIPPING);
+        long deliveredOrders = orderService.countByStatus(Order.OrderStatus.DELIVERED);
+        
+        model.addAttribute("totalOrders", totalOrders);
+        model.addAttribute("pendingOrders", pendingOrders);
+        model.addAttribute("shippingOrders", shippingOrders);
+        model.addAttribute("deliveredOrders", deliveredOrders);
+        
         return "admin/orders/list";
     }
     
@@ -131,7 +142,7 @@ public class AdminOrderController {
         return "redirect:/admin/orders/view/" + id;
     }
     
-    @GetMapping("/delete/{id}")
+    @PostMapping("/delete/{id}")
     public String deleteOrder(@PathVariable Long id, RedirectAttributes redirectAttributes) {
         try {
             Order order = orderService.findByIdDirect(id);
