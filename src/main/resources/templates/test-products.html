@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Test Products</title>
+    <meta charset="UTF-8">
+</head>
+<body>
+    <h1>Test Products Database</h1>
+    
+    <div th:if="${error}">
+        <h2 style="color: red;">Error: <span th:text="${error}"></span></h2>
+    </div>
+    
+    <div th:unless="${error}">
+        <h2>Database Status:</h2>
+        <p>Total Products: <span th:text="${productCount}">0</span></p>
+        <p>Total Categories: <span th:text="${categoryCount}">0</span></p>
+        
+        <h3>Categories:</h3>
+        <ul>
+            <li th:each="category : ${categories}" th:text="${category.name}">Category Name</li>
+        </ul>
+        
+        <h3>Products:</h3>
+        <ul>
+            <li th:each="product : ${products}" th:text="${product.name} + ' - ' + ${product.price}">Product Name - Price</li>
+        </ul>
+    </div>
+</body>
+</html>

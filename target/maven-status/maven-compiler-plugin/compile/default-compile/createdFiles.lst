@@ -1,10 +1,8 @@
 com\electronicstore\entity\User.class
-com\electronicstore\viewmodel\ProductFormViewModel.class
 com\electronicstore\service\FileStorageService.class
 com\electronicstore\controller\AdminCategoryController.class
 com\electronicstore\repository\CategoryRepository.class
 com\electronicstore\viewmodel\CategoryListViewModel.class
-com\electronicstore\mapper\ProductMapper.class
 com\electronicstore\controller\AuthController.class
 com\electronicstore\service\impl\CategoryBusinessServiceImpl.class
 com\electronicstore\entity\Order$OrderStatus.class
@@ -15,7 +13,6 @@ com\electronicstore\dto\CartItem.class
 com\electronicstore\config\PasswordEncoderConfig.class
 com\electronicstore\ElectronicStoreApplication.class
 com\electronicstore\mapper\CategoryMapper.class
-com\electronicstore\controller\AdminProductController.class
 com\electronicstore\controller\HomeController.class
 com\electronicstore\config\SecurityConfig.class
 com\electronicstore\service\CategoryBusinessService.class
@@ -43,8 +40,6 @@ com\electronicstore\util\FileUtil.class
 com\electronicstore\service\UserService.class
 com\electronicstore\controller\CartController.class
 com\electronicstore\controller\ProfileController.class
-com\electronicstore\dto\request\ProductRequest.class
-com\electronicstore\service\business\ProductBusinessService.class
 com\electronicstore\controller\CheckoutController.class
 com\electronicstore\service\ReviewService.class
 com\electronicstore\viewmodel\CategoryFormViewModel.class

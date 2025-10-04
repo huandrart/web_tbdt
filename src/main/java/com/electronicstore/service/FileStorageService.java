@@ -29,6 +29,10 @@ public class FileStorageService {
         return saveImage(file, userUploadDir);
     }
 
+    public String storeFile(MultipartFile file) {
+        return saveImage(file, productUploadDir);
+    }
+
     private String saveImage(MultipartFile file, String targetDir) {
         if (file.isEmpty()) {
             return null;
@@ -73,5 +77,17 @@ public class FileStorageService {
             // Log error but don't throw exception
             System.err.println("Failed to delete file: " + fileName);
         }
+    }
+
+    public String getFileUrl(String fileName) {
+        if (fileName == null || fileName.isEmpty()) {
+            return null;
+        }
+        // If already a full URL, return as is
+        if (fileName.startsWith("http") || fileName.startsWith("/")) {
+            return fileName;
+        }
+        // Otherwise, prepend with uploads directory
+        return "/uploads/products/" + fileName;
     }
 }

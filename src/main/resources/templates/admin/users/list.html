@@ -389,15 +389,15 @@
                                         <td>
                                             <div class="d-flex align-items-center">
                                                 <div class="user-avatar me-3">
-                                                    <span th:text="${#strings.substring(user.firstName, 0, 1).toUpperCase()}"></span>
+                                                    <span th:text="${#strings.substring(user.fullName, 0, 1).toUpperCase()}"></span>
                                                 </div>
                                                 <div>
-                                                    <strong th:text="${user.firstName + ' ' + user.lastName}"></strong>
+                                                    <strong th:text="${user.fullName}"></strong>
                                                     <br>
                                                     <small class="text-muted" th:text="${user.email}"></small>
                                                     <br>
-                                                    <small class="text-muted" th:if="${user.phoneNumber != null}" 
-                                                           th:text="${user.phoneNumber}"></small>
+                                                    <small class="text-muted" th:if="${user.phone != null}" 
+                                                           th:text="${user.phone}"></small>
                                                 </div>
                                             </div>
                                         </td>
@@ -415,7 +415,7 @@
                                         </td>
                                         <td>
                                             <div class="text-center">
-                                                <strong th:text="${user.orders != null ? user.orders.size() : 0}">0</strong>
+                                                <strong>0</strong>
                                                 <br>
                                                 <small class="text-muted">đơn hàng</small>
                                             </div>

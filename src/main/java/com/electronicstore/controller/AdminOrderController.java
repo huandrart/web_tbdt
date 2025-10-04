@@ -34,7 +34,7 @@ public class AdminOrderController {
     public String listOrders(
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int size,
-            @RequestParam(defaultValue = "orderDate") String sort,
+            @RequestParam(defaultValue = "createdAt") String sort,
             @RequestParam(defaultValue = "desc") String direction,
             @RequestParam(required = false) String status,
             @RequestParam(required = false) String search,

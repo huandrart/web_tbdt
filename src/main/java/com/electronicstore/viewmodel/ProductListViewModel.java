@@ -33,6 +33,11 @@ public class ProductListViewModel {
     private List<String> stockStatuses;
     private List<Category> categories;
     
+    // Statistics
+    private long activeItems;
+    private long featuredItems;
+    private long lowStockItems;
+    
     // Constructors
     public ProductListViewModel() {}
     
@@ -182,5 +187,29 @@ public class ProductListViewModel {
     
     public void setCategories(List<Category> categories) {
         this.categories = categories;
+    }
+    
+    public long getActiveItems() {
+        return activeItems;
+    }
+    
+    public void setActiveItems(long activeItems) {
+        this.activeItems = activeItems;
+    }
+    
+    public long getFeaturedItems() {
+        return featuredItems;
+    }
+    
+    public void setFeaturedItems(long featuredItems) {
+        this.featuredItems = featuredItems;
+    }
+    
+    public long getLowStockItems() {
+        return lowStockItems;
+    }
+    
+    public void setLowStockItems(long lowStockItems) {
+        this.lowStockItems = lowStockItems;
     }
 }

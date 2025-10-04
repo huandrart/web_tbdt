@@ -569,35 +569,35 @@
             
             <nav class="sidebar-nav">
                 <div class="nav-item">
-                    <a href="/admin" class="nav-link" th:classappend="${#httpServletRequest.requestURI == '/admin'} ? 'active' : ''">
+                    <a href="/admin" class="nav-link" th:classappend="${#httpServletRequest != null and #httpServletRequest.requestURI == '/admin'} ? 'active' : ''">
                         <i class="fas fa-tachometer-alt"></i>
                         Dashboard
                     </a>
                 </div>
                 
                 <div class="nav-item">
-                    <a href="/admin/categories" class="nav-link" th:classappend="${#strings.contains(#httpServletRequest.requestURI, '/admin/categories')} ? 'active' : ''">
+                    <a href="/admin/categories" class="nav-link" th:classappend="${#httpServletRequest != null and #strings.contains(#httpServletRequest.requestURI, '/admin/categories')} ? 'active' : ''">
                         <i class="fas fa-list"></i>
                         Danh mục
                     </a>
                 </div>
                 
                 <div class="nav-item">
-                    <a href="/admin/products" class="nav-link" th:classappend="${#strings.contains(#httpServletRequest.requestURI, '/admin/products')} ? 'active' : ''">
+                    <a href="/admin/products" class="nav-link" th:classappend="${#httpServletRequest != null and #strings.contains(#httpServletRequest.requestURI, '/admin/products')} ? 'active' : ''">
                         <i class="fas fa-box"></i>
                         Sản phẩm
                     </a>
                 </div>
                 
                 <div class="nav-item">
-                    <a href="/admin/orders" class="nav-link" th:classappend="${#strings.contains(#httpServletRequest.requestURI, '/admin/orders')} ? 'active' : ''">
+                    <a href="/admin/orders" class="nav-link" th:classappend="${#httpServletRequest != null and #strings.contains(#httpServletRequest.requestURI, '/admin/orders')} ? 'active' : ''">
                         <i class="fas fa-shopping-cart"></i>
                         Đơn hàng
                     </a>
                 </div>
                 
                 <div class="nav-item">
-                    <a href="/admin/users" class="nav-link" th:classappend="${#strings.contains(#httpServletRequest.requestURI, '/admin/users')} ? 'active' : ''">
+                    <a href="/admin/users" class="nav-link" th:classappend="${#httpServletRequest != null and #strings.contains(#httpServletRequest.requestURI, '/admin/users')} ? 'active' : ''">
                         <i class="fas fa-users"></i>
                         Người dùng
                     </a>

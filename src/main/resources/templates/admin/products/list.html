@@ -1,907 +1,282 @@
 <!DOCTYPE html>
-<html lang="vi" xmlns:th="http://www.thymeleaf.org"
-      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<html lang="vi" xmlns:th="http://www.thymeleaf.org" 
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{admin/layout}">
 <head>
-    <title>Quản lý sản phẩm - Electronic Store Admin</title>
-    
-    <!-- Bootstrap CSS -->
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    <!-- Font Awesome -->
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
-    
-    <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-        
-        body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background-color: #f8f9fa;
-            line-height: 1.6;
-            margin: 0;
-            padding: 0;
-            overflow-x: hidden;
-        }
-        
-        .admin-container {
-            display: flex;
-            min-height: 100vh;
-            position: relative;
-        }
-        
-        /* Sidebar */
-        .sidebar {
-            width: 250px;
-            background: linear-gradient(180deg, #667eea 0%, #764ba2 100%);
-            color: white;
-            position: fixed;
-            height: 100vh;
-            overflow-y: auto;
-            z-index: 1050;
-            transition: all 0.3s ease;
-            left: 0;
-            top: 0;
-            box-shadow: 2px 0 10px rgba(0,0,0,0.1);
-            display: block !important;
-        }
-        
-        .sidebar-header {
-            padding: 2rem 1.5rem 1.5rem 1.5rem;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-        }
-        
-        .sidebar-header h4 {
-            margin: 0;
-            font-weight: 700;
-            display: flex;
-            align-items: center;
-            gap: 0.75rem;
-            font-size: 1.25rem;
-            color: white;
-            letter-spacing: 0.5px;
-        }
-        
-        .sidebar-header i {
-            font-size: 1.5rem;
-            color: white;
-        }
-        
-        .sidebar-nav {
-            padding: 0.5rem 0;
-        }
-        
-        .nav-item {
-            margin: 0;
-        }
-        
-        .nav-link {
-            display: flex;
-            align-items: center;
-            gap: 1rem;
-            padding: 0.875rem 1.5rem;
-            color: white !important;
-            text-decoration: none;
-            transition: all 0.3s ease;
-            border-radius: 0;
-            position: relative;
-            font-weight: 500;
-            font-size: 0.95rem;
-            margin: 0.125rem 0;
-            letter-spacing: 0.3px;
-        }
-        
-        .nav-link:hover {
-            background-color: rgba(255, 255, 255, 0.1);
-            color: white !important;
-        }
-        
-        .nav-link.active {
-            background-color: rgba(255, 255, 255, 0.15);
-            color: white !important;
-            border-radius: 8px;
-            margin: 0.125rem 1rem;
-            width: calc(100% - 2rem);
-            position: relative;
-            font-weight: 600;
-        }
-        
-        .nav-link.active::before {
-            content: '';
-            position: absolute;
-            left: 0;
-            top: 0;
-            bottom: 0;
-            width: 4px;
-            background: white;
-            border-radius: 0 4px 4px 0;
-            opacity: 0.8;
-        }
-        
-        .nav-link i {
-            width: 24px;
-            text-align: center;
-            font-size: 1.1rem;
-            color: white;
-            opacity: 0.9;
-            transition: opacity 0.3s ease;
-        }
-        
-        .nav-link:hover i {
-            opacity: 1;
-        }
-        
-        .nav-link.active i {
-            opacity: 1;
-            color: white;
-        }
-        
-        /* Main Content */
-        .main-content {
-            flex: 1;
-            margin-left: 250px;
-            background-color: #f8f9fa;
-            min-height: 100vh;
-            width: calc(100% - 250px);
-        }
-        
-        .main-header {
-            background: white;
-            padding: 1rem 2rem;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-        
-        .header-left {
-            display: flex;
-            align-items: center;
-            gap: 1rem;
-        }
-        
-        .sidebar-toggle {
-            background: none;
-            border: none;
-            font-size: 1.2rem;
-            color: #6c757d;
-            cursor: pointer;
-            padding: 0.5rem;
-            border-radius: 4px;
-            transition: background-color 0.3s ease;
-        }
-        
-        .sidebar-toggle:hover {
-            background-color: #f8f9fa;
-        }
-        
-        .header-left h2 {
-            margin: 0;
-            color: #2c3e50;
-            font-size: 1.5rem;
-            font-weight: 600;
-        }
-        
-        .header-right {
-            display: flex;
-            align-items: center;
-        }
-        
-        .user-info {
-            display: flex;
-            align-items: center;
-            gap: 0.75rem;
-        }
-        
-        .user-avatar {
-            width: 40px;
-            height: 40px;
-            border-radius: 50%;
-            background: linear-gradient(135deg, #667eea, #764ba2);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: white;
-            font-size: 1.1rem;
-        }
-        
-        .user-details {
-            display: flex;
-            flex-direction: column;
-        }
-        
-        .user-name {
-            font-weight: 600;
-            color: #2c3e50;
-            font-size: 0.9rem;
-        }
-        
-        .user-role {
-            font-size: 0.8rem;
-            color: #6c757d;
-        }
-        
-        .page-content {
-            padding: 2rem;
-        }
-        
-        /* Products Specific Styles */
-        .page-header {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
-            padding: 2rem 0;
-            margin-bottom: 2rem;
-            border-radius: 0 0 20px 20px;
-        }
-        
-        .page-title {
-            font-size: 2.5rem;
-            font-weight: 700;
-            margin-bottom: 0.5rem;
-        }
-        
-        .page-subtitle {
-            font-size: 1.1rem;
-            opacity: 0.9;
-        }
-        
-        .stats-card {
-            background: white;
-            border-radius: 15px;
-            padding: 1.5rem;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
-            transition: transform 0.3s ease, box-shadow 0.3s ease;
-            border: none;
-            height: 100%;
-        }
-        
-        .stats-card:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 8px 25px rgba(0,0,0,0.15);
-        }
-        
-        .stats-icon {
-            width: 60px;
-            height: 60px;
-            border-radius: 15px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 1.5rem;
-            color: white;
-            margin-bottom: 1rem;
-        }
-        
-        .stats-icon.primary { background: linear-gradient(135deg, #667eea, #764ba2); }
-        .stats-icon.success { background: linear-gradient(135deg, #4facfe, #00f2fe); }
-        .stats-icon.warning { background: linear-gradient(135deg, #43e97b, #38f9d7); }
-        .stats-icon.danger { background: linear-gradient(135deg, #fa709a, #fee140); }
-        
-        .stats-number {
-            font-size: 2rem;
-            font-weight: 700;
-            color: #2c3e50;
-            margin-bottom: 0.5rem;
-        }
-        
-        .stats-label {
-            font-size: 0.9rem;
-            color: #6c757d;
-            font-weight: 600;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-        }
-        
-        .action-buttons {
-            display: flex;
-            gap: 1rem;
-            margin-bottom: 2rem;
-        }
-        
-        .btn-primary {
-            background: linear-gradient(135deg, #667eea, #764ba2);
-            border: none;
-            padding: 0.75rem 1.5rem;
-            border-radius: 10px;
-            font-weight: 600;
-            transition: all 0.3s ease;
-        }
-        
-        .btn-primary:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
-        }
-        
-        .btn-outline-primary {
-            border: 2px solid #667eea;
-            color: #667eea;
-            padding: 0.75rem 1.5rem;
-            border-radius: 10px;
-            font-weight: 600;
-            transition: all 0.3s ease;
-        }
-        
-        .btn-outline-primary:hover {
-            background: #667eea;
-            color: white;
-            transform: translateY(-2px);
-        }
-        
-        .filter-section {
-            background: white;
-            border-radius: 15px;
-            padding: 1.5rem;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
-            margin-bottom: 2rem;
-        }
-        
-        .filter-title {
-            font-size: 1.2rem;
-            font-weight: 600;
-            color: #2c3e50;
-            margin-bottom: 1rem;
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
-        }
-        
-        .filter-title i {
-            color: #667eea;
-        }
-        
-        .form-control, .form-select {
-            border: 2px solid #e9ecef;
-            border-radius: 10px;
-            padding: 0.75rem 1rem;
-            transition: all 0.3s ease;
-        }
-        
-        .form-control:focus, .form-select:focus {
-            border-color: #667eea;
-            box-shadow: 0 0 0 0.2rem rgba(102, 126, 234, 0.25);
-        }
-        
-        .products-table {
-            background: white;
-            border-radius: 15px;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
-            overflow: hidden;
-        }
-        
-        .table {
-            margin: 0;
-        }
-        
-        .table thead th {
-            background: linear-gradient(135deg, #667eea, #764ba2);
-            color: white;
-            border: none;
-            padding: 1rem;
-            font-weight: 600;
-            text-transform: uppercase;
-            font-size: 0.85rem;
-            letter-spacing: 0.5px;
-        }
-        
-        .table tbody td {
-            padding: 1rem;
-            vertical-align: middle;
-            border-color: #f8f9fa;
-        }
-        
-        .table tbody tr:hover {
-            background-color: #f8f9fa;
-        }
-        
-        .product-image {
-            width: 60px;
-            height: 60px;
-            object-fit: cover;
-            border-radius: 10px;
-            border: 2px solid #e9ecef;
-        }
-        
-        .product-name {
-            font-weight: 600;
-            color: #2c3e50;
-            margin-bottom: 0.25rem;
-        }
-        
-        .product-category {
-            font-size: 0.85rem;
-            color: #6c757d;
-        }
-        
-        .price {
-            font-weight: 700;
-            color: #28a745;
-            font-size: 1.1rem;
-        }
-        
-        .sale-price {
-            color: #dc3545;
-            text-decoration: line-through;
-            font-size: 0.9rem;
-            margin-right: 0.5rem;
-        }
-        
-        .stock-badge {
-            padding: 0.25rem 0.75rem;
-            border-radius: 20px;
-            font-size: 0.8rem;
-            font-weight: 600;
-            text-transform: uppercase;
-        }
-        
-        .stock-in {
-            background: #d4edda;
-            color: #155724;
-        }
-        
-        .stock-low {
-            background: #fff3cd;
-            color: #856404;
-        }
-        
-        .stock-out {
-            background: #f8d7da;
-            color: #721c24;
-        }
-        
-        .status-badge {
-            padding: 0.25rem 0.75rem;
-            border-radius: 20px;
-            font-size: 0.8rem;
-            font-weight: 600;
-            text-transform: uppercase;
-        }
-        
-        .status-active {
-            background: #d4edda;
-            color: #155724;
-        }
-        
-        .status-inactive {
-            background: #f8d7da;
-            color: #721c24;
-        }
-        
-        .action-buttons-small {
-            display: flex;
-            gap: 0.5rem;
-        }
-        
-        .btn-sm {
-            padding: 0.375rem 0.75rem;
-            font-size: 0.8rem;
-            border-radius: 6px;
-        }
-        
-        .btn-success {
-            background: linear-gradient(135deg, #4facfe, #00f2fe);
-            border: none;
-        }
-        
-        .btn-warning {
-            background: linear-gradient(135deg, #43e97b, #38f9d7);
-            border: none;
-            color: white;
-        }
-        
-        .btn-danger {
-            background: linear-gradient(135deg, #fa709a, #fee140);
-            border: none;
-        }
-        
-        .btn-info {
-            background: linear-gradient(135deg, #667eea, #764ba2);
-            border: none;
-        }
-        
-        .empty-state {
-            text-align: center;
-            padding: 3rem;
-            color: #6c757d;
-        }
-        
-        .empty-state i {
-            font-size: 4rem;
-            color: #dee2e6;
-            margin-bottom: 1rem;
-        }
-        
-        .empty-state h4 {
-            color: #6c757d;
-            margin-bottom: 0.5rem;
-        }
-        
-        .pagination {
-            justify-content: center;
-            margin-top: 2rem;
-        }
-        
-        .page-link {
-            border: none;
-            color: #667eea;
-            padding: 0.75rem 1rem;
-            margin: 0 0.25rem;
-            border-radius: 10px;
-            transition: all 0.3s ease;
-        }
-        
-        .page-link:hover {
-            background: #667eea;
-            color: white;
-        }
-        
-        .page-item.active .page-link {
-            background: linear-gradient(135deg, #667eea, #764ba2);
-            color: white;
-        }
-        
-        /* Responsive */
-        @media (max-width: 768px) {
-            .sidebar {
-                transform: translateX(0);
-                width: 250px;
-            }
-            
-            .main-content {
-                margin-left: 0;
-                width: 100%;
-            }
-            
-            .action-buttons {
-                flex-direction: column;
-            }
-            
-            .table-responsive {
-                font-size: 0.85rem;
-            }
-        }
-    </style>
+    <title>Quản lý sản phẩm - Admin</title>
 </head>
-
 <body>
-    <div class="admin-container">
-        <!-- Sidebar -->
-        <div class="sidebar">
-            <div class="sidebar-header">
-                <h4>
-                    <i class="fas fa-laptop"></i>
-                    Admin Panel
-                </h4>
-            </div>
-            
-            <nav class="sidebar-nav">
-                <div class="nav-item">
-                    <a href="/admin" class="nav-link">
-                        <i class="fas fa-tachometer-alt"></i>
-                        Dashboard
-                    </a>
-                </div>
-                
-                <div class="nav-item">
-                    <a href="/admin/categories" class="nav-link">
-                        <i class="fas fa-list"></i>
-                        Danh mục
-                    </a>
-                </div>
-                
-                <div class="nav-item">
-                    <a href="/admin/products" class="nav-link active">
-                        <i class="fas fa-box"></i>
-                        Sản phẩm
-                    </a>
-                </div>
-                
-                <div class="nav-item">
-                    <a href="/admin/orders" class="nav-link">
-                        <i class="fas fa-shopping-cart"></i>
-                        Đơn hàng
-                    </a>
-                </div>
-                
-                <div class="nav-item">
-                    <a href="/admin/users" class="nav-link">
-                        <i class="fas fa-users"></i>
-                        Người dùng
-                    </a>
-                </div>
-                
-                <div class="nav-item">
-                    <a href="/" class="nav-link">
-                        <i class="fas fa-home"></i>
-                        Về trang chủ
-                    </a>
-                </div>
-                
-                <div class="nav-item">
-                    <a href="/logout" class="nav-link">
-                        <i class="fas fa-sign-out-alt"></i>
-                        Đăng xuất
-                    </a>
-                </div>
-            </nav>
+    <div layout:fragment="content">
+        <!-- Debug Information -->
+        <div class="alert alert-info" th:if="${debug}">
+            <h4>Debug Information:</h4>
+            <p>Total Products: <span th:text="${totalItems}">0</span></p>
+            <p>Current Page: <span th:text="${currentPage}">0</span></p>
+            <p>Total Pages: <span th:text="${totalPages}">0</span></p>
+            <p>Categories Count: <span th:text="${categories != null ? categories.size() : 0}">0</span></p>
         </div>
         
-        <!-- Main Content -->
-        <div class="main-content">
-            <!-- Header -->
-            <div class="main-header">
-                <div class="header-left">
-                    <button class="sidebar-toggle d-md-none" onclick="toggleSidebar()">
-                        <i class="fas fa-bars"></i>
-                    </button>
-                    <h2>Quản lý sản phẩm</h2>
-                </div>
-                
-                <div class="header-right">
-                    <div class="user-info">
-                        <div class="user-avatar">
-                            <i class="fas fa-user"></i>
-                        </div>
-                        <div class="user-details">
-                            <div class="user-name" sec:authentication="name">Admin</div>
-                            <div class="user-role">Quản trị viên</div>
-                        </div>
+        <!-- Error Message -->
+        <div class="alert alert-danger" th:if="${error}">
+            <h4>Lỗi:</h4>
+            <p th:text="${error}">Error message</p>
+        </div>
+        
+        <!-- Success Message -->
+        <div class="alert alert-success" th:if="${message}">
+            <h4>Thông báo:</h4>
+            <p th:text="${message}">Success message</p>
+        </div>
+        
+        <!-- Page Header -->
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <div>
+                <h2 class="mb-1">Quản lý sản phẩm</h2>
+                <p class="text-muted mb-0">Tổng cộng <span th:text="${totalItems}">0</span> sản phẩm</p>
+            </div>
+            <a th:href="@{/admin/products/new}" class="btn btn-primary-modern">
+                <i class="fas fa-plus"></i>
+                Thêm sản phẩm mới
+            </a>
+        </div>
+        
+        <!-- Statistics Cards -->
+        <div class="row mb-4">
+            <div class="col-md-3">
+                <div class="stats-card">
+                    <div class="stats-icon primary">
+                        <i class="fas fa-box"></i>
                     </div>
+                    <div class="stats-number" th:text="${activeItems}">0</div>
+                    <div class="stats-label">Sản phẩm hoạt động</div>
                 </div>
             </div>
-            
-            <!-- Page Content -->
-            <div class="page-content">
-                <!-- Page Header -->
-                <div class="page-header">
-                    <div class="container-fluid">
-                        <div class="row align-items-center">
-                            <div class="col-md-8">
-                                <h1 class="page-title">Quản lý sản phẩm</h1>
-                                <p class="page-subtitle">Quản lý danh sách sản phẩm trong cửa hàng</p>
+            <div class="col-md-3">
+                <div class="stats-card">
+                    <div class="stats-icon success">
+                        <i class="fas fa-star"></i>
+                    </div>
+                    <div class="stats-number" th:text="${featuredItems}">0</div>
+                    <div class="stats-label">Sản phẩm nổi bật</div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="stats-card">
+                    <div class="stats-icon warning">
+                        <i class="fas fa-exclamation-triangle"></i>
+                    </div>
+                    <div class="stats-number" th:text="${lowStockItems}">0</div>
+                    <div class="stats-label">Sắp hết hàng</div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="stats-card">
+                    <div class="stats-icon info">
+                        <i class="fas fa-list"></i>
+                    </div>
+                    <div class="stats-number" th:text="${categories != null ? categories.size() : 0}">0</div>
+                    <div class="stats-label">Danh mục</div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Filters -->
+        <div class="card-modern mb-4">
+            <div class="card-header-modern">
+                <h5 class="mb-0">
+                    <i class="fas fa-filter"></i>
+                    Bộ lọc
+                </h5>
+            </div>
+            <div class="card-body">
+                <form method="get" action="/admin/products" class="row g-3">
+                    <div class="col-md-3">
+                        <label for="search" class="form-label">Tìm kiếm</label>
+                        <input type="text" class="form-control-modern" id="search" name="search" 
+                               th:value="${search}" placeholder="Tên sản phẩm, mô tả...">
+                    </div>
+                    <div class="col-md-2">
+                        <label for="category" class="form-label">Danh mục</label>
+                        <select class="form-select-modern" id="category" name="categoryId">
+                            <option value="">Tất cả danh mục</option>
+                            <option th:each="category : ${categories}" 
+                                    th:value="${category.id}" 
+                                    th:text="${category.name}"
+                                    th:selected="${categoryId == category.id}">Danh mục</option>
+                        </select>
+                    </div>
+                    <div class="col-md-2">
+                        <label for="status" class="form-label">Trạng thái</label>
+                        <select class="form-select-modern" id="status" name="status">
+                            <option value="">Tất cả trạng thái</option>
+                            <option value="active" th:selected="${status == 'active'}">Hoạt động</option>
+                            <option value="inactive" th:selected="${status == 'inactive'}">Không hoạt động</option>
+                        </select>
+                    </div>
+                    <div class="col-md-2">
+                        <label for="sort" class="form-label">Sắp xếp</label>
+                        <select class="form-select-modern" id="sort" name="sortBy">
+                            <option value="id" th:selected="${sortBy == 'id'}">ID</option>
+                            <option value="name" th:selected="${sortBy == 'name'}">Tên</option>
+                            <option value="price" th:selected="${sortBy == 'price'}">Giá</option>
+                        </select>
+                    </div>
+                    <div class="col-md-2">
+                        <label for="direction" class="form-label">Thứ tự</label>
+                        <select class="form-select-modern" id="direction" name="sortDir">
+                            <option value="asc" th:selected="${sortDir == 'asc'}">Tăng dần</option>
+                            <option value="desc" th:selected="${sortDir == 'desc'}">Giảm dần</option>
+                        </select>
+                    </div>
+                    <div class="col-md-1">
+                        <label class="form-label">&nbsp;</label>
+                        <button type="submit" class="btn btn-primary-modern w-100">
+                            <i class="fas fa-search"></i>
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+        
+        <!-- Products Table -->
+        <div class="card-modern">
+            <div class="card-header-modern">
+                <h5 class="mb-0">
+                    <i class="fas fa-list"></i>
+                    Danh sách sản phẩm
+                </h5>
+            </div>
+            <div class="card-body p-0">
+                <div th:if="${products != null and !products.empty}">
+                    <div class="table-responsive">
+                        <table class="table table-modern mb-0">
+                            <thead>
+                                <tr>
+                                    <th class="sortable-header">
+                                        ID
+                                        <i class="fas fa-sort sort-icon" th:classappend="${sortBy == 'id'} ? 'active' : ''"></i>
+                                    </th>
+                                    <th>Hình ảnh</th>
+                                    <th class="sortable-header">
+                                        Tên sản phẩm
+                                        <i class="fas fa-sort sort-icon" th:classappend="${sortBy == 'name'} ? 'active' : ''"></i>
+                                    </th>
+                                    <th>Mô tả</th>
+                                    <th class="sortable-header">
+                                        Giá
+                                        <i class="fas fa-sort sort-icon" th:classappend="${sortBy == 'price'} ? 'active' : ''"></i>
+                                    </th>
+                                    <th>Tồn kho</th>
+                                    <th>Danh mục</th>
+                                    <th class="sortable-header">
+                                        Trạng thái
+                                        <i class="fas fa-sort sort-icon"></i>
+                                    </th>
+                                    <th class="sortable-header">
+                                        Ngày tạo
+                                        <i class="fas fa-sort sort-icon" th:classappend="${sortBy == 'createdAt'} ? 'active' : ''"></i>
+                                    </th>
+                                    <th>Thao tác</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr th:each="product : ${products.content}">
+                                    <td th:text="${product.id}">1</td>
+                                    <td>
+                                        <img th:if="${product.imageUrl != null}" 
+                                             th:src="${product.imageUrl}" 
+                                             class="product-image" 
+                                             alt="Product Image">
+                                        <div th:unless="${product.imageUrl != null}" 
+                                             class="product-image bg-light d-flex align-items-center justify-content-center">
+                                            <i class="fas fa-image text-muted"></i>
+                                        </div>
+                                    </td>
+                                    <td>
+                                        <div class="product-name" th:text="${product.name}">Tên sản phẩm</div>
+                                        <div class="product-brand" th:text="${product.brand}">Thương hiệu</div>
+                                    </td>
+                                    <td>
+                                        <div class="text-muted" th:text="${#strings.abbreviate(product.description, 50)}">Mô tả sản phẩm</div>
+                                    </td>
+                                    <td>
+                                        <div class="price-display" th:text="${#numbers.formatDecimal(product.price, 0, 'COMMA', 0, 'POINT')}">0</div>
+                                        <div th:if="${product.salePrice != null and product.salePrice > 0}" 
+                                             class="sale-price" 
+                                             th:text="${#numbers.formatDecimal(product.salePrice, 0, 'COMMA', 0, 'POINT')}">0</div>
+                                    </td>
+                                    <td>
+                                        <span th:class="${product.stock <= 5 ? 'stock-low' : (product.stock <= 20 ? 'stock-medium' : 'stock-high')}"
+                                              th:text="${product.stock}">0</span>
+                                    </td>
+                                    <td th:text="${product.categoryName}">Danh mục</td>
+                                    <td>
+                                        <span th:if="${product.active}" class="badge bg-success">Hoạt động</span>
+                                        <span th:unless="${product.active}" class="badge bg-secondary">Không hoạt động</span>
+                                    </td>
+                                    <td th:text="${#temporals.format(product.createdAt, 'dd/MM/yyyy')}">01/01/2024</td>
+                        <td>
+                            <div class="action-buttons">
+                                <a th:href="@{/admin/products/{id}(id=${product.id})}" class="btn btn-primary btn-sm" title="Xem">
+                                    <i class="fas fa-eye"></i>
+                                </a>
+                                <a th:href="@{/admin/products/{id}/edit(id=${product.id})}" class="btn btn-success btn-sm" title="Sửa">
+                                    <i class="fas fa-edit"></i>
+                                </a>
+                                <a th:href="@{/admin/products/{id}/delete(id=${product.id})}" 
+                                   class="btn btn-danger btn-sm" 
+                                   title="Xóa"
+                                   onclick="return confirm('Bạn có chắc chắn muốn xóa sản phẩm này không?');">
+                                    <i class="fas fa-trash"></i>
+                                </a>
                             </div>
+                        </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    
+                    <!-- Pagination -->
+                    <div th:if="${totalPages > 1}" class="d-flex justify-content-between align-items-center p-3">
+                        <div class="text-muted">
+                            Hiển thị <span th:text="${products.number * products.size + 1}">1</span> - 
+                            <span th:text="${(products.number + 1) * products.size > products.totalElements ? products.totalElements : (products.number + 1) * products.size}">10</span> 
+                            trong tổng số <span th:text="${products.totalElements}">0</span> sản phẩm
                         </div>
+                        <nav>
+                            <ul class="pagination pagination-modern mb-0">
+                                <li class="page-item" th:classappend="${!products.hasPrevious()} ? 'disabled' : ''">
+                                    <a class="page-link" th:href="@{/admin/products(search=${search}, categoryId=${categoryId}, status=${status}, sortBy=${sortBy}, sortDir=${sortDir}, page=${products.number - 1})}">
+                                        <i class="fas fa-chevron-left"></i>
+                                    </a>
+                                </li>
+                                <li class="page-item" th:each="i : ${#numbers.sequence(0, products.totalPages - 1)}" 
+                                    th:classappend="${i == products.number} ? 'active' : ''">
+                                    <a class="page-link" th:href="@{/admin/products(search=${search}, categoryId=${categoryId}, status=${status}, sortBy=${sortBy}, sortDir=${sortDir}, page=${i})}"
+                                       th:text="${i + 1}">1</a>
+                                </li>
+                                <li class="page-item" th:classappend="${!products.hasNext()} ? 'disabled' : ''">
+                                    <a class="page-link" th:href="@{/admin/products(search=${search}, categoryId=${categoryId}, status=${status}, sortBy=${sortBy}, sortDir=${sortDir}, page=${products.number + 1})}">
+                                        <i class="fas fa-chevron-right"></i>
+                                    </a>
+                                </li>
+                            </ul>
+                        </nav>
                     </div>
                 </div>
-
-                <div class="container-fluid">
-                    <!-- Statistics Cards -->
-                    <div class="row g-4 mb-4">
-                        <div class="col-md-3">
-                            <div class="stats-card">
-                                <div class="stats-icon primary">
-                                    <i class="fas fa-box"></i>
-                                </div>
-                                <div class="stats-number" th:text="${totalItems}">0</div>
-                                <div class="stats-label">Tổng sản phẩm</div>
-                            </div>
-                        </div>
-                        <div class="col-md-3">
-                            <div class="stats-card">
-                                <div class="stats-icon success">
-                                    <i class="fas fa-check-circle"></i>
-                                </div>
-                                <div class="stats-number" th:text="${activeItems}">0</div>
-                                <div class="stats-label">Sản phẩm hoạt động</div>
-                            </div>
-                        </div>
-                        <div class="col-md-3">
-                            <div class="stats-card">
-                                <div class="stats-icon warning">
-                                    <i class="fas fa-star"></i>
-                                </div>
-                                <div class="stats-number" th:text="${featuredItems}">0</div>
-                                <div class="stats-label">Sản phẩm nổi bật</div>
-                            </div>
-                        </div>
-                        <div class="col-md-3">
-                            <div class="stats-card">
-                                <div class="stats-icon danger">
-                                    <i class="fas fa-exclamation-triangle"></i>
-                                </div>
-                                <div class="stats-number" th:text="${lowStockItems}">0</div>
-                                <div class="stats-label">Sắp hết hàng</div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Action Buttons -->
-                    <div class="action-buttons">
-                        <a href="/admin/products/new" class="btn btn-primary">
-                            <i class="fas fa-plus me-2"></i>
-                            Thêm sản phẩm mới
-                        </a>
-                        <a href="/admin/products/export" class="btn btn-outline-primary">
-                            <i class="fas fa-download me-2"></i>
-                            Xuất Excel
-                        </a>
-                    </div>
-
-                    <!-- Filter Section -->
-                    <div class="filter-section">
-                        <h5 class="filter-title">
-                            <i class="fas fa-filter"></i>
-                            Bộ lọc và tìm kiếm
-                        </h5>
-                        <form th:action="@{/admin/products}" method="get" class="row g-3">
-                            <div class="col-md-3">
-                                <label class="form-label">Tìm kiếm</label>
-                                <input type="text" class="form-control" name="search" th:value="${search}" placeholder="Tên sản phẩm, SKU...">
-                            </div>
-                            <div class="col-md-2">
-                                <label class="form-label">Danh mục</label>
-                                <select class="form-select" name="categoryId">
-                                    <option value="">Tất cả danh mục</option>
-                                    <option th:each="category : ${categories}" 
-                                            th:value="${category.id}" 
-                                            th:text="${category.name}"
-                                            th:selected="${category.id == categoryId}">
-                                    </option>
-                                </select>
-                            </div>
-                            <div class="col-md-2">
-                                <label class="form-label">Trạng thái</label>
-                                <select class="form-select" name="status">
-                                    <option value="">Tất cả</option>
-                                    <option value="active" th:selected="${status == 'active'}">Hoạt động</option>
-                                    <option value="inactive" th:selected="${status == 'inactive'}">Không hoạt động</option>
-                                </select>
-                            </div>
-                            <div class="col-md-2">
-                                <label class="form-label">Sắp xếp</label>
-                                <select class="form-select" name="sortBy">
-                                    <option value="id" th:selected="${sortBy == 'id'}">ID</option>
-                                    <option value="name" th:selected="${sortBy == 'name'}">Tên</option>
-                                    <option value="price" th:selected="${sortBy == 'price'}">Giá</option>
-                                    <option value="createdAt" th:selected="${sortBy == 'createdAt'}">Ngày tạo</option>
-                                </select>
-                            </div>
-                            <div class="col-md-2">
-                                <label class="form-label">Thứ tự</label>
-                                <select class="form-select" name="sortDir">
-                                    <option value="asc" th:selected="${sortDir == 'asc'}">Tăng dần</option>
-                                    <option value="desc" th:selected="${sortDir == 'desc'}">Giảm dần</option>
-                                </select>
-                            </div>
-                            <div class="col-md-1">
-                                <label class="form-label">&nbsp;</label>
-                                <button type="submit" class="btn btn-primary w-100">
-                                    <i class="fas fa-search"></i>
-                                </button>
-                            </div>
-                        </form>
-                    </div>
-
-                    <!-- Products Table -->
-                    <div class="products-table">
-                        <div class="table-responsive">
-                            <table class="table table-hover">
-                                <thead>
-                                    <tr>
-                                        <th style="width: 80px;">ID</th>
-                                        <th style="width: 100px;">Hình ảnh</th>
-                                        <th>Tên sản phẩm</th>
-                                        <th style="width: 120px;">Danh mục</th>
-                                        <th style="width: 120px;">Giá</th>
-                                        <th style="width: 100px;">Tồn kho</th>
-                                        <th style="width: 100px;">Trạng thái</th>
-                                        <th style="width: 150px;">Thao tác</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    <tr th:each="product : ${products}" th:if="${products != null and !products.empty}">
-                                        <td th:text="${product.id}">1</td>
-                                        <td>
-                                            <img th:src="${product.imageUrl != null ? product.imageUrl : '/images/default-product.svg'}" 
-                                                 class="product-image" 
-                                                 th:alt="${product.name}">
-                                        </td>
-                                        <td>
-                                            <div class="product-name" th:text="${product.name}">iPhone 15 Pro Max</div>
-                                            <div class="product-category" th:text="${product.sku}">SKU: IP15PM256</div>
-                                        </td>
-                                        <td th:text="${product.category.name}">Điện thoại</td>
-                                        <td>
-                                            <div class="price" th:if="${product.salePrice != null and product.salePrice > 0}">
-                                                <span class="sale-price" th:text="'₫' + ${#numbers.formatDecimal(product.price, 0, 'COMMA', 0, 'POINT')}">₫31,990,000</span>
-                                                <span th:text="'₫' + ${#numbers.formatDecimal(product.salePrice, 0, 'COMMA', 0, 'POINT')}">₫29,990,000</span>
-                                            </div>
-                                            <div class="price" th:unless="${product.salePrice != null and product.salePrice > 0}" 
-                                                 th:text="'₫' + ${#numbers.formatDecimal(product.price, 0, 'COMMA', 0, 'POINT')}">₫31,990,000</div>
-                                        </td>
-                                        <td>
-                                            <span class="stock-badge" 
-                                                  th:classappend="${product.stockQuantity > 10} ? 'stock-in' : (${product.stockQuantity > 0} ? 'stock-low' : 'stock-out')"
-                                                  th:text="${product.stockQuantity} + ' sản phẩm'">15 sản phẩm</span>
-                                        </td>
-                                        <td>
-                                            <span class="status-badge" 
-                                                  th:classappend="${product.isActive} ? 'status-active' : 'status-inactive'"
-                                                  th:text="${product.isActive} ? 'Hoạt động' : 'Không hoạt động'">Hoạt động</span>
-                                        </td>
-                                        <td>
-                                            <div class="action-buttons-small">
-                                                <a th:href="@{/admin/products/{id}(id=${product.id})}" class="btn btn-info btn-sm">
-                                                    <i class="fas fa-eye"></i>
-                                                </a>
-                                                <a th:href="@{/admin/products/{id}/edit(id=${product.id})}" class="btn btn-warning btn-sm">
-                                                    <i class="fas fa-edit"></i>
-                                                </a>
-                                                <a th:href="@{/admin/products/{id}/delete(id=${product.id})}" 
-                                                   class="btn btn-danger btn-sm"
-                                                   onclick="return confirm('Bạn có chắc chắn muốn xóa sản phẩm này?')">
-                                                    <i class="fas fa-trash"></i>
-                                                </a>
-                                            </div>
-                                        </td>
-                                    </tr>
-                                    <tr th:if="${products == null or products.empty}">
-                                        <td colspan="8">
-                                            <div class="empty-state">
-                                                <i class="fas fa-box-open"></i>
-                                                <h4>Không có sản phẩm nào</h4>
-                                                <p>Chưa có sản phẩm nào trong hệ thống. Hãy thêm sản phẩm đầu tiên!</p>
-                                                <a href="/admin/products/new" class="btn btn-primary mt-3">
-                                                    <i class="fas fa-plus me-2"></i>
-                                                    Thêm sản phẩm mới
-                                                </a>
-                                            </div>
-                                        </td>
-                                    </tr>
-                                </tbody>
-                            </table>
-                        </div>
-                    </div>
-
-                    <!-- Pagination -->
-                    <nav th:if="${totalPages > 1}">
-                        <ul class="pagination">
-                            <li class="page-item" th:classappend="${currentPage == 1} ? 'disabled'">
-                                <a class="page-link" th:href="@{/admin/products(page=${currentPage - 1}, search=${search}, categoryId=${categoryId}, status=${status}, sortBy=${sortBy}, sortDir=${sortDir})}">
-                                    <i class="fas fa-chevron-left"></i>
-                                </a>
-                            </li>
-                            <li class="page-item" th:each="page : ${#numbers.sequence(1, totalPages)}" 
-                                th:classappend="${page == currentPage} ? 'active'">
-                                <a class="page-link" th:href="@{/admin/products(page=${page}, search=${search}, categoryId=${categoryId}, status=${status}, sortBy=${sortBy}, sortDir=${sortDir})}" 
-                                   th:text="${page}">1</a>
-                            </li>
-                            <li class="page-item" th:classappend="${currentPage == totalPages} ? 'disabled'">
-                                <a class="page-link" th:href="@{/admin/products(page=${currentPage + 1}, search=${search}, categoryId=${categoryId}, status=${status}, sortBy=${sortBy}, sortDir=${sortDir})}">
-                                    <i class="fas fa-chevron-right"></i>
-                                </a>
-                            </li>
-                        </ul>
-                    </nav>
+                
+                <!-- No Products Message -->
+                <div th:if="${products == null or products.empty}" class="empty-state">
+                    <i class="fas fa-box-open"></i>
+                    <h4>Không có sản phẩm nào</h4>
+                    <p>Chưa có sản phẩm nào trong hệ thống. Hãy thêm sản phẩm đầu tiên!</p>
+                    <a th:href="@{/admin/products/new}" class="btn btn-primary-modern">
+                        <i class="fas fa-plus"></i>
+                        Thêm sản phẩm mới
+                    </a>
                 </div>
             </div>
         </div>
     </div>
-    
-    <script>
-        // Mobile sidebar toggle
-        function toggleSidebar() {
-            document.querySelector('.sidebar').classList.toggle('show');
-        }
-        
-        // Auto-hide sidebar on mobile when clicking outside
-        document.addEventListener('click', function(e) {
-            if (window.innerWidth <= 768) {
-                const sidebar = document.querySelector('.sidebar');
-                const toggleBtn = document.querySelector('.sidebar-toggle');
-                
-                if (!sidebar.contains(e.target) && !toggleBtn?.contains(e.target)) {
-                    sidebar.classList.remove('show');
-                }
-            }
-        });
-        
-        // Auto-hide sidebar on desktop resize
-        window.addEventListener('resize', function() {
-            if (window.innerWidth > 768) {
-                document.querySelector('.sidebar').classList.remove('show');
-            }
-        });
-    </script>
 </body>
 </html>

@@ -1,29 +1,64 @@
-# Build
+# =========================
+# Build artifacts
+# =========================
 target/
 build/
 out/
 *.class
 *.log
-# IDE
-.idea/
-.vscode/
-*.iml
-# Maven/Gradle
+hs_err_pid*
+replay_pid*
+*.hprof
+
+# =========================
+# Package managers / tooling
+# =========================
 .gradle/
-# Node
+.mvn/wrapper/maven-wrapper.jar
 node_modules/
 dist/
-# OS rac
+
+# =========================
+# IDEs / Editors
+# =========================
+# IntelliJ
+.idea/
+*.iml
+# VS Code
+.vscode/
+# Eclipse
+.project
+.classpath
+.settings/
+.factorypath
+
+# =========================
+# OS junk
+# =========================
 .DS_Store
 Thumbs.db
-# Secrets and config
+
+# =========================
+# Secrets / local config
+# =========================
 .env
+.env.*
 application-*.yml
 application-*.properties
 *.jks
 *.p12
 *.pem
 *.key
-# Runtime data
+
+# =========================
+# Runtime / uploads
+# (thư mục sinh ra khi chạy app)
+# =========================
 uploads/
 storage/
+
+# =========================
+# Logs / temp
+# =========================
+*.tmp
+*.swp

@@ -149,7 +149,8 @@ public class UserService implements UserDetailsService {
 
     // Có thể mở rộng filter thật sự qua Spec/Query Methods
     public Page<User> searchUsers(String search, String role, Boolean isActive, Pageable pageable) {
-        // Minimal fallback
+        // For now, just return all users with pagination
+        // TODO: Implement proper search logic
         return userRepository.findAll(pageable);
     }
 

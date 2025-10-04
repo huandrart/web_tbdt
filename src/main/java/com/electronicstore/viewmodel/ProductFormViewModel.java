@@ -1,6 +1,5 @@
 package com.electronicstore.viewmodel;
 
-import com.electronicstore.dto.request.ProductRequest;
 import com.electronicstore.dto.response.CategoryResponse;
 
 import java.util.List;
@@ -10,7 +9,6 @@ import java.util.List;
  */
 public class ProductFormViewModel {
     
-    private ProductRequest productRequest;
     private List<CategoryResponse> categories; // Danh sách categories để chọn
     private boolean isEditMode;
     private String pageTitle;
@@ -22,38 +20,12 @@ public class ProductFormViewModel {
     
     public ProductFormViewModel(boolean isEditMode) {
         this.isEditMode = isEditMode;
-        this.productRequest = new ProductRequest();
-        this.pageTitle = isEditMode ? "Chỉnh sửa sản phẩm" : "Thêm sản phẩm mới";
-        this.submitButtonText = isEditMode ? "Cập nhật" : "Thêm mới";
-        this.cancelUrl = "/admin/products";
-    }
-    
-    public ProductFormViewModel(ProductRequest productRequest, boolean isEditMode) {
-        this.productRequest = productRequest;
-        this.isEditMode = isEditMode;
         this.pageTitle = isEditMode ? "Chỉnh sửa sản phẩm" : "Thêm sản phẩm mới";
         this.submitButtonText = isEditMode ? "Cập nhật" : "Thêm mới";
         this.cancelUrl = "/admin/products";
     }
     
     // Getters and Setters
-    public ProductRequest getProductRequest() {
-        return productRequest;
-    }
-    
-    public void setProductRequest(ProductRequest productRequest) {
-        this.productRequest = productRequest;
-    }
-    
-    // Alias method for compatibility
-    public ProductRequest getProduct() {
-        return productRequest;
-    }
-    
-    public void setProduct(ProductRequest productRequest) {
-        this.productRequest = productRequest;
-    }
-    
     public List<CategoryResponse> getCategories() {
         return categories;
     }
@@ -70,15 +42,6 @@ public class ProductFormViewModel {
         isEditMode = editMode;
     }
     
-    // Alias methods for compatibility
-    public String getMode() {
-        return isEditMode ? "edit" : "create";
-    }
-    
-    public void setMode(String mode) {
-        this.isEditMode = "edit".equals(mode);
-    }
-    
     public String getPageTitle() {
         return pageTitle;
     }
@@ -87,7 +50,6 @@ public class ProductFormViewModel {
         this.pageTitle = pageTitle;
     }
     
-    // Alias method for compatibility
     public String getTitle() {
         return pageTitle;
     }
@@ -112,9 +74,8 @@ public class ProductFormViewModel {
         this.cancelUrl = cancelUrl;
     }
     
-    // Additional methods for form compatibility
     public String getAction() {
-        return isEditMode ? "/admin/products/" + (productRequest != null ? productRequest.getId() : "") : "/admin/products";
+        return isEditMode ? "/admin/products" : "/admin/products";
     }
     
     public void setAction(String action) {

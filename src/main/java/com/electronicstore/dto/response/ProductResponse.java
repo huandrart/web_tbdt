@@ -21,6 +21,7 @@ public class ProductResponse {
     private String model;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
+    private Long viewCount;
     
     // Category info
     private Long categoryId;
@@ -137,6 +138,14 @@ public class ProductResponse {
     
     public void setUpdatedAt(LocalDateTime updatedAt) {
         this.updatedAt = updatedAt;
+    }
+    
+    public Long getViewCount() {
+        return viewCount;
+    }
+    
+    public void setViewCount(Long viewCount) {
+        this.viewCount = viewCount;
     }
     
     public Long getCategoryId() {

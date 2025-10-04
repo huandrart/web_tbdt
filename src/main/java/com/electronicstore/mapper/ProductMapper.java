@@ -1,6 +1,5 @@
 package com.electronicstore.mapper;
 
-import com.electronicstore.dto.request.ProductRequest;
 import com.electronicstore.dto.response.ProductResponse;
 import com.electronicstore.entity.Product;
 import org.springframework.stereotype.Component;
@@ -73,77 +72,7 @@ public class ProductMapper {
         return response;
     }
     
-    /**
-     * Convert ProductRequest DTO to Product entity (for creation)
-     */
-    public Product toEntity(ProductRequest request) {
-        if (request == null) {
-            return null;
-        }
-        
-        Product product = new Product();
-        
-        product.setName(request.getName());
-        product.setDescription(request.getDescription());
-        product.setBrand(request.getBrand());
-        product.setModel(request.getModel());
-        product.setPrice(request.getPrice());
-        product.setSalePrice(request.getSalePrice());
-        product.setStockQuantity(request.getStock());
-        product.setIsFeatured(request.getFeatured());
-        product.setIsActive(request.getActive());
-        product.setCreatedAt(LocalDateTime.now());
-        product.setUpdatedAt(LocalDateTime.now());
-        
-        return product;
-    }
+    // ProductRequest methods removed - using simple approach
     
-    /**
-     * Update existing Product entity with ProductRequest data
-     */
-    public void updateEntity(Product product, ProductRequest request) {
-        if (product == null || request == null) {
-            return;
-        }
-        
-        product.setName(request.getName());
-        product.setDescription(request.getDescription());
-        product.setBrand(request.getBrand());
-        product.setModel(request.getModel());
-        product.setPrice(request.getPrice());
-        product.setSalePrice(request.getSalePrice());
-        product.setStockQuantity(request.getStock());
-        product.setIsFeatured(request.getFeatured());
-        product.setIsActive(request.getActive());
-        product.setUpdatedAt(LocalDateTime.now());
-    }
-    
-    /**
-     * Convert Product entity to ProductRequest DTO (for editing)
-     */
-    public ProductRequest toRequest(Product product) {
-        if (product == null) {
-            return null;
-        }
-        
-        ProductRequest request = new ProductRequest();
-        
-        request.setId(product.getId());
-        request.setName(product.getName());
-        request.setDescription(product.getDescription());
-        request.setBrand(product.getBrand());
-        request.setModel(product.getModel());
-        request.setPrice(product.getPrice());
-        request.setSalePrice(product.getSalePrice());
-        request.setStock(product.getStockQuantity());
-        request.setFeatured(product.getIsFeatured());
-        request.setActive(product.getIsActive());
-        request.setCurrentImageUrl(product.getImageUrl());
-        
-        if (product.getCategory() != null) {
-            request.setCategoryId(product.getCategory().getId());
-        }
-        
-        return request;
-    }
+    // ProductRequest methods removed - using simple approach
 }

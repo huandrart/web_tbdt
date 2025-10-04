@@ -32,6 +32,8 @@ public class DataLoader implements ApplicationRunner {
 
     @Override
     public void run(ApplicationArguments args) throws Exception {
+        System.out.println("DataLoader starting...");
+        
         // Create admin user if not exists
         if (!userRepository.existsByEmail("admin@electronicstore.com")) {
             User admin = new User();
@@ -71,7 +73,10 @@ public class DataLoader implements ApplicationRunner {
 
         // Create sample products if not exists
         if (productRepository.count() == 0) {
+            System.out.println("Creating sample products...");
             createSampleProducts();
+        } else {
+            System.out.println("Products already exist: " + productRepository.count());
         }
     }
 
