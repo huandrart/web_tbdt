@@ -160,6 +160,10 @@ public class ProductService {
     }
     
     public void deleteById(Long id) {
+        productRepository.deleteById(id);
+    }
+    
+    public void softDeleteById(Long id) {
         Optional<Product> product = productRepository.findById(id);
         if (product.isPresent()) {
             Product prod = product.get();

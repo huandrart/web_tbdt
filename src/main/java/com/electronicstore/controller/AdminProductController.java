@@ -303,7 +303,7 @@ public class AdminProductController {
                                @RequestParam(value = "imageFile", required = false) MultipartFile imageFile,
                                Model model, RedirectAttributes redirectAttributes) {
         try {
-            Product existingProduct = productService.findById(id)
+            Product existingProduct = productService.findByIdOptional(id)
                     .orElseThrow(() -> new RuntimeException("Product not found with id: " + id));
             
             // Update fields

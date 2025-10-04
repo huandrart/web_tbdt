@@ -172,10 +172,6 @@
                                         Trạng thái
                                         <i class="fas fa-sort sort-icon"></i>
                                     </th>
-                                    <th class="sortable-header">
-                                        Ngày tạo
-                                        <i class="fas fa-sort sort-icon" th:classappend="${sortBy == 'createdAt'} ? 'active' : ''"></i>
-                                    </th>
                                     <th>Thao tác</th>
                                 </tr>
                             </thead>
@@ -214,8 +210,7 @@
                                         <span th:if="${product.active}" class="badge bg-success">Hoạt động</span>
                                         <span th:unless="${product.active}" class="badge bg-secondary">Không hoạt động</span>
                                     </td>
-                                    <td th:text="${#temporals.format(product.createdAt, 'dd/MM/yyyy')}">01/01/2024</td>
-                        <td>
+                                    <td>
                             <div class="action-buttons">
                                 <a th:href="@{/admin/products/{id}(id=${product.id})}" class="btn btn-primary btn-sm" title="Xem">
                                     <i class="fas fa-eye"></i>
@@ -223,12 +218,14 @@
                                 <a th:href="@{/admin/products/{id}/edit(id=${product.id})}" class="btn btn-success btn-sm" title="Sửa">
                                     <i class="fas fa-edit"></i>
                                 </a>
-                                <a th:href="@{/admin/products/{id}/delete(id=${product.id})}" 
-                                   class="btn btn-danger btn-sm" 
-                                   title="Xóa"
-                                   onclick="return confirm('Bạn có chắc chắn muốn xóa sản phẩm này không?');">
-                                    <i class="fas fa-trash"></i>
-                                </a>
+                                <form th:action="@{/admin/products/{id}/delete(id=${product.id})}" method="post" style="display: inline;">
+                                    <button type="submit" 
+                                            class="btn btn-danger btn-sm" 
+                                            title="Xóa"
+                                            onclick="return confirm('Bạn có chắc chắn muốn xóa sản phẩm này không?');">
+                                        <i class="fas fa-trash"></i>
+                                    </button>
+                                </form>
                             </div>
                         </td>
                                 </tr>
