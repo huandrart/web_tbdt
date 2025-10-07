@@ -1,8 +1,13 @@
 package com.electronicstore.controller;
 
 import com.electronicstore.dto.CartItem;
-import com.electronicstore.entity.*;
-import com.electronicstore.service.*;
+import com.electronicstore.entity.Cart;
+import com.electronicstore.entity.Order;
+import com.electronicstore.entity.User;
+import com.electronicstore.service.CartService;
+import com.electronicstore.service.OrderService;
+import com.electronicstore.service.ProductService;
+import com.electronicstore.service.UserService;
 import jakarta.servlet.http.HttpSession;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
@@ -31,32 +36,43 @@ public class CheckoutController {
     @Autowired
     private ProductService productService;
     
+    @Autowired
+    private CartService cartService;
+    
     @GetMapping
-    public String showCheckout(HttpSession session, Model model) {
-        List<CartItem> cartItems = CartController.getCartItems(session);
+    public String showCheckout(Authentication authentication, Model model) {
+        if (authentication == null || !authentication.isAuthenticated()) {
+            return "redirect:/login";
+        }
         
-        if (cartItems.isEmpty()) {
+        // Get user from authentication
+        String userEmail = authentication.getName();
+        Optional<User> userOpt = userService.findByEmail(userEmail);
+        if (userOpt.isEmpty()) {
+            return "redirect:/login";
+        }
+        
+        User user = userOpt.get();
+        
+        // Get cart from database
+        List<Cart> cartItems = cartService.findByUser(user);
+        List<CartItem> cartItemDTOs = convertToCartItemDTOs(cartItems);
+        
+        if (cartItemDTOs.isEmpty()) {
             return "redirect:/cart";
         }
         
         // Calculate totals
-        BigDecimal subtotal = cartItems.stream()
+        BigDecimal subtotal = cartItemDTOs.stream()
                 .map(CartItem::getTotalPrice)
                 .reduce(BigDecimal.ZERO, BigDecimal::add);
         
         BigDecimal shippingFee = BigDecimal.valueOf(30000); // 30,000 VND
         BigDecimal total = subtotal.add(shippingFee);
         
-        // Get current user
-        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-        if (auth != null && auth.isAuthenticated() && !auth.getPrincipal().equals("anonymousUser")) {
-            Optional<User> userOpt = userService.findByEmail(auth.getName());
-            if (userOpt.isPresent()) {
-                model.addAttribute("user", userOpt.get());
-            }
-        }
+        model.addAttribute("user", user);
         
-        model.addAttribute("cartItems", cartItems);
+        model.addAttribute("cartItems", cartItemDTOs);
         model.addAttribute("subtotal", subtotal);
         model.addAttribute("shippingFee", shippingFee);
         model.addAttribute("total", total);
@@ -71,31 +87,37 @@ public class CheckoutController {
                                  @RequestParam("address") String address,
                                  @RequestParam("paymentMethod") Order.PaymentMethod paymentMethod,
                                  @RequestParam(value = "notes", required = false) String notes,
-                                 HttpSession session,
+                                 Authentication authentication,
                                  RedirectAttributes redirectAttributes) {
         
-        List<CartItem> cartItems = CartController.getCartItems(session);
+        if (authentication == null || !authentication.isAuthenticated()) {
+            redirectAttributes.addFlashAttribute("errorMessage", "Bạn cần đăng nhập để đặt hàng!");
+            return "redirect:/login";
+        }
         
-        if (cartItems.isEmpty()) {
+        // Get user from authentication
+        String userEmail = authentication.getName();
+        Optional<User> userOpt = userService.findByEmail(userEmail);
+        if (userOpt.isEmpty()) {
+            redirectAttributes.addFlashAttribute("errorMessage", "Không tìm thấy thông tin người dùng!");
+            return "redirect:/login";
+        }
+        
+        User user = userOpt.get();
+        
+        // Get cart from database
+        List<Cart> cartItems = cartService.findByUser(user);
+        List<CartItem> cartItemDTOs = convertToCartItemDTOs(cartItems);
+        
+        if (cartItemDTOs.isEmpty()) {
             redirectAttributes.addFlashAttribute("errorMessage", "Giỏ hàng trống!");
             return "redirect:/cart";
         }
         
         try {
-            // Get current user
-            Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-            User user = null;
-            
-            if (auth != null && auth.isAuthenticated() && !auth.getPrincipal().equals("anonymousUser")) {
-                Optional<User> userOpt = userService.findByEmail(auth.getName());
-                if (userOpt.isPresent()) {
-                    user = userOpt.get();
-                }
-            }
-            
             // Convert CartItems to OrderItems
             List<OrderItem> orderItems = new ArrayList<>();
-            for (CartItem cartItem : cartItems) {
+            for (CartItem cartItem : cartItemDTOs) {
                 Product product = productService.findById(cartItem.getProductId());
                 if (product != null) {
                     
@@ -124,8 +146,8 @@ public class CheckoutController {
             order.setPaymentMethod(paymentMethod);
             orderService.save(order);
             
-            // Clear cart
-            CartController.clearCart(session);
+            // Clear cart from database
+            cartService.clearCart(user);
             
             redirectAttributes.addFlashAttribute("successMessage", 
                 "Đặt hàng thành công! Mã đơn hàng: " + order.getOrderNumber());
@@ -137,6 +159,26 @@ public class CheckoutController {
                 "Có lỗi xảy ra khi đặt hàng: " + e.getMessage());
             return "redirect:/checkout";
         }
+    }
+    
+    // Convert Cart entities to CartItem DTOs
+    private List<CartItem> convertToCartItemDTOs(List<Cart> cartItems) {
+        List<CartItem> cartItemDTOs = new ArrayList<>();
+        
+        for (Cart cart : cartItems) {
+            CartItem cartItem = new CartItem();
+            cartItem.setProductId(cart.getProduct().getId());
+            cartItem.setProductName(cart.getProduct().getName());
+            cartItem.setUnitPrice(cart.getProduct().getCurrentPrice());
+            cartItem.setQuantity(cart.getQuantity());
+            cartItem.setTotalPrice(cart.getProduct().getCurrentPrice().multiply(BigDecimal.valueOf(cart.getQuantity())));
+            cartItem.setImageUrl(cart.getProduct().getImageUrls() != null && !cart.getProduct().getImageUrls().isEmpty() 
+                ? cart.getProduct().getImageUrls().get(0) : "no-image.png");
+            
+            cartItemDTOs.add(cartItem);
+        }
+        
+        return cartItemDTOs;
     }
     
     @GetMapping("/success/{orderId}")

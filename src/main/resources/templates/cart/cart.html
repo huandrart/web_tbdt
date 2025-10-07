@@ -4,6 +4,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="_csrf" th:content="${_csrf.token}">
+    <meta name="_csrf_header" th:content="${_csrf.headerName}">
     <title>Giỏ hàng - Electronic Store</title>
     
     <!-- Bootstrap CSS -->
@@ -149,7 +151,7 @@
                             <!-- Product Image -->
                             <div class="col-md-2 col-3">
                                 
-                                <img th:src="${item.imageUrl != null ? '/images/products/' + item.imageUrl : '/images/no-image.png'}" 
+                                <img th:src="${item.imageUrl != null && !item.imageUrl.startsWith('/') ? '/images/products/' + item.imageUrl : (item.imageUrl != null ? item.imageUrl : '/images/no-image.png')}" 
                                      th:alt="${item.productName}" class="product-image">
                             </div>
                             
@@ -166,15 +168,16 @@
                             <!-- Quantity Controls -->
                             <div class="col-md-3 col-6">
                                 <div class="d-flex align-items-center">
-                                    <button class="btn btn-outline-secondary btn-quantity me-2" 
-                                            onclick="updateQuantity([[${item.productId}]], -1)">
+                                    <button class="btn btn-outline-secondary btn-quantity quantity-minus me-2" 
+                                            th:data-product-id="${item.productId}">
                                         <i class="fas fa-minus"></i>
                                     </button>
                                     <input type="number" class="form-control quantity-input" 
                                            th:value="${item.quantity}" min="1" max="99"
+                                           th:data-product-id="${item.productId}"
                                            th:id="'quantity-' + ${item.productId}">
-                                    <button class="btn btn-outline-secondary btn-quantity ms-2" 
-                                            onclick="updateQuantity([[${item.productId}]], 1)">
+                                    <button class="btn btn-outline-secondary btn-quantity quantity-plus ms-2" 
+                                            th:data-product-id="${item.productId}">
                                         <i class="fas fa-plus"></i>
                                     </button>
                                 </div>
@@ -186,8 +189,8 @@
                                    th:text="${#numbers.formatDecimal(item.totalPrice, 0, 'COMMA', 0, 'POINT')} + ' ₫'">
                                    Total
                                 </p>
-                                <button class="btn btn-outline-danger btn-sm" 
-                                        onclick="removeFromCart([[${item.productId}]])"
+                                <button class="btn btn-outline-danger btn-sm remove-item" 
+                                        th:data-product-id="${item.productId}"
                                         title="Xóa sản phẩm">
                                     <i class="fas fa-trash"></i>
                                 </button>
@@ -200,7 +203,7 @@
                         <a href="/" class="btn btn-outline-primary">
                             <i class="fas fa-arrow-left me-2"></i>Tiếp tục mua sắm
                         </a>
-                        <button class="btn btn-outline-danger" onclick="clearCart()">
+                        <button class="btn btn-outline-danger" id="clearAllBtn">
                             <i class="fas fa-trash me-2"></i>Xóa tất cả
                         </button>
                     </div>
@@ -249,8 +252,8 @@
                         
                         <!-- Checkout Button -->
                         <div class="d-grid">
-                            <a href="/checkout" class="btn btn-success checkout-btn">
-                                <i class="fas fa-credit-card me-2"></i>Thanh toán
+                            <a href="/order" class="btn btn-success checkout-btn">
+                                <i class="fas fa-shopping-cart me-2"></i>Đặt hàng
                             </a>
                         </div>
                         
@@ -271,7 +274,7 @@
                         <div th:each="product : ${suggestedProducts}" class="card mb-2">
                             <div class="row g-0">
                                 <div class="col-4">
-                                    <img th:src="@{'/images/products/' + ${product.imageUrl}}" 
+                                    <img th:src="${product.imageUrls != null && !product.imageUrls.isEmpty() ? '/images/products/' + product.imageUrls[0] : '/images/no-image.png'}" 
                                          class="img-fluid rounded-start" th:alt="${product.name}">
                                 </div>
                                 <div class="col-8">
