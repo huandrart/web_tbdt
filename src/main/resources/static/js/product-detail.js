@@ -41,20 +41,25 @@
         // Add to cart
         function addToCart(productId) {
             const quantity = document.getElementById('quantity').value;
+            const csrfToken = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
             
             $.ajax({
                 url: '/cart/add',
                 method: 'POST',
+                headers: {
+                    'X-CSRF-TOKEN': csrfToken
+                },
                 data: {
                     productId: productId,
                     quantity: quantity
                 },
                 success: function(response) {
-                    if (response.success) {
-                        showToast('Đã thêm sản phẩm vào giỏ hàng!', 'success');
+                    const result = typeof response === 'string' ? JSON.parse(response) : response;
+                    if (result.success) {
+                        showToast(result.message || 'Đã thêm sản phẩm vào giỏ hàng!', 'success');
                         updateCartCount();
                     } else {
-                        showToast('Có lỗi xảy ra: ' + response.message, 'error');
+                        showToast(result.message || 'Có lỗi xảy ra', 'error');
                     }
                 },
                 error: function() {
@@ -66,20 +71,25 @@
         // Buy now
         function buyNow(productId) {
             const quantity = document.getElementById('quantity').value;
+            const csrfToken = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
             
             // Add to cart first, then redirect to checkout
             $.ajax({
                 url: '/cart/add',
                 method: 'POST',
+                headers: {
+                    'X-CSRF-TOKEN': csrfToken
+                },
                 data: {
                     productId: productId,
                     quantity: quantity
                 },
                 success: function(response) {
-                    if (response.success) {
+                    const result = typeof response === 'string' ? JSON.parse(response) : response;
+                    if (result.success) {
                         window.location.href = '/checkout';
                     } else {
-                        showToast('Có lỗi xảy ra: ' + response.message, 'error');
+                        showToast(result.message || 'Có lỗi xảy ra', 'error');
                     }
                 },
                 error: function() {
@@ -140,8 +150,114 @@
             });
         }
         
+        // Review rating stars
+        function initRatingStars() {
+            const stars = document.querySelectorAll('.rating-input i');
+            const ratingInput = document.getElementById('rating');
+            
+            stars.forEach((star, index) => {
+                star.addEventListener('click', function() {
+                    const rating = parseInt(this.getAttribute('data-rating'));
+                    ratingInput.value = rating;
+                    
+                    // Update star display
+                    stars.forEach((s, i) => {
+                        if (i < rating) {
+                            s.className = 'fas fa-star';
+                        } else {
+                            s.className = 'far fa-star';
+                        }
+                    });
+                });
+                
+                star.addEventListener('mouseenter', function() {
+                    const rating = parseInt(this.getAttribute('data-rating'));
+                    stars.forEach((s, i) => {
+                        if (i < rating) {
+                            s.className = 'fas fa-star';
+                        } else {
+                            s.className = 'far fa-star';
+                        }
+                    });
+                });
+            });
+            
+            // Reset stars on mouse leave
+            document.querySelector('.rating-input').addEventListener('mouseleave', function() {
+                const currentRating = parseInt(ratingInput.value);
+                stars.forEach((s, i) => {
+                    if (i < currentRating) {
+                        s.className = 'fas fa-star';
+                    } else {
+                        s.className = 'far fa-star';
+                    }
+                });
+            });
+        }
+        
+        // Submit review form
+        function initReviewForm() {
+            const reviewForm = document.getElementById('reviewForm');
+            if (reviewForm) {
+                reviewForm.addEventListener('submit', function(e) {
+                    e.preventDefault();
+                    
+                    const productId = window.location.pathname.split('/').pop();
+                    const rating = document.getElementById('rating').value;
+                    const comment = document.getElementById('comment').value;
+                    const csrfToken = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
+                    
+                    if (!comment.trim()) {
+                        showToast('Vui lòng nhập nhận xét!', 'error');
+                        return;
+                    }
+                    
+                    $.ajax({
+                        url: '/reviews/add',
+                        method: 'POST',
+                        headers: {
+                            'X-CSRF-TOKEN': csrfToken
+                        },
+                        data: {
+                            productId: productId,
+                            rating: rating,
+                            comment: comment
+                        },
+                        success: function(response) {
+                            const result = typeof response === 'string' ? JSON.parse(response) : response;
+                            if (result.success) {
+                                showToast(result.message, 'success');
+                                // Reset form
+                                document.getElementById('comment').value = '';
+                                document.getElementById('rating').value = '5';
+                                // Reset stars
+                                document.querySelectorAll('.rating-input i').forEach((s, i) => {
+                                    if (i < 5) {
+                                        s.className = 'fas fa-star';
+                                    } else {
+                                        s.className = 'far fa-star';
+                                    }
+                                });
+                                // Reload page after 2 seconds to show new review
+                                setTimeout(() => {
+                                    window.location.reload();
+                                }, 2000);
+                            } else {
+                                showToast(result.message, 'error');
+                            }
+                        },
+                        error: function() {
+                            showToast('Có lỗi xảy ra khi gửi đánh giá', 'error');
+                        }
+                    });
+                });
+            }
+        }
+        
         // Load cart count on page load
         document.addEventListener('DOMContentLoaded', function() {
             updateCartCount();
+            initRatingStars();
+            initReviewForm();
         });
     

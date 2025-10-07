@@ -47,4 +47,6 @@ public interface OrderRepository extends JpaRepository<Order, Long> {
     long countOrdersByStatus(@Param("status") Order.OrderStatus status);
     
     long countByUser(User user);
+    
+    Page<Order> findByUserAndStatus(User user, Order.OrderStatus status, Pageable pageable);
 }

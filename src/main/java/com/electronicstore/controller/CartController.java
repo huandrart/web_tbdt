@@ -36,61 +36,59 @@ public class CartController {
     }
     
     @PostMapping("/add")
+    @ResponseBody
     public String addToCart(@RequestParam("productId") Long productId,
                            @RequestParam(value = "quantity", defaultValue = "1") Integer quantity,
-                           HttpSession session,
-                           RedirectAttributes redirectAttributes) {
+                           HttpSession session) {
         
-        Product product = productService.findById(productId);
-        if (product == null) {
-            redirectAttributes.addFlashAttribute("errorMessage", "Sản phẩm không tồn tại!");
-            return "redirect:/products";
-        }
-        
-        if (!product.getIsActive()) {
-            redirectAttributes.addFlashAttribute("errorMessage", "Sản phẩm không còn bán!");
-            return "redirect:/products";
-        }
-        
-        if (product.getStockQuantity() < quantity) {
-            redirectAttributes.addFlashAttribute("errorMessage", "Không đủ hàng trong kho!");
-            return "redirect:/product/" + productId;
-        }
-        
-        List<CartItem> cart = getCartFromSession(session);
-        
-        // Check if product already in cart
-        boolean found = false;
-        for (CartItem item : cart) {
-            if (item.getProductId().equals(productId)) {
-                int newQuantity = item.getQuantity() + quantity;
-                if (newQuantity > product.getStockQuantity()) {
-                    redirectAttributes.addFlashAttribute("errorMessage", 
-                        "Số lượng vượt quá tồn kho! Tồn kho: " + product.getStockQuantity());
-                    return "redirect:/product/" + productId;
-                }
-                item.setQuantity(newQuantity);
-                item.setTotalPrice(item.getUnitPrice().multiply(BigDecimal.valueOf(newQuantity)));
-                found = true;
-                break;
+        try {
+            Product product = productService.findById(productId);
+            if (product == null) {
+                return "{\"success\": false, \"message\": \"Sản phẩm không tồn tại!\"}";
             }
+            
+            if (!product.getIsActive()) {
+                return "{\"success\": false, \"message\": \"Sản phẩm không còn bán!\"}";
+            }
+            
+            if (product.getStockQuantity() < quantity) {
+                return "{\"success\": false, \"message\": \"Không đủ hàng trong kho!\"}";
+            }
+            
+            List<CartItem> cart = getCartFromSession(session);
+            
+            // Check if product already in cart
+            boolean found = false;
+            for (CartItem item : cart) {
+                if (item.getProductId().equals(productId)) {
+                    int newQuantity = item.getQuantity() + quantity;
+                    if (newQuantity > product.getStockQuantity()) {
+                        return "{\"success\": false, \"message\": \"Số lượng vượt quá tồn kho! Tồn kho: " + product.getStockQuantity() + "\"}";
+                    }
+                    item.setQuantity(newQuantity);
+                    item.setTotalPrice(item.getUnitPrice().multiply(BigDecimal.valueOf(newQuantity)));
+                    found = true;
+                    break;
+                }
+            }
+            
+            if (!found) {
+                CartItem cartItem = new CartItem();
+                cartItem.setProductId(product.getId());
+                cartItem.setProductName(product.getName());
+                cartItem.setUnitPrice(product.getCurrentPrice());
+                cartItem.setQuantity(quantity);
+                cartItem.setTotalPrice(product.getCurrentPrice().multiply(BigDecimal.valueOf(quantity)));
+                cartItem.setImageUrl(product.getImageUrls().isEmpty() ? null : product.getImageUrls().get(0));
+                cart.add(cartItem);
+            }
+            
+            session.setAttribute(CART_SESSION_KEY, cart);
+            return "{\"success\": true, \"message\": \"Đã thêm vào giỏ hàng!\"}";
+            
+        } catch (Exception e) {
+            return "{\"success\": false, \"message\": \"Có lỗi xảy ra: " + e.getMessage() + "\"}";
         }
-        
-        if (!found) {
-            CartItem cartItem = new CartItem();
-            cartItem.setProductId(product.getId());
-            cartItem.setProductName(product.getName());
-            cartItem.setUnitPrice(product.getCurrentPrice());
-            cartItem.setQuantity(quantity);
-            cartItem.setTotalPrice(product.getCurrentPrice().multiply(BigDecimal.valueOf(quantity)));
-            cartItem.setImageUrl(product.getImageUrls().isEmpty() ? null : product.getImageUrls().get(0));
-            cart.add(cartItem);
-        }
-        
-        session.setAttribute(CART_SESSION_KEY, cart);
-        redirectAttributes.addFlashAttribute("successMessage", "Đã thêm vào giỏ hàng!");
-        
-        return "redirect:/cart";
     }
     
     @PostMapping("/update")

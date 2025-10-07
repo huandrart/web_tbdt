@@ -49,9 +49,48 @@
                         </a>
                     </li>
                     <li class="nav-item" sec:authorize="isAuthenticated()">
-                        <a class="nav-link" href="/profile">
-                            <i class="fas fa-user me-1"></i>Tài khoản
-                        </a>
+                        <div class="dropdown">
+                            <a class="nav-link dropdown-toggle d-flex align-items-center" href="#" role="button" 
+                               data-bs-toggle="dropdown" aria-expanded="false">
+                                <i class="fas fa-user me-1"></i>
+                                <span sec:authentication="name">User</span>
+                                <i class="fas fa-chevron-down ms-1"></i>
+                            </a>
+                            <ul class="dropdown-menu dropdown-menu-end">
+                                <li>
+                                    <h6 class="dropdown-header">
+                                        <i class="fas fa-user me-2"></i>Xin chào, <span sec:authentication="name">User</span>
+                                    </h6>
+                                </li>
+                                <li><hr class="dropdown-divider"></li>
+                                <li>
+                                    <a class="dropdown-item" href="/profile">
+                                        <i class="fas fa-user me-2"></i>Thông tin cá nhân
+                                    </a>
+                                </li>
+                                <li>
+                                    <a class="dropdown-item" href="/profile/edit">
+                                        <i class="fas fa-edit me-2"></i>Sửa thông tin
+                                    </a>
+                                </li>
+                                <li>
+                                    <a class="dropdown-item" href="/profile/change-password">
+                                        <i class="fas fa-lock me-2"></i>Đổi mật khẩu
+                                    </a>
+                                </li>
+                                <li>
+                                    <a class="dropdown-item" href="/orders">
+                                        <i class="fas fa-shopping-bag me-2"></i>Đơn hàng của tôi
+                                    </a>
+                                </li>
+                                <li><hr class="dropdown-divider"></li>
+                                <li>
+                                    <a class="dropdown-item text-danger" href="/logout">
+                                        <i class="fas fa-sign-out-alt me-2"></i>Đăng xuất
+                                    </a>
+                                </li>
+                            </ul>
+                        </div>
                     </li>
                     <li class="nav-item" sec:authorize="!isAuthenticated()">
                         <a class="nav-link" href="/login">
@@ -111,7 +150,7 @@
                             -[[${#numbers.formatDecimal((product.originalPrice - product.price) * 100 / product.originalPrice, 0, 'POINT')}]]%
                         </div>
                         
-                        <img th:src="@{'/images/products/' + ${product.imageUrl}}" 
+                        <img th:src="${product.imageUrls != null && !product.imageUrls.empty} ? ${product.imageUrls[0]} : '/images/no-image.png'" 
                              class="card-img-top product-image" th:alt="${product.name}">
                         
                         <div class="card-body d-flex flex-column">

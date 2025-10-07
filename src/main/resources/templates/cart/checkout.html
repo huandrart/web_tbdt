@@ -1,5 +1,6 @@
 <!DOCTYPE html>
-<html lang="vi" xmlns:th="http://www.thymeleaf.org">
+<html lang="vi" xmlns:th="http://www.thymeleaf.org" 
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -10,23 +11,99 @@
     <!-- Font Awesome -->
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
     
-        <!-- Custom CSS -->
+    <!-- Custom CSS -->
     <link th:href="@{/css/cart-checkout.css}" rel="stylesheet">
 </head>
 <body>
     <!-- Navigation -->
-    <nav class="navbar navbar-expand-lg navbar-dark bg-primary">
+    <nav class="navbar navbar-expand-lg navbar-dark bg-primary sticky-top">
         <div class="container">
             <a class="navbar-brand" href="/">
                 <i class="fas fa-bolt me-2"></i>Electronic Store
             </a>
-            <div class="navbar-nav ms-auto">
-                <a class="nav-link" href="/">
-                    <i class="fas fa-home me-1"></i>Trang chủ
-                </a>
-                <a class="nav-link" href="/cart">
-                    <i class="fas fa-shopping-cart me-1"></i>Giỏ hàng
-                </a>
+            
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <!-- Search Bar -->
+                <div class="mx-auto" style="max-width: 400px;">
+                    <form class="d-flex" action="/search" method="get">
+                        <div class="input-group">
+                            <input type="search" class="form-control search-bar" name="q" 
+                                   placeholder="Tìm kiếm sản phẩm..." 
+                                   th:value="${searchQuery}">
+                            <button class="btn btn-outline-light" type="submit">
+                                <i class="fas fa-search"></i>
+                            </button>
+                        </div>
+                    </form>
+                </div>
+                
+                <!-- User Menu -->
+                <ul class="navbar-nav ms-auto">
+                    <li class="nav-item">
+                        <a class="nav-link" href="/cart">
+                            <i class="fas fa-shopping-cart me-1"></i>Giỏ hàng
+                            <span class="badge bg-danger ms-1" id="cartCount">0</span>
+                        </a>
+                    </li>
+                    <li class="nav-item" sec:authorize="isAuthenticated()">
+                        <div class="dropdown">
+                            <a class="nav-link dropdown-toggle d-flex align-items-center" href="#" role="button" 
+                               data-bs-toggle="dropdown" aria-expanded="false">
+                                <i class="fas fa-user me-1"></i>
+                                <span sec:authentication="name">User</span>
+                                <i class="fas fa-chevron-down ms-1"></i>
+                            </a>
+                            <ul class="dropdown-menu dropdown-menu-end">
+                                <li>
+                                    <h6 class="dropdown-header">
+                                        <i class="fas fa-user me-2"></i>Xin chào, <span sec:authentication="name">User</span>
+                                    </h6>
+                                </li>
+                                <li><hr class="dropdown-divider"></li>
+                                <li>
+                                    <a class="dropdown-item" href="/profile">
+                                        <i class="fas fa-user me-2"></i>Thông tin cá nhân
+                                    </a>
+                                </li>
+                                <li>
+                                    <a class="dropdown-item" href="/profile/edit">
+                                        <i class="fas fa-edit me-2"></i>Sửa thông tin
+                                    </a>
+                                </li>
+                                <li>
+                                    <a class="dropdown-item" href="/profile/change-password">
+                                        <i class="fas fa-lock me-2"></i>Đổi mật khẩu
+                                    </a>
+                                </li>
+                                <li>
+                                    <a class="dropdown-item" href="/orders">
+                                        <i class="fas fa-shopping-bag me-2"></i>Đơn hàng của tôi
+                                    </a>
+                                </li>
+                                <li><hr class="dropdown-divider"></li>
+                                <li>
+                                    <a class="dropdown-item text-danger" href="/logout">
+                                        <i class="fas fa-sign-out-alt me-2"></i>Đăng xuất
+                                    </a>
+                                </li>
+                            </ul>
+                        </div>
+                    </li>
+                    <li class="nav-item" sec:authorize="!isAuthenticated()">
+                        <a class="nav-link" href="/login">
+                            <i class="fas fa-sign-in-alt me-1"></i>Đăng nhập
+                        </a>
+                    </li>
+                    <li class="nav-item" sec:authorize="hasRole('ADMIN')">
+                        <a class="nav-link" href="/admin/dashboard">
+                            <i class="fas fa-cog me-1"></i>Quản trị
+                        </a>
+                    </li>
+                </ul>
             </div>
         </div>
     </nav>
@@ -271,7 +348,7 @@
                         <div class="order-items mb-4" style="max-height: 300px; overflow-y: auto;">
                             <div th:each="item : ${cartItems}" class="d-flex align-items-center mb-3 pb-3 border-bottom">
                                 <div class="flex-shrink-0 me-3">
-                                    <img th:src="@{'/images/products/' + ${item.product.imageUrl}}" 
+                                    <img th:src="${item.imageUrl != null ? '/images/products/' + item.imageUrl : '/images/no-image.png'}" 
                                          class="rounded" style="width: 50px; height: 50px; object-fit: cover;"
                                          th:alt="${item.product.name}">
                                     <span class="badge bg-primary position-absolute translate-middle-x" 

@@ -1,5 +1,6 @@
 <!DOCTYPE html>
-<html lang="vi" xmlns:th="http://www.thymeleaf.org">
+<html lang="vi" xmlns:th="http://www.thymeleaf.org" 
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -10,24 +11,99 @@
     <!-- Font Awesome -->
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
     
-        <!-- Custom CSS -->
+    <!-- Custom CSS -->
     <link th:href="@{/css/cart-cart.css}" rel="stylesheet">
 </head>
 <body>
-    <!-- Navigation Bar -->
-    <nav class="navbar navbar-expand-lg navbar-dark bg-primary">
+    <!-- Navigation -->
+    <nav class="navbar navbar-expand-lg navbar-dark bg-primary sticky-top">
         <div class="container">
             <a class="navbar-brand" href="/">
                 <i class="fas fa-bolt me-2"></i>Electronic Store
             </a>
-            <div class="navbar-nav ms-auto">
-                <a class="nav-link" href="/">
-                    <i class="fas fa-home me-1"></i>Trang chủ
-                </a>
-                <a class="nav-link active" href="/cart">
-                    <i class="fas fa-shopping-cart me-1"></i>Giỏ hàng
-                    <span class="badge bg-danger ms-1" th:text="${cartItemCount}">0</span>
-                </a>
+            
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <!-- Search Bar -->
+                <div class="mx-auto" style="max-width: 400px;">
+                    <form class="d-flex" action="/search" method="get">
+                        <div class="input-group">
+                            <input type="search" class="form-control search-bar" name="q" 
+                                   placeholder="Tìm kiếm sản phẩm..." 
+                                   th:value="${searchQuery}">
+                            <button class="btn btn-outline-light" type="submit">
+                                <i class="fas fa-search"></i>
+                            </button>
+                        </div>
+                    </form>
+                </div>
+                
+                <!-- User Menu -->
+                <ul class="navbar-nav ms-auto">
+                    <li class="nav-item">
+                        <a class="nav-link active" href="/cart">
+                            <i class="fas fa-shopping-cart me-1"></i>Giỏ hàng
+                            <span class="badge bg-danger ms-1" th:text="${cartItemCount}">0</span>
+                        </a>
+                    </li>
+                    <li class="nav-item" sec:authorize="isAuthenticated()">
+                        <div class="dropdown">
+                            <a class="nav-link dropdown-toggle d-flex align-items-center" href="#" role="button" 
+                               data-bs-toggle="dropdown" aria-expanded="false">
+                                <i class="fas fa-user me-1"></i>
+                                <span sec:authentication="name">User</span>
+                                <i class="fas fa-chevron-down ms-1"></i>
+                            </a>
+                            <ul class="dropdown-menu dropdown-menu-end">
+                                <li>
+                                    <h6 class="dropdown-header">
+                                        <i class="fas fa-user me-2"></i>Xin chào, <span sec:authentication="name">User</span>
+                                    </h6>
+                                </li>
+                                <li><hr class="dropdown-divider"></li>
+                                <li>
+                                    <a class="dropdown-item" href="/profile">
+                                        <i class="fas fa-user me-2"></i>Thông tin cá nhân
+                                    </a>
+                                </li>
+                                <li>
+                                    <a class="dropdown-item" href="/profile/edit">
+                                        <i class="fas fa-edit me-2"></i>Sửa thông tin
+                                    </a>
+                                </li>
+                                <li>
+                                    <a class="dropdown-item" href="/profile/change-password">
+                                        <i class="fas fa-lock me-2"></i>Đổi mật khẩu
+                                    </a>
+                                </li>
+                                <li>
+                                    <a class="dropdown-item" href="/orders">
+                                        <i class="fas fa-shopping-bag me-2"></i>Đơn hàng của tôi
+                                    </a>
+                                </li>
+                                <li><hr class="dropdown-divider"></li>
+                                <li>
+                                    <a class="dropdown-item text-danger" href="/logout">
+                                        <i class="fas fa-sign-out-alt me-2"></i>Đăng xuất
+                                    </a>
+                                </li>
+                            </ul>
+                        </div>
+                    </li>
+                    <li class="nav-item" sec:authorize="!isAuthenticated()">
+                        <a class="nav-link" href="/login">
+                            <i class="fas fa-sign-in-alt me-1"></i>Đăng nhập
+                        </a>
+                    </li>
+                    <li class="nav-item" sec:authorize="hasRole('ADMIN')">
+                        <a class="nav-link" href="/admin/dashboard">
+                            <i class="fas fa-cog me-1"></i>Quản trị
+                        </a>
+                    </li>
+                </ul>
             </div>
         </div>
     </nav>
@@ -72,16 +148,17 @@
                         <div class="row align-items-center">
                             <!-- Product Image -->
                             <div class="col-md-2 col-3">
-                                <img th:src="@{'/images/products/' + ${item.product.imageUrl}}" 
-                                     th:alt="${item.product.name}" class="product-image">
+                                
+                                <img th:src="${item.imageUrl != null ? '/images/products/' + item.imageUrl : '/images/no-image.png'}" 
+                                     th:alt="${item.productName}" class="product-image">
                             </div>
                             
                             <!-- Product Info -->
                             <div class="col-md-4 col-9">
-                                <h6 class="mb-1" th:text="${item.product.name}">Product Name</h6>
-                                <p class="text-muted small mb-1" th:text="${item.product.category.name}">Category</p>
+                                <h6 class="mb-1" th:text="${item.productName}">Product Name</h6>
+                                <p class="text-muted small mb-1">Sản phẩm</p>
                                 <p class="text-primary fw-bold mb-0" 
-                                   th:text="${#numbers.formatDecimal(item.product.price, 0, 'COMMA', 0, 'POINT')} + ' ₫'">
+                                   th:text="${#numbers.formatDecimal(item.unitPrice, 0, 'COMMA', 0, 'POINT')} + ' ₫'">
                                    Price
                                 </p>
                             </div>
@@ -90,14 +167,14 @@
                             <div class="col-md-3 col-6">
                                 <div class="d-flex align-items-center">
                                     <button class="btn btn-outline-secondary btn-quantity me-2" 
-                                            onclick="updateQuantity([[${item.product.id}]], -1)">
+                                            onclick="updateQuantity([[${item.productId}]], -1)">
                                         <i class="fas fa-minus"></i>
                                     </button>
                                     <input type="number" class="form-control quantity-input" 
                                            th:value="${item.quantity}" min="1" max="99"
-                                           th:id="'quantity-' + ${item.product.id}">
+                                           th:id="'quantity-' + ${item.productId}">
                                     <button class="btn btn-outline-secondary btn-quantity ms-2" 
-                                            onclick="updateQuantity([[${item.product.id}]], 1)">
+                                            onclick="updateQuantity([[${item.productId}]], 1)">
                                         <i class="fas fa-plus"></i>
                                     </button>
                                 </div>
@@ -106,11 +183,11 @@
                             <!-- Total Price & Remove -->
                             <div class="col-md-2 col-6 text-end">
                                 <p class="fw-bold text-success mb-2" 
-                                   th:text="${#numbers.formatDecimal(item.product.price * item.quantity, 0, 'COMMA', 0, 'POINT')} + ' ₫'">
+                                   th:text="${#numbers.formatDecimal(item.totalPrice, 0, 'COMMA', 0, 'POINT')} + ' ₫'">
                                    Total
                                 </p>
                                 <button class="btn btn-outline-danger btn-sm" 
-                                        onclick="removeFromCart([[${item.product.id}]])"
+                                        onclick="removeFromCart([[${item.productId}]])"
                                         title="Xóa sản phẩm">
                                     <i class="fas fa-trash"></i>
                                 </button>
@@ -138,7 +215,7 @@
                         
                         <div class="d-flex justify-content-between mb-2">
                             <span>Tạm tính:</span>
-                            <span th:text="${#numbers.formatDecimal(subtotal, 0, 'COMMA', 0, 'POINT')} + ' ₫'">0 ₫</span>
+                            <span th:text="${#numbers.formatDecimal(cartTotal, 0, 'COMMA', 0, 'POINT')} + ' ₫'">0 ₫</span>
                         </div>
                         
                         <div class="d-flex justify-content-between mb-2">
@@ -148,7 +225,7 @@
                         
                         <div class="d-flex justify-content-between mb-2">
                             <span>Thuế VAT (10%):</span>
-                            <span th:text="${#numbers.formatDecimal(tax, 0, 'COMMA', 0, 'POINT')} + ' ₫'">0 ₫</span>
+                            <span th:text="${#numbers.formatDecimal(cartTotal * 0.1, 0, 'COMMA', 0, 'POINT')} + ' ₫'">0 ₫</span>
                         </div>
                         
                         <hr>
@@ -156,7 +233,7 @@
                         <div class="d-flex justify-content-between mb-4">
                             <strong>Tổng cộng:</strong>
                             <strong class="text-primary fs-5" 
-                                    th:text="${#numbers.formatDecimal(total, 0, 'COMMA', 0, 'POINT')} + ' ₫'">0 ₫</strong>
+                                    th:text="${#numbers.formatDecimal(cartTotal * 1.1, 0, 'COMMA', 0, 'POINT')} + ' ₫'">0 ₫</strong>
                         </div>
                         
                         <!-- Discount Code -->

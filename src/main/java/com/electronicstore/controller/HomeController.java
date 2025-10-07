@@ -2,8 +2,10 @@ package com.electronicstore.controller;
 
 import com.electronicstore.entity.Category;
 import com.electronicstore.entity.Product;
+import com.electronicstore.entity.Review;
 import com.electronicstore.service.CategoryService;
 import com.electronicstore.service.ProductService;
+import com.electronicstore.service.ReviewService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -23,6 +25,9 @@ public class HomeController {
     
     @Autowired
     private CategoryService categoryService;
+    
+    @Autowired
+    private ReviewService reviewService;
     
     @GetMapping({"/", "/home"})
     public String home(Model model) {
@@ -114,8 +119,16 @@ public class HomeController {
             model.addAttribute("relatedProducts", relatedProducts.getContent());
         }
         
+        // Lấy tất cả reviews (bao gồm cả chưa duyệt để testing)
+        List<Review> allReviews = reviewService.findByProduct(product);
+        Double averageRating = reviewService.getAverageRatingByProduct(product);
+        long reviewCount = allReviews.size();
+        
         model.addAttribute("product", product);
-        return "product-detail";
+        model.addAttribute("reviews", allReviews);
+        model.addAttribute("averageRating", averageRating != null ? averageRating : 0.0);
+        model.addAttribute("reviewCount", reviewCount);
+        return "product/detail";
     }
     
     @GetMapping("/category/{id}")  

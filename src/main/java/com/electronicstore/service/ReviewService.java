@@ -3,91 +3,39 @@ package com.electronicstore.service;
 import com.electronicstore.entity.Review;
 import com.electronicstore.entity.Product;
 import com.electronicstore.entity.User;
-import com.electronicstore.repository.ReviewRepository;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+
 import java.util.List;
 import java.util.Optional;
 
-@Service
-@Transactional
-public class ReviewService {
+public interface ReviewService {
     
-    @Autowired
-    private ReviewRepository reviewRepository;
+    Review save(Review review);
     
-    public List<Review> findAll() {
-        return reviewRepository.findAll();
-    }
+    Optional<Review> findById(Long id);
     
-    public Optional<Review> findById(Long id) {
-        return reviewRepository.findById(id);
-    }
+    List<Review> findByProduct(Product product);
     
-    public List<Review> findByProduct(Product product) {
-        return reviewRepository.findByProduct(product);
-    }
+    List<Review> findByUser(User user);
     
-    public List<Review> findByProductAndApproved(Product product, boolean approved) {
-        return reviewRepository.findByProductAndIsApproved(product, approved);
-    }
+    List<Review> findByProductAndIsApproved(Product product, Boolean isApproved);
     
-    public List<Review> findByUser(User user) {
-        return reviewRepository.findByUser(user);
-    }
+    Page<Review> findByProductAndIsApproved(Product product, Boolean isApproved, Pageable pageable);
     
-    public List<Review> findPendingReviews() {
-        return reviewRepository.findByIsApprovedFalse();
-    }
+    List<Review> findPendingReviews();
     
-    public Optional<Review> findByUserAndProduct(User user, Product product) {
-        return reviewRepository.findByUserAndProduct(user, product);
-    }
+    Optional<Review> findByUserAndProduct(User user, Product product);
     
-    public Review save(Review review) {
-        return reviewRepository.save(review);
-    }
+    Double getAverageRatingByProduct(Product product);
     
-    public Review addReview(User user, Product product, Integer rating, String comment) {
-        // Check if user already reviewed this product
-        if (reviewRepository.findByUserAndProduct(user, product).isPresent()) {
-            throw new IllegalArgumentException("Bạn đã đánh giá sản phẩm này rồi");
-        }
-        
-        Review review = new Review();
-        review.setUser(user);
-        review.setProduct(product);
-        review.setRating(rating);
-        review.setComment(comment);
-        review.setIsApproved(false); // Require approval
-        
-        return reviewRepository.save(review);
-    }
+    long countByProductAndIsApproved(Product product, Boolean isApproved);
     
-    public Review approveReview(Long reviewId) {
-        Optional<Review> reviewOpt = reviewRepository.findById(reviewId);
-        if (reviewOpt.isPresent()) {
-            Review review = reviewOpt.get();
-            review.setIsApproved(true);
-            return reviewRepository.save(review);
-        }
-        throw new IllegalArgumentException("Đánh giá không tồn tại");
-    }
+    long countPendingReviews();
     
-    public void deleteById(Long id) {
-        reviewRepository.deleteById(id);
-    }
+    void deleteById(Long id);
     
-    public Double getAverageRatingForProduct(Product product) {
-        return reviewRepository.getAverageRatingByProduct(product);
-    }
+    Review createReview(Product product, User user, Integer rating, String comment);
     
-    public long countReviewsForProduct(Product product) {
-        return reviewRepository.countByProductAndIsApproved(product, true);
-    }
-    
-    public boolean hasUserReviewedProduct(User user, Product product) {
-        return reviewRepository.findByUserAndProduct(user, product).isPresent();
-    }
+    boolean canUserReview(User user, Product product);
 }

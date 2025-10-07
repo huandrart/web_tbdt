@@ -27,8 +27,11 @@ public class SecurityConfig {
                                "/register", "/login", "/forgot-password", "/reset-password",
                                "/auth/**").permitAll()
                 .requestMatchers("/admin/**").hasAnyRole("ADMIN", "SUPER_ADMIN")
-                .requestMatchers("/profile/**", "/orders/**").hasAnyRole("USER", "ADMIN", "SUPER_ADMIN")
+                .requestMatchers("/profile/**", "/orders/**", "/reviews/**").hasAnyRole("USER", "ADMIN", "SUPER_ADMIN")
                 .anyRequest().authenticated()
+            )
+            .csrf(csrf -> csrf
+                .ignoringRequestMatchers("/css/**", "/js/**", "/images/**", "/favicon.ico")
             )
             .formLogin(form -> form
                 .loginPage("/login")

@@ -192,4 +192,8 @@ public class OrderService {
     public long countByUser(User user) {
         return orderRepository.countByUser(user);
     }
+    
+    public Page<Order> findByUserAndStatus(User user, Order.OrderStatus status, Pageable pageable) {
+        return orderRepository.findByUserAndStatus(user, status, pageable);
+    }
 }

@@ -138,4 +138,38 @@
             max-height: 90%;
             object-fit: contain;
         }
+        
+        /* Rating stars */
+        .rating-input {
+            display: flex;
+            gap: 5px;
+            margin-bottom: 10px;
+        }
+        
+        .rating-input i {
+            font-size: 1.5rem;
+            color: #e9ecef;
+            cursor: pointer;
+            transition: color 0.2s ease;
+        }
+        
+        .rating-input i:hover,
+        .rating-input i.fas {
+            color: #ffc107;
+        }
+        
+        .rating-input i.fas {
+            color: #ffc107;
+        }
+        
+        /* Review cards */
+        .review-card {
+            border: 1px solid #e9ecef;
+            border-radius: 10px;
+            transition: box-shadow 0.3s ease;
+        }
+        
+        .review-card:hover {
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+        }
     
