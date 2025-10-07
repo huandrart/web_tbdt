@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Test Users</title>
+</head>
+<body>
+    <h1>Test Users Page</h1>
+    <p>Total users: <span th:text="${users != null ? users.totalElements : 'NULL'}">0</span></p>
+    <p>Users content: <span th:text="${users != null ? users.content.size() : 'NULL'}">0</span></p>
+    
+    <div th:if="${users != null and users.content.size() > 0}">
+        <h2>Users List:</h2>
+        <ul>
+            <li th:each="user : ${users.content}">
+                <span th:text="${user.fullName}">Name</span> - 
+                <span th:text="${user.email}">Email</span> - 
+                <span th:text="${user.role}">Role</span>
+            </li>
+        </ul>
+    </div>
+    
+    <div th:if="${users == null or users.content.size() == 0}">
+        <p>No users found or users is null</p>
+    </div>
+</body>
+</html>

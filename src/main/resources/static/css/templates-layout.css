@@ -1,0 +1,54 @@
+/* templates/layout.html styles */
+
+
+        .navbar-brand {
+            font-weight: bold;
+            font-size: 1.5rem;
+        }
+        
+        .product-card {
+            transition: transform 0.3s;
+            height: 100%;
+        }
+        
+        .product-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+        }
+        
+        .product-image {
+            height: 200px;
+            object-fit: cover;
+        }
+        
+        .price {
+            color: #e74c3c;
+            font-weight: bold;
+            font-size: 1.2rem;
+        }
+        
+        .old-price {
+            text-decoration: line-through;
+            color: #6c757d;
+            font-size: 1rem;
+        }
+        
+        .hero-section {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 80px 0;
+        }
+        
+        .category-card {
+            transition: all 0.3s;
+        }
+        
+        .category-card:hover {
+            transform: scale(1.05);
+        }
+        
+        footer {
+            background-color: #2c3e50;
+            color: white;
+        }
+    

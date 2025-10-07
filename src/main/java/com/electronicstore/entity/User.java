@@ -42,8 +42,9 @@ public class User {
     private String address;
     
     @NotNull(message = "Role is required")
+    @Enumerated(EnumType.STRING)
     @Column(nullable = false)
-    private String role = "USER";
+    private UserRole role = UserRole.USER;
     
     @Column(name = "is_active", nullable = false)
     private Boolean isActive = true;
@@ -61,7 +62,7 @@ public class User {
         this.fullName = fullName;
         this.email = email;
         this.password = password;
-        this.role = "USER";
+        this.role = UserRole.USER;
         this.isActive = true;
         this.createdAt = LocalDateTime.now();
         this.updatedAt = LocalDateTime.now();
@@ -154,11 +155,11 @@ public class User {
         this.address = address;
     }
     
-    public String getRole() {
+    public UserRole getRole() {
         return role;
     }
     
-    public void setRole(String role) {
+    public void setRole(UserRole role) {
         this.role = role;
     }
     

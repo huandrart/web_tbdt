@@ -1,0 +1,143 @@
+/* users/view.html styles */
+
+
+        .sidebar {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+        }
+        
+        .sidebar .nav-link {
+            color: rgba(255, 255, 255, 0.8);
+            transition: all 0.3s;
+            border-radius: 8px;
+            margin: 2px 0;
+        }
+        
+        .sidebar .nav-link:hover,
+        .sidebar .nav-link.active {
+            color: white;
+            background: rgba(255, 255, 255, 0.1);
+            transform: translateX(5px);
+        }
+        
+        .main-content {
+            background-color: #f8f9fa;
+            min-height: 100vh;
+        }
+        
+        .card {
+            border: none;
+            border-radius: 15px;
+            box-shadow: 0 0 20px rgba(0,0,0,0.1);
+        }
+        
+        .user-avatar-large {
+            width: 100px;
+            height: 100px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+            font-size: 2.5rem;
+            margin-bottom: 20px;
+        }
+        
+        .badge-role {
+            font-size: 0.9em;
+            padding: 0.6em 1.2em;
+            border-radius: 25px;
+        }
+        
+        .role-admin { background-color: #dc3545; color: #fff; }
+        .role-user { background-color: #28a745; color: #fff; }
+        
+        .badge-status {
+            font-size: 0.9em;
+            padding: 0.6em 1.2em;
+            border-radius: 25px;
+        }
+        
+        .status-active { background-color: #28a745; color: #fff; }
+        .status-blocked { background-color: #dc3545; color: #fff; }
+        
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border: none;
+            border-radius: 20px;
+        }
+        
+        .info-row {
+            border-bottom: 1px solid #e9ecef;
+            padding: 12px 0;
+        }
+        
+        .info-row:last-child {
+            border-bottom: none;
+        }
+        
+        .info-label {
+            font-weight: 600;
+            color: #495057;
+            width: 150px;
+            display: inline-block;
+        }
+        
+        .order-card {
+            transition: transform 0.2s;
+            cursor: pointer;
+        }
+        
+        .order-card:hover {
+            transform: translateY(-2px);
+        }
+        
+        .stats-card {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border-radius: 15px;
+            text-align: center;
+        }
+        
+        .stats-number {
+            font-size: 2rem;
+            font-weight: bold;
+        }
+        
+        .activity-timeline {
+            position: relative;
+        }
+        
+        .activity-timeline::before {
+            content: '';
+            position: absolute;
+            left: 20px;
+            top: 0;
+            bottom: 0;
+            width: 2px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        }
+        
+        .activity-item {
+            position: relative;
+            padding-left: 60px;
+            padding-bottom: 20px;
+        }
+        
+        .activity-icon {
+            position: absolute;
+            left: 0;
+            top: 0;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 3px 10px rgba(102, 126, 234, 0.3);
+        }
+    

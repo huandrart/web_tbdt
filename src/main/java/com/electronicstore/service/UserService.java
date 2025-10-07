@@ -1,6 +1,7 @@
 package com.electronicstore.service;
 
 import com.electronicstore.entity.User;
+import com.electronicstore.entity.UserRole;
 import com.electronicstore.repository.UserRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -28,7 +29,7 @@ public class UserService implements UserDetailsService {
 
     private static final Logger log = LoggerFactory.getLogger(UserService.class);
     private static final String ROLE_PREFIX = "ROLE_";
-    private static final String DEFAULT_ROLE = "USER"; // khớp ENUM('USER','ADMIN')
+    private static final UserRole DEFAULT_ROLE = UserRole.USER;
     private static final Pattern BCRYPT_PATTERN = Pattern.compile("^\\$2[aby]?\\$\\d{2}\\$.*");
 
     @Autowired
@@ -43,7 +44,7 @@ public class UserService implements UserDetailsService {
         User user = userRepository.findByEmail(email)
                 .orElseThrow(() -> new UsernameNotFoundException("User not found with email: " + email));
 
-        String role = (user.getRole() == null || user.getRole().isBlank()) ? DEFAULT_ROLE : user.getRole().toUpperCase();
+        UserRole role = (user.getRole() == null) ? DEFAULT_ROLE : user.getRole();
 
         return new org.springframework.security.core.userdetails.User(
                 user.getEmail(),
@@ -52,7 +53,7 @@ public class UserService implements UserDetailsService {
                 true,   // accountNonExpired
                 true,   // credentialsNonExpired
                 true,   // accountNonLocked
-                getAuthorities(role)
+                getAuthorities(role.getCode())
         );
     }
 
@@ -69,11 +70,9 @@ public class UserService implements UserDetailsService {
             throw new IllegalArgumentException("Email đã được sử dụng");
         }
 
-        // Mặc định role = USER nếu null/rỗng
-        if (user.getRole() == null || user.getRole().isBlank()) {
+        // Mặc định role = USER nếu null
+        if (user.getRole() == null) {
             user.setRole(DEFAULT_ROLE);
-        } else {
-            user.setRole(user.getRole().toUpperCase());
         }
 
         // Mã hoá mật khẩu nếu chưa mã hoá
@@ -147,10 +146,17 @@ public class UserService implements UserDetailsService {
         userRepository.deleteById(id);
     }
 
-    // Có thể mở rộng filter thật sự qua Spec/Query Methods
+    // Search users with filters
     public Page<User> searchUsers(String search, String role, Boolean isActive, Pageable pageable) {
-        // For now, just return all users with pagination
-        // TODO: Implement proper search logic
+        // If no filters, return all users
+        if ((search == null || search.trim().isEmpty()) && 
+            (role == null || role.trim().isEmpty()) && 
+            isActive == null) {
+            return userRepository.findAll(pageable);
+        }
+        
+        // For now, implement basic filtering
+        // TODO: Implement proper search with JPA Specifications
         return userRepository.findAll(pageable);
     }
 
@@ -165,10 +171,10 @@ public class UserService implements UserDetailsService {
             user.setPassword(passwordEncoder.encode(user.getPassword()));
         }
         // chuẩn hoá role
-        if (user.getRole() == null || user.getRole().isBlank()) {
+        if (user.getRole() == null) {
             user.setRole(DEFAULT_ROLE);
         } else {
-            user.setRole(user.getRole().toUpperCase());
+            // Role đã được set đúng từ trước
         }
         return userRepository.save(user);
     }
@@ -213,8 +219,8 @@ public class UserService implements UserDetailsService {
             }
 
             // đổi role nếu cần và hợp lệ
-            if (user.getRole() != null && !user.getRole().isBlank()) {
-                existing.setRole(user.getRole().toUpperCase());
+            if (user.getRole() != null) {
+                existing.setRole(user.getRole());
             }
 
             return userRepository.save(existing);

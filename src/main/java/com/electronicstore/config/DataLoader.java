@@ -3,6 +3,7 @@ package com.electronicstore.config;
 import com.electronicstore.entity.Category;
 import com.electronicstore.entity.Product;
 import com.electronicstore.entity.User;
+import com.electronicstore.entity.UserRole;
 import com.electronicstore.repository.CategoryRepository;
 import com.electronicstore.repository.ProductRepository;
 import com.electronicstore.repository.UserRepository;
@@ -34,20 +35,45 @@ public class DataLoader implements ApplicationRunner {
     public void run(ApplicationArguments args) throws Exception {
         System.out.println("DataLoader starting...");
         
-        // Create admin user if not exists
-        if (!userRepository.existsByEmail("admin@electronicstore.com")) {
+        // Create super admin user if not exists
+        if (!userRepository.existsByEmail("superadmin@electronicstore.com")) {
+            User superAdmin = new User();
+            superAdmin.setFullName("Super Administrator");
+            superAdmin.setEmail("superadmin@electronicstore.com");
+            superAdmin.setPassword(passwordEncoder.encode("superadmin123"));
+            superAdmin.setPhone("0123456789");
+            superAdmin.setAddress("Super Admin Office");
+            superAdmin.setRole(UserRole.SUPER_ADMIN);
+            superAdmin.setIsActive(true);
+            superAdmin.setCreatedAt(LocalDateTime.now());
+            superAdmin.setUpdatedAt(LocalDateTime.now());
+            userRepository.save(superAdmin);
+            System.out.println("Created super admin user: superadmin@electronicstore.com / superadmin123");
+        }
+        
+        // Update existing admin user or create if not exists
+        User existingAdmin = userRepository.findByEmail("admin@electronicstore.com").orElse(null);
+        if (existingAdmin == null) {
             User admin = new User();
             admin.setFullName("Administrator");
             admin.setEmail("admin@electronicstore.com");
             admin.setPassword(passwordEncoder.encode("admin123"));
             admin.setPhone("0123456789");
             admin.setAddress("Admin Office");
-            admin.setRole("ADMIN");
+            admin.setRole(UserRole.ADMIN);
             admin.setIsActive(true);
             admin.setCreatedAt(LocalDateTime.now());
             admin.setUpdatedAt(LocalDateTime.now());
             userRepository.save(admin);
             System.out.println("Created admin user: admin@electronicstore.com / admin123");
+        } else {
+            // Update existing admin user
+            if (existingAdmin.getFullName() == null || existingAdmin.getFullName().isEmpty()) {
+                existingAdmin.setFullName("Administrator");
+                existingAdmin.setUpdatedAt(LocalDateTime.now());
+                userRepository.save(existingAdmin);
+                System.out.println("Updated admin user fullName");
+            }
         }
 
         // Create sample user if not exists
@@ -58,7 +84,7 @@ public class DataLoader implements ApplicationRunner {
             user.setPassword(passwordEncoder.encode("user123"));
             user.setPhone("0987654321");
             user.setAddress("123 Nguyễn Trãi, Q1, TP.HCM");
-            user.setRole("USER");
+            user.setRole(UserRole.USER);
             user.setIsActive(true);
             user.setCreatedAt(LocalDateTime.now());
             user.setUpdatedAt(LocalDateTime.now());

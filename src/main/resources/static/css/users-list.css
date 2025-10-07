@@ -1,0 +1,132 @@
+/* users/list.html styles */
+
+
+        .sidebar {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+        }
+        
+        .sidebar .nav-link {
+            color: rgba(255, 255, 255, 0.8);
+            transition: all 0.3s;
+            border-radius: 8px;
+            margin: 2px 0;
+        }
+        
+        .sidebar .nav-link:hover,
+        .sidebar .nav-link.active {
+            color: white;
+            background: rgba(255, 255, 255, 0.1);
+            transform: translateX(5px);
+        }
+        
+        .main-content {
+            background-color: #f8f9fa;
+            min-height: 100vh;
+        }
+        
+        .card {
+            border: none;
+            border-radius: 15px;
+            box-shadow: 0 0 20px rgba(0,0,0,0.1);
+        }
+        
+        .user-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+        }
+        
+        .badge-role {
+            font-size: 0.75em;
+            padding: 0.5em 0.75em;
+            border-radius: 20px;
+        }
+        
+        .role-user { background-color: #28a745; color: #fff; }
+        .role-admin { background-color: #dc3545; color: #fff; }
+        .role-super_admin { background-color: #6f42c1; color: #fff; }
+        
+        .badge-status {
+            font-size: 0.75em;
+            padding: 0.5em 0.75em;
+            border-radius: 20px;
+        }
+        
+        .status-active { background-color: #28a745; color: #fff; }
+        .status-blocked { background-color: #dc3545; color: #fff; }
+        
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border: none;
+            border-radius: 20px;
+        }
+        
+        .btn-outline-primary {
+            border-color: #667eea;
+            color: #667eea;
+            border-radius: 20px;
+        }
+        
+        .form-control, .form-select {
+            border-radius: 10px;
+            border: 2px solid #e9ecef;
+            transition: all 0.3s;
+        }
+        
+        .form-control:focus, .form-select:focus {
+            border-color: #667eea;
+            box-shadow: 0 0 0 0.2rem rgba(102, 126, 234, 0.25);
+        }
+        
+        .table-responsive {
+            border-radius: 15px;
+            overflow: hidden;
+        }
+        
+        .table th {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            font-weight: 600;
+        }
+        
+        .table td {
+            border-color: #e9ecef;
+            vertical-align: middle;
+        }
+        
+        .table tbody tr:hover {
+            background-color: #f8f9fa;
+        }
+        
+        .pagination .page-link {
+            border-radius: 20px;
+            margin: 0 2px;
+            border: 1px solid #667eea;
+            color: #667eea;
+        }
+        
+        .pagination .page-link:hover,
+        .pagination .page-item.active .page-link {
+            background-color: #667eea;
+            border-color: #667eea;
+        }
+        
+        .stats-card {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border-radius: 15px;
+        }
+        
+        .stats-icon {
+            opacity: 0.8;
+            font-size: 2.5rem;
+        }
+    

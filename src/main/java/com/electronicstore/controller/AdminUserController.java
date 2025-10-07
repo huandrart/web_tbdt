@@ -1,6 +1,7 @@
 package com.electronicstore.controller;
 
 import com.electronicstore.entity.User;
+import com.electronicstore.entity.UserRole;
 import com.electronicstore.service.UserService;
 import com.electronicstore.service.OrderService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -26,6 +27,51 @@ public class AdminUserController {
     @Autowired
     private OrderService orderService;
     
+    @GetMapping("/test")
+    public String testUsers(Model model) {
+        Page<User> users = userService.findAll(PageRequest.of(0, 10));
+        model.addAttribute("users", users);
+        return "admin/users/test";
+    }
+    
+    @GetMapping("/view-simple/{id}")
+    public String viewUserSimple(@PathVariable Long id, Model model, RedirectAttributes redirectAttributes) {
+        User user = userService.findById(id);
+        
+        if (user == null) {
+            redirectAttributes.addFlashAttribute("error", "Không tìm thấy người dùng với ID: " + id);
+            return "redirect:/admin/users";
+        }
+        
+        // Get user's orders
+        Page<com.electronicstore.entity.Order> orders = orderService.findByUserWithPagination(
+            user, PageRequest.of(0, 10, Sort.by(Sort.Direction.DESC, "createdAt")));
+        
+        model.addAttribute("user", user);
+        model.addAttribute("totalOrders", orders.getTotalElements());
+        
+        return "admin/users/view-simple";
+    }
+    
+    @GetMapping("/view-fixed/{id}")
+    public String viewUserFixed(@PathVariable Long id, Model model, RedirectAttributes redirectAttributes) {
+        User user = userService.findById(id);
+        
+        if (user == null) {
+            redirectAttributes.addFlashAttribute("error", "Không tìm thấy người dùng với ID: " + id);
+            return "redirect:/admin/users";
+        }
+        
+        // Get user's orders
+        Page<com.electronicstore.entity.Order> orders = orderService.findByUserWithPagination(
+            user, PageRequest.of(0, 10, Sort.by(Sort.Direction.DESC, "createdAt")));
+        
+        model.addAttribute("user", user);
+        model.addAttribute("totalOrders", orders.getTotalElements());
+        
+        return "admin/users/view-fixed";
+    }
+    
     @GetMapping
     public String listUsers(
             @RequestParam(defaultValue = "0") int page,
@@ -37,39 +83,50 @@ public class AdminUserController {
             @RequestParam(required = false) String status,
             Model model) {
         
-        Sort.Direction sortDirection = Sort.Direction.fromString(direction);
-        Pageable pageable = PageRequest.of(page, size, Sort.by(sortDirection, sort));
-        
-        Page<User> users;
-        
-        // Apply filters
-        if ((search != null && !search.trim().isEmpty()) || 
-            (role != null && !role.isEmpty()) ||
-            (status != null && !status.isEmpty())) {
+        try {
+            System.out.println("AdminUserController.listUsers() called with page=" + page + ", size=" + size);
             
-            Boolean isActive = null;
-            if (status != null && !status.isEmpty()) {
-                isActive = Boolean.parseBoolean(status);
+            Sort.Direction sortDirection = Sort.Direction.fromString(direction);
+            Pageable pageable = PageRequest.of(page, size, Sort.by(sortDirection, sort));
+            
+            Page<User> users;
+            
+            // Apply filters
+            if ((search != null && !search.trim().isEmpty()) || 
+                (role != null && !role.isEmpty()) ||
+                (status != null && !status.isEmpty())) {
+                
+                Boolean isActive = null;
+                if (status != null && !status.isEmpty()) {
+                    isActive = Boolean.parseBoolean(status);
+                }
+                
+                users = userService.searchUsers(search, role, isActive, pageable);
+            } else {
+                users = userService.findAll(pageable);
             }
             
-            users = userService.searchUsers(search, role, isActive, pageable);
-        } else {
-            users = userService.findAll(pageable);
+            System.out.println("Found " + users.getTotalElements() + " users, content size: " + users.getContent().size());
+            
+            model.addAttribute("users", users);
+            model.addAttribute("currentPage", page);
+            model.addAttribute("totalPages", users.getTotalPages());
+            model.addAttribute("totalItems", users.getTotalElements());
+            model.addAttribute("size", size);
+            model.addAttribute("sort", sort);
+            model.addAttribute("direction", direction);
+            model.addAttribute("reversedDirection", direction.equals("asc") ? "desc" : "asc");
+            model.addAttribute("search", search);
+            model.addAttribute("role", role);
+            model.addAttribute("status", status);
+            
+            return "admin/users/list";
+        } catch (Exception e) {
+            System.err.println("Error in listUsers: " + e.getMessage());
+            e.printStackTrace();
+            model.addAttribute("error", "Có lỗi xảy ra: " + e.getMessage());
+            return "admin/users/list";
         }
-        
-        model.addAttribute("users", users);
-        model.addAttribute("currentPage", page);
-        model.addAttribute("totalPages", users.getTotalPages());
-        model.addAttribute("totalItems", users.getTotalElements());
-        model.addAttribute("size", size);
-        model.addAttribute("sort", sort);
-        model.addAttribute("direction", direction);
-        model.addAttribute("reversedDirection", direction.equals("asc") ? "desc" : "asc");
-        model.addAttribute("search", search);
-        model.addAttribute("role", role);
-        model.addAttribute("status", status);
-        
-        return "admin/users/list";
     }
     
     @GetMapping("/view/{id}")
@@ -125,7 +182,7 @@ public class AdminUserController {
             }
             
             // Set role trực tiếp
-            user.setRole(role.toUpperCase());
+            user.setRole(UserRole.fromCode(role.toUpperCase()));
             user.setUpdatedAt(LocalDateTime.now());
             
             userService.save(user);
@@ -230,7 +287,7 @@ public class AdminUserController {
     // Thay đổi vai trò người dùng
     @PostMapping("/{id}/change-role")
     public String changeUserRole(@PathVariable Long id, 
-                                @RequestParam String newRole,
+                                @RequestParam UserRole newRole,
                                 RedirectAttributes redirectAttributes) {
         try {
             User user = userService.findById(id);
@@ -240,13 +297,13 @@ public class AdminUserController {
             }
             
             // Kiểm tra role hợp lệ
-            if (!newRole.equals("USER") && !newRole.equals("ADMIN")) {
+            if (newRole != UserRole.USER && newRole != UserRole.ADMIN) {
                 redirectAttributes.addFlashAttribute("error", "Vai trò không hợp lệ");
                 return "redirect:/admin/users";
             }
             
             // Cập nhật role
-            String oldRole = user.getRole();
+            UserRole oldRole = user.getRole();
             user.setRole(newRole);
             user.setUpdatedAt(LocalDateTime.now());
             userService.update(user);
@@ -261,5 +318,179 @@ public class AdminUserController {
         }
         
         return "redirect:/admin/users";
+    }
+    
+    // Đặt lại mật khẩu - GET redirect
+    @GetMapping("/reset-password/{id}")
+    public String resetPasswordForm(@PathVariable Long id, RedirectAttributes redirectAttributes) {
+        return "redirect:/admin/users/view/" + id;
+    }
+    
+    // Đặt lại mật khẩu - POST
+    @PostMapping("/reset-password/{id}")
+    public String resetPassword(@PathVariable Long id, 
+                               @RequestParam String newPassword,
+                               RedirectAttributes redirectAttributes) {
+        try {
+            User user = userService.findById(id);
+            if (user == null) {
+                redirectAttributes.addFlashAttribute("error", "Không tìm thấy người dùng");
+                return "redirect:/admin/users";
+            }
+            
+            // Kiểm tra quyền: chỉ SUPER_ADMIN mới có thể reset password cho ADMIN
+            if (user.getRole() == UserRole.ADMIN) {
+                // TODO: Kiểm tra current user có phải SUPER_ADMIN không
+                // if (currentUser.getRole() != UserRole.SUPER_ADMIN) {
+                //     redirectAttributes.addFlashAttribute("error", "Không có quyền reset password cho admin");
+                //     return "redirect:/admin/users";
+                // }
+            }
+            
+            user.setPassword(newPassword);
+            user.setUpdatedAt(LocalDateTime.now());
+            userService.save(user);
+            
+            redirectAttributes.addFlashAttribute("success", 
+                "Mật khẩu đã được đặt lại thành công cho " + user.getFullName());
+            
+        } catch (Exception e) {
+            redirectAttributes.addFlashAttribute("error", 
+                "Có lỗi xảy ra khi đặt lại mật khẩu: " + e.getMessage());
+        }
+        
+        return "redirect:/admin/users/view/" + id;
+    }
+    
+    // Khóa/Mở khóa tài khoản - GET redirect
+    @GetMapping("/toggle-lock/{id}")
+    public String toggleLockForm(@PathVariable Long id, RedirectAttributes redirectAttributes) {
+        return "redirect:/admin/users/view/" + id;
+    }
+    
+    // Khóa/Mở khóa tài khoản - POST
+    @PostMapping("/toggle-lock/{id}")
+    public String toggleLock(@PathVariable Long id, 
+                            @RequestParam boolean locked,
+                            RedirectAttributes redirectAttributes) {
+        try {
+            User user = userService.findById(id);
+            if (user == null) {
+                redirectAttributes.addFlashAttribute("error", "Không tìm thấy người dùng");
+                return "redirect:/admin/users";
+            }
+            
+            // Kiểm tra quyền: không cho phép khóa SUPER_ADMIN
+            if (user.getRole() == UserRole.SUPER_ADMIN) {
+                redirectAttributes.addFlashAttribute("error", "Không thể khóa tài khoản siêu quản trị");
+                return "redirect:/admin/users";
+            }
+            
+            // Kiểm tra quyền: chỉ SUPER_ADMIN mới có thể khóa ADMIN
+            if (user.getRole() == UserRole.ADMIN && locked) {
+                // TODO: Kiểm tra current user có phải SUPER_ADMIN không
+            }
+            
+            user.setIsActive(!locked);
+            user.setUpdatedAt(LocalDateTime.now());
+            userService.save(user);
+            
+            String action = locked ? "khóa" : "mở khóa";
+            redirectAttributes.addFlashAttribute("success", 
+                "Đã " + action + " tài khoản " + user.getFullName() + " thành công");
+            
+        } catch (Exception e) {
+            redirectAttributes.addFlashAttribute("error", 
+                "Có lỗi xảy ra: " + e.getMessage());
+        }
+        
+        return "redirect:/admin/users/view/" + id;
+    }
+    
+    // Cấp quyền admin - GET redirect
+    @GetMapping("/grant-admin/{id}")
+    public String grantAdminForm(@PathVariable Long id, RedirectAttributes redirectAttributes) {
+        return "redirect:/admin/users/view/" + id;
+    }
+    
+    // Cấp quyền admin (chỉ SUPER_ADMIN mới có thể cấp) - POST
+    @PostMapping("/grant-admin/{id}")
+    public String grantAdmin(@PathVariable Long id, 
+                            @RequestParam UserRole newRole,
+                            RedirectAttributes redirectAttributes) {
+        try {
+            User user = userService.findById(id);
+            if (user == null) {
+                redirectAttributes.addFlashAttribute("error", "Không tìm thấy người dùng");
+                return "redirect:/admin/users";
+            }
+            
+            // Kiểm tra quyền: chỉ SUPER_ADMIN mới có thể cấp quyền admin
+            // TODO: Kiểm tra current user có phải SUPER_ADMIN không
+            
+            // Không cho phép cấp SUPER_ADMIN qua web interface
+            if (newRole == UserRole.SUPER_ADMIN) {
+                redirectAttributes.addFlashAttribute("error", "Không thể cấp quyền siêu quản trị qua giao diện web");
+                return "redirect:/admin/users";
+            }
+            
+            UserRole oldRole = user.getRole();
+            user.setRole(newRole);
+            user.setUpdatedAt(LocalDateTime.now());
+            userService.save(user);
+            
+            redirectAttributes.addFlashAttribute("success", 
+                "Đã cấp quyền " + newRole.getDisplayName() + " cho " + user.getFullName() + 
+                " (từ " + oldRole.getDisplayName() + ")");
+            
+        } catch (Exception e) {
+            redirectAttributes.addFlashAttribute("error", 
+                "Có lỗi xảy ra khi cấp quyền: " + e.getMessage());
+        }
+        
+        return "redirect:/admin/users/view/" + id;
+    }
+    
+    // Thu hồi quyền admin - GET redirect
+    @GetMapping("/revoke-admin/{id}")
+    public String revokeAdminForm(@PathVariable Long id, RedirectAttributes redirectAttributes) {
+        return "redirect:/admin/users/view/" + id;
+    }
+    
+    // Thu hồi quyền admin (chỉ SUPER_ADMIN mới có thể thu hồi) - POST
+    @PostMapping("/revoke-admin/{id}")
+    public String revokeAdmin(@PathVariable Long id, 
+                             RedirectAttributes redirectAttributes) {
+        try {
+            User user = userService.findById(id);
+            if (user == null) {
+                redirectAttributes.addFlashAttribute("error", "Không tìm thấy người dùng");
+                return "redirect:/admin/users";
+            }
+            
+            // Kiểm tra quyền: chỉ SUPER_ADMIN mới có thể thu hồi quyền admin
+            // TODO: Kiểm tra current user có phải SUPER_ADMIN không
+            
+            // Không cho phép thu hồi quyền SUPER_ADMIN
+            if (user.getRole() == UserRole.SUPER_ADMIN) {
+                redirectAttributes.addFlashAttribute("error", "Không thể thu hồi quyền siêu quản trị");
+                return "redirect:/admin/users";
+            }
+            
+            UserRole oldRole = user.getRole();
+            user.setRole(UserRole.USER);
+            user.setUpdatedAt(LocalDateTime.now());
+            userService.save(user);
+            
+            redirectAttributes.addFlashAttribute("success", 
+                "Đã thu hồi quyền " + oldRole.getDisplayName() + " của " + user.getFullName() + 
+                " và chuyển về " + UserRole.USER.getDisplayName());
+            
+        } catch (Exception e) {
+            redirectAttributes.addFlashAttribute("error", 
+                "Có lỗi xảy ra khi thu hồi quyền: " + e.getMessage());
+        }
+        
+        return "redirect:/admin/users/view/" + id;
     }
 }

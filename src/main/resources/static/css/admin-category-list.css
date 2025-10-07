@@ -1,0 +1,110 @@
+/* Admin Category List Styles */
+
+.sidebar {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    min-height: 100vh;
+}
+
+.main-content {
+    background-color: #f8f9fa;
+    min-height: 100vh;
+}
+
+.category-card {
+    border: none;
+    border-radius: 15px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    transition: transform 0.3s ease;
+}
+
+.category-card:hover {
+    transform: translateY(-2px);
+}
+
+.btn-danger-modern {
+    background: linear-gradient(45deg, #ff6b6b, #ee5a52);
+    border: none;
+    border-radius: 8px;
+    color: white;
+    padding: 10px 20px;
+    transition: all 0.3s ease;
+}
+
+.btn-danger-modern:hover {
+    background: linear-gradient(45deg, #ee5a52, #ff6b6b);
+    transform: translateY(-1px);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+}
+
+.btn-primary-modern {
+    background: linear-gradient(45deg, #4facfe, #00f2fe);
+    border: none;
+    border-radius: 8px;
+    color: white;
+    padding: 10px 20px;
+    transition: all 0.3s ease;
+}
+
+.btn-primary-modern:hover {
+    background: linear-gradient(45deg, #00f2fe, #4facfe);
+    transform: translateY(-1px);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+}
+
+.status-badge {
+    padding: 8px 16px;
+    border-radius: 20px;
+    font-weight: 500;
+    font-size: 0.9em;
+}
+
+.status-active {
+    background-color: #d4edda;
+    color: #155724;
+    border: 1px solid #c3e6cb;
+}
+
+.status-inactive {
+    background-color: #f8d7da;
+    color: #721c24;
+    border: 1px solid #f5c6cb;
+}
+
+.table-hover tbody tr:hover {
+    background-color: rgba(0, 123, 255, 0.1);
+}
+
+.search-container {
+    background: white;
+    border-radius: 10px;
+    padding: 20px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    margin-bottom: 20px;
+}
+
+.filter-buttons .btn {
+    margin-right: 10px;
+    margin-bottom: 10px;
+}
+
+.pagination-container {
+    display: flex;
+    justify-content: center;
+    margin-top: 20px;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+    .search-container {
+        padding: 15px;
+    }
+    
+    .filter-buttons .btn {
+        width: 100%;
+        margin-right: 0;
+    }
+    
+    .table-responsive {
+        font-size: 0.9em;
+    }
+}
