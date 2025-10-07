@@ -163,7 +163,8 @@ public class CategoryBusinessServiceImpl implements CategoryBusinessService {
             fileStorageService.deleteFile(category.getImageUrl());
         }
         
-        categoryService.deleteById(categoryId);
+        // Hard delete - xóa hẳn khỏi database
+        categoryService.hardDeleteById(categoryId);
     }
     
     @Override
@@ -202,6 +203,15 @@ public class CategoryBusinessServiceImpl implements CategoryBusinessService {
         
         // Kiểm tra xem có sản phẩm nào thuộc danh mục này không
         return category.getProducts() == null || category.getProducts().isEmpty();
+    }
+    
+    @Override
+    public Category getCategoryWithDetails(Long categoryId) {
+        Category category = categoryService.findById(categoryId);
+        if (category == null) {
+            throw new RuntimeException("Không tìm thấy danh mục với ID: " + categoryId);
+        }
+        return category;
     }
     
     /**

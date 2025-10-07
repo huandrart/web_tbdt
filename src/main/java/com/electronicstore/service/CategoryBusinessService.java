@@ -2,6 +2,7 @@ package com.electronicstore.service;
 
 import com.electronicstore.dto.request.CategoryRequest;
 import com.electronicstore.dto.response.CategoryResponse;
+import com.electronicstore.entity.Category;
 import com.electronicstore.viewmodel.CategoryFormViewModel;
 import com.electronicstore.viewmodel.CategoryListViewModel;
 
@@ -50,4 +51,9 @@ public interface CategoryBusinessService {
      * Kiểm tra xem category có thể xóa được không
      */
     boolean canDeleteCategory(Long categoryId);
+    
+    /**
+     * Lấy category với đầy đủ thông tin bao gồm products và children
+     */
+    Category getCategoryWithDetails(Long categoryId);
 }

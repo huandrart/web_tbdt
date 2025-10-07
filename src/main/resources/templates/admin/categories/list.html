@@ -201,7 +201,8 @@
                                                class="btn btn-sm btn-outline-danger delete-category" 
                                                title="Xóa danh mục"
                                                th:data-name="${category.name}"
-                                               onclick="return confirm('Bạn có chắc chắn muốn xóa danh mục này?')">
+                                               th:data-product-count="${category.productCount != null ? category.productCount : 0}"
+                                               onclick="return confirmDeleteCategory(this)">
                                                 <i class="fas fa-trash"></i>
                                             </a>
                                         </div>
@@ -319,16 +320,23 @@ document.addEventListener('DOMContentLoaded', function() {
     });
     
     // Enhanced delete confirmation
-    document.querySelectorAll('.delete-category').forEach(link => {
-        link.addEventListener('click', function(e) {
-            e.preventDefault();
-            const categoryName = this.dataset.name;
-            
-            if (confirm(`Bạn có chắc chắn muốn xóa danh mục "${categoryName}"?\n\nHành động này không thể hoàn tác!`)) {
-                window.location.href = this.href;
-            }
-        });
-    });
+    window.confirmDeleteCategory = function(element) {
+        const categoryName = element.dataset.name;
+        const productCount = element.dataset.productCount;
+        
+        let message = `Bạn có chắc chắn muốn XÓA HẲN danh mục "${categoryName}"?\n\n`;
+        
+        if (productCount > 0) {
+            message += `⚠️ CẢNH BÁO: Danh mục này có ${productCount} sản phẩm!\n`;
+            message += `Các sản phẩm sẽ không còn thuộc danh mục nào (category_id = NULL).\n\n`;
+        }
+        
+        message += `❌ Hành động này sẽ XÓA VĨNH VIỄN danh mục khỏi hệ thống!\n`;
+        message += `🔄 Không thể hoàn tác sau khi xóa!\n\n`;
+        message += `Bạn có chắc chắn muốn tiếp tục?`;
+        
+        return confirm(message);
+    };
 });
 </script>
 

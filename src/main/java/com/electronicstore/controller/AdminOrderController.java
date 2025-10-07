@@ -87,6 +87,15 @@ public class AdminOrderController {
         long shippingOrders = orderService.countByStatus(Order.OrderStatus.SHIPPING);
         long deliveredOrders = orderService.countByStatus(Order.OrderStatus.DELIVERED);
         
+        // Debug: In ra số lượng đơn hàng
+        System.out.println("=== DEBUG: Order Statistics ===");
+        System.out.println("Total orders: " + totalOrders);
+        System.out.println("Pending orders: " + pendingOrders);
+        System.out.println("Shipping orders: " + shippingOrders);
+        System.out.println("Delivered orders: " + deliveredOrders);
+        System.out.println("Orders in current page: " + orders.getContent().size());
+        System.out.println("=== END DEBUG ===");
+        
         model.addAttribute("totalOrders", totalOrders);
         model.addAttribute("pendingOrders", pendingOrders);
         model.addAttribute("shippingOrders", shippingOrders);
@@ -97,15 +106,39 @@ public class AdminOrderController {
     
     @GetMapping("/view/{id}")
     public String viewOrder(@PathVariable Long id, Model model, RedirectAttributes redirectAttributes) {
-        Order order = orderService.findByIdDirect(id);
-        
-        if (order == null) {
-            redirectAttributes.addFlashAttribute("error", "Không tìm thấy đơn hàng với ID: " + id);
-            return "redirect:/admin/orders";
+        try {
+            System.out.println("=== AdminOrderController.viewOrder START ===");
+            System.out.println("Looking for order with ID: " + id);
+            
+            Order order = orderService.findById(id).orElse(null);
+            
+            if (order == null) {
+                System.out.println("Order not found, setting order = null in model");
+                model.addAttribute("order", null);
+                model.addAttribute("error", "Không tìm thấy đơn hàng với ID: " + id);
+                return "admin/orders/view";
+            }
+            
+            System.out.println("Found order: " + order.getId() + " - " + order.getOrderNumber());
+            System.out.println("Order status: " + order.getStatus());
+            System.out.println("Order user: " + (order.getUser() != null ? order.getUser().getFullName() : "null"));
+            System.out.println("Order items count: " + (order.getOrderItems() != null ? order.getOrderItems().size() : "null"));
+            
+            model.addAttribute("order", order);
+            System.out.println("Successfully prepared model for admin/orders/view");
+            System.out.println("=== AdminOrderController.viewOrder END ===");
+            
+            return "admin/orders/view";
+        } catch (Exception e) {
+            System.err.println("=== ERROR in AdminOrderController.viewOrder ===");
+            System.err.println("Error message: " + e.getMessage());
+            e.printStackTrace();
+            System.err.println("=== END ERROR ===");
+            
+            model.addAttribute("order", null);
+            model.addAttribute("error", "Lỗi khi tải đơn hàng: " + e.getMessage());
+            return "admin/orders/view";
         }
-        
-        model.addAttribute("order", order);
-        return "admin/orders/view";
     }
     
     @PostMapping("/update-status/{id}")
@@ -173,15 +206,39 @@ public class AdminOrderController {
     
     @GetMapping("/print/{id}")
     public String printOrder(@PathVariable Long id, Model model, RedirectAttributes redirectAttributes) {
-        Order order = orderService.findByIdDirect(id);
-        
-        if (order == null) {
-            redirectAttributes.addFlashAttribute("error", "Không tìm thấy đơn hàng với ID: " + id);
-            return "redirect:/admin/orders";
+        try {
+            System.out.println("=== AdminOrderController.printOrder START ===");
+            System.out.println("Looking for order with ID: " + id);
+            
+            Order order = orderService.findById(id).orElse(null);
+            
+            if (order == null) {
+                System.out.println("Order not found, setting order = null in model");
+                model.addAttribute("order", null);
+                model.addAttribute("error", "Không tìm thấy đơn hàng với ID: " + id);
+                return "admin/orders/print";
+            }
+            
+            System.out.println("Found order: " + order.getId() + " - " + order.getOrderNumber());
+            System.out.println("Order status: " + order.getStatus());
+            System.out.println("Order user: " + (order.getUser() != null ? order.getUser().getFullName() : "null"));
+            System.out.println("Order items count: " + (order.getOrderItems() != null ? order.getOrderItems().size() : "null"));
+            
+            model.addAttribute("order", order);
+            System.out.println("Successfully prepared model for admin/orders/print");
+            System.out.println("=== AdminOrderController.printOrder END ===");
+            
+            return "admin/orders/print";
+        } catch (Exception e) {
+            System.err.println("=== ERROR in AdminOrderController.printOrder ===");
+            System.err.println("Error message: " + e.getMessage());
+            e.printStackTrace();
+            System.err.println("=== END ERROR ===");
+            
+            model.addAttribute("order", null);
+            model.addAttribute("error", "Lỗi khi tải đơn hàng: " + e.getMessage());
+            return "admin/orders/print";
         }
-        
-        model.addAttribute("order", order);
-        return "admin/orders/print";
     }
     
     @PostMapping("/bulk-action")

@@ -206,7 +206,14 @@
         <i class="fas fa-print"></i> In hóa đơn
     </button>
 
-    <div class="invoice-container">
+    <!-- No Order Data Message -->
+    <div th:if="${order == null}" class="alert alert-warning" role="alert" style="margin: 20px; padding: 20px; border: 1px solid #f0ad4e; background-color: #fcf8e3; border-radius: 5px;">
+        <h4 style="color: #8a6d3b; margin-top: 0;">Không tìm thấy đơn hàng!</h4>
+        <p style="color: #8a6d3b; margin-bottom: 15px;">Đơn hàng với ID này không tồn tại hoặc đã bị xóa.</p>
+        <a th:href="@{/admin/orders}" style="background-color: #f0ad4e; color: white; padding: 8px 16px; text-decoration: none; border-radius: 4px;">Quay lại danh sách đơn hàng</a>
+    </div>
+
+    <div class="invoice-container" th:if="${order != null}">
         <!-- Header -->
         <div class="invoice-header">
             <div class="company-info">
@@ -263,7 +270,7 @@
                 </div>
                 <div class="info-row">
                     <span class="info-label">Điện thoại:</span>
-                    <span th:text="${order.user.phoneNumber}"></span>
+                    <span th:text="${order.user.phone}"></span>
                 </div>
                 <div class="info-row" th:if="${order.shippingAddress != null}">
                     <span class="info-label">Địa chỉ:</span>

@@ -1,5 +1,6 @@
 # Mặc định: lưu LF cho mọi file text trong repo
-* text eol=lf
+* text=auto eol=lf
+
 
 # Batch Windows (nếu cần CRLF)
 *.bat text eol=crlf

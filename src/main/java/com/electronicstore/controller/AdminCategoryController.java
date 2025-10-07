@@ -2,6 +2,7 @@ package com.electronicstore.controller;
 
 import com.electronicstore.dto.request.CategoryRequest;
 import com.electronicstore.dto.response.CategoryResponse;
+import com.electronicstore.entity.Category;
 import com.electronicstore.service.CategoryBusinessService;
 import com.electronicstore.viewmodel.CategoryFormViewModel;
 import com.electronicstore.viewmodel.CategoryListViewModel;
@@ -139,8 +140,8 @@ public class AdminCategoryController {
             CategoryResponse savedCategory = categoryBusinessService.saveCategory(categoryRequest);
             
             String successMessage = categoryRequest.getId() != null 
-                ? "Cập nhật danh mục thành công!"
-                : "Thêm danh mục mới thành công!";
+                ? "Cập nhật danh mục '" + savedCategory.getName() + "' thành công!"
+                : "Thêm danh mục '" + savedCategory.getName() + "' mới thành công!";
                 
             redirectAttributes.addFlashAttribute("success", successMessage);
             return "redirect:/admin/categories";
@@ -179,7 +180,8 @@ public class AdminCategoryController {
     @GetMapping("/view/{id}")
     public String viewCategory(@PathVariable Long id, Model model, RedirectAttributes redirectAttributes) {
         try {
-            CategoryResponse category = categoryBusinessService.getCategoryDetail(id);
+            // Lấy category với đầy đủ thông tin bao gồm products và children
+            Category category = categoryBusinessService.getCategoryWithDetails(id);
             model.addAttribute("category", category);
             
             return "admin/categories/view";
