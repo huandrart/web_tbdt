@@ -188,4 +188,8 @@ public class OrderService {
     public long countByStatus(Order.OrderStatus status) {
         return orderRepository.countOrdersByStatus(status);
     }
+    
+    public long countByUser(User user) {
+        return orderRepository.countByUser(user);
+    }
 }
