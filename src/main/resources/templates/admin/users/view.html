@@ -161,7 +161,7 @@
                                                 <i class="fas fa-unlock me-1"></i> Kích hoạt tài khoản
                                             </a>
                                         </div>
-                                        <div th:if="${user.isActive && user.role.name() != 'SUPER_ADMIN'}">
+                                        <div th:if="${user.isActive && user.role.name() != 'SUPER_ADMIN' && (user.role.name() != 'ADMIN' || (currentUser != null && currentUser.role.name() == 'SUPER_ADMIN'))}">
                                             <form th:action="@{/admin/users/toggle-lock/{id}(id=${user.id})}" method="post" class="d-inline">
                                                 <input type="hidden" name="locked" value="true">
                                                 <button type="submit" class="btn btn-danger w-100"
@@ -172,7 +172,7 @@
                                         </div>
                                         
                                         <!-- Role Actions -->
-                                        <div th:if="${user.role.name() == 'USER'}">
+                                        <div th:if="${user.role.name() == 'USER' and currentUser != null and currentUser.role.name() == 'SUPER_ADMIN'}">
                                             <form th:action="@{/admin/users/grant-admin/{id}(id=${user.id})}" method="post" class="d-inline">
                                                 <input type="hidden" name="newRole" value="ADMIN">
                                                 <button type="submit" class="btn btn-warning w-100"
@@ -181,7 +181,7 @@
                                                 </button>
                                             </form>
                                         </div>
-                                        <div th:if="${user.role.name() == 'ADMIN'}">
+                                        <div th:if="${user.role.name() == 'ADMIN' and currentUser != null and currentUser.role.name() == 'SUPER_ADMIN'}">
                                             <form th:action="@{/admin/users/revoke-admin/{id}(id=${user.id})}" method="post" class="d-inline">
                                                 <button type="submit" class="btn btn-outline-warning w-100"
                                                         onclick="return confirm('Bạn có chắc muốn thu hồi quyền Admin của người dùng này?')">

@@ -13,6 +13,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
+import org.springframework.security.core.Authentication;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -130,7 +131,8 @@ public class AdminUserController {
     }
     
     @GetMapping("/view/{id}")
-    public String viewUser(@PathVariable Long id, Model model, RedirectAttributes redirectAttributes) {
+    public String viewUser(@PathVariable Long id, Model model, RedirectAttributes redirectAttributes,
+                          Authentication authentication) {
         User user = userService.findById(id);
         
         if (user == null) {
@@ -138,11 +140,19 @@ public class AdminUserController {
             return "redirect:/admin/users";
         }
         
+        // Get current user info
+        User currentUser = null;
+        if (authentication != null && authentication.isAuthenticated()) {
+            String currentUserEmail = authentication.getName();
+            currentUser = userService.findByEmail(currentUserEmail).orElse(null);
+        }
+        
         // Get user's orders
         Page<com.electronicstore.entity.Order> orders = orderService.findByUserWithPagination(
             user, PageRequest.of(0, 10, Sort.by(Sort.Direction.DESC, "createdAt")));
         
         model.addAttribute("user", user);
+        model.addAttribute("currentUser", currentUser);
         model.addAttribute("orders", orders.getContent());
         model.addAttribute("totalOrders", orders.getTotalElements());
         
@@ -349,7 +359,7 @@ public class AdminUserController {
             
             user.setPassword(newPassword);
             user.setUpdatedAt(LocalDateTime.now());
-            userService.save(user);
+            userService.update(user);
             
             redirectAttributes.addFlashAttribute("success", 
                 "Mật khẩu đã được đặt lại thành công cho " + user.getFullName());
@@ -393,7 +403,7 @@ public class AdminUserController {
             
             user.setIsActive(!locked);
             user.setUpdatedAt(LocalDateTime.now());
-            userService.save(user);
+            userService.update(user);
             
             String action = locked ? "khóa" : "mở khóa";
             redirectAttributes.addFlashAttribute("success", 
@@ -437,7 +447,7 @@ public class AdminUserController {
             UserRole oldRole = user.getRole();
             user.setRole(newRole);
             user.setUpdatedAt(LocalDateTime.now());
-            userService.save(user);
+            userService.update(user);
             
             redirectAttributes.addFlashAttribute("success", 
                 "Đã cấp quyền " + newRole.getDisplayName() + " cho " + user.getFullName() + 
@@ -480,7 +490,7 @@ public class AdminUserController {
             UserRole oldRole = user.getRole();
             user.setRole(UserRole.USER);
             user.setUpdatedAt(LocalDateTime.now());
-            userService.save(user);
+            userService.update(user);
             
             redirectAttributes.addFlashAttribute("success", 
                 "Đã thu hồi quyền " + oldRole.getDisplayName() + " của " + user.getFullName() + 

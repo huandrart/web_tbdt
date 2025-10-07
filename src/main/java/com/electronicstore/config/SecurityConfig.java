@@ -26,8 +26,8 @@ public class SecurityConfig {
                                "/css/**", "/js/**", "/images/**", "/favicon.ico",
                                "/register", "/login", "/forgot-password", "/reset-password",
                                "/auth/**").permitAll()
-                .requestMatchers("/admin/**").hasRole("ADMIN")
-                .requestMatchers("/profile/**", "/orders/**").hasAnyRole("USER", "ADMIN")
+                .requestMatchers("/admin/**").hasAnyRole("ADMIN", "SUPER_ADMIN")
+                .requestMatchers("/profile/**", "/orders/**").hasAnyRole("USER", "ADMIN", "SUPER_ADMIN")
                 .anyRequest().authenticated()
             )
             .formLogin(form -> form
@@ -37,7 +37,8 @@ public class SecurityConfig {
                     String redirectURL = request.getContextPath();
                     
                     if (authentication.getAuthorities().stream()
-                            .anyMatch(a -> a.getAuthority().equals("ROLE_ADMIN"))) {
+                            .anyMatch(a -> a.getAuthority().equals("ROLE_ADMIN") || 
+                                         a.getAuthority().equals("ROLE_SUPER_ADMIN"))) {
                         redirectURL = "/admin/dashboard";
                     } else {
                         redirectURL = "/home";
