@@ -3,6 +3,8 @@ package com.electronicstore.controller;
 import com.electronicstore.dto.CartItem;
 import com.electronicstore.entity.Cart;
 import com.electronicstore.entity.Order;
+import com.electronicstore.entity.OrderItem;
+import com.electronicstore.entity.Product;
 import com.electronicstore.entity.User;
 import com.electronicstore.service.CartService;
 import com.electronicstore.service.OrderService;

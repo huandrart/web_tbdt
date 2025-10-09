@@ -38,8 +38,8 @@ public class AdminOrderController {
             @RequestParam(defaultValue = "desc") String direction,
             @RequestParam(required = false) String status,
             @RequestParam(required = false) String search,
-            @RequestParam(required = false) String dateFrom,
-            @RequestParam(required = false) String dateTo,
+            @RequestParam(required = false) String fromDate,
+            @RequestParam(required = false) String toDate,
             Model model) {
         
         Sort.Direction sortDirection = Sort.Direction.fromString(direction);
@@ -50,20 +50,20 @@ public class AdminOrderController {
         // Apply filters
         if ((status != null && !status.isEmpty()) ||
             (search != null && !search.trim().isEmpty()) ||
-            (dateFrom != null && !dateFrom.isEmpty()) ||
-            (dateTo != null && !dateTo.isEmpty())) {
+            (fromDate != null && !fromDate.isEmpty()) ||
+            (toDate != null && !toDate.isEmpty())) {
             
-            LocalDate fromDate = null;
-            LocalDate toDate = null;
+            LocalDate fromDateParsed = null;
+            LocalDate toDateParsed = null;
             
-            if (dateFrom != null && !dateFrom.isEmpty()) {
-                fromDate = LocalDate.parse(dateFrom);
+            if (fromDate != null && !fromDate.isEmpty()) {
+                fromDateParsed = LocalDate.parse(fromDate);
             }
-            if (dateTo != null && !dateTo.isEmpty()) {
-                toDate = LocalDate.parse(dateTo);
+            if (toDate != null && !toDate.isEmpty()) {
+                toDateParsed = LocalDate.parse(toDate);
             }
             
-            orders = orderService.searchOrders(search, status, fromDate, toDate, pageable);
+            orders = orderService.searchOrders(search, status, fromDateParsed, toDateParsed, pageable);
         } else {
             orders = orderService.findAll(pageable);
         }
@@ -78,8 +78,8 @@ public class AdminOrderController {
         model.addAttribute("reversedDirection", direction.equals("asc") ? "desc" : "asc");
         model.addAttribute("status", status);
         model.addAttribute("search", search);
-        model.addAttribute("dateFrom", dateFrom);
-        model.addAttribute("dateTo", dateTo);
+        model.addAttribute("fromDate", fromDate);
+        model.addAttribute("toDate", toDate);
         
         // Thống kê
         long totalOrders = orderService.count();

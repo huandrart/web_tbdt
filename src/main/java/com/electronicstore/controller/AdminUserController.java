@@ -179,6 +179,43 @@ public class AdminUserController {
         }
     }
     
+    @GetMapping("/update-status/{id}")
+    public String updateUserStatus(@PathVariable Long id, 
+                                 @RequestParam String active,
+                                 RedirectAttributes redirectAttributes) {
+        try {
+            User user = userService.findById(id);
+            
+            if (user == null) {
+                redirectAttributes.addFlashAttribute("error", "Không tìm thấy người dùng với ID: " + id);
+                return "redirect:/admin/users";
+            }
+            
+            // Convert string to boolean
+            boolean isActive = Boolean.parseBoolean(active);
+            
+            // Kiểm tra quyền: không cho phép khóa SUPER_ADMIN
+            if (user.getRole() == UserRole.SUPER_ADMIN && !isActive) {
+                redirectAttributes.addFlashAttribute("error", "Không thể vô hiệu hóa tài khoản siêu quản trị");
+                return "redirect:/admin/users/view/" + id;
+            }
+            
+            user.setIsActive(isActive);
+            user.setUpdatedAt(LocalDateTime.now());
+            userService.save(user);
+            
+            String action = isActive ? "kích hoạt" : "vô hiệu hóa";
+            redirectAttributes.addFlashAttribute("success", 
+                "Đã " + action + " tài khoản " + user.getFullName() + " thành công!");
+            
+        } catch (Exception e) {
+            redirectAttributes.addFlashAttribute("error", 
+                "Có lỗi xảy ra khi cập nhật trạng thái: " + e.getMessage());
+        }
+        
+        return "redirect:/admin/users/view/" + id;
+    }
+    
     @PostMapping("/update-role/{id}")
     public String updateUserRole(@PathVariable Long id,
                                 @RequestParam String role,

@@ -17,3 +17,4 @@ CREATE TABLE IF NOT EXISTS carts (
 CREATE INDEX idx_carts_user_id ON carts(user_id);
 CREATE INDEX idx_carts_product_id ON carts(product_id);
 CREATE INDEX idx_carts_created_at ON carts(created_at);
+

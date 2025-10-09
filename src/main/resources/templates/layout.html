@@ -10,8 +10,8 @@
     <!-- Font Awesome -->
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
     <!-- Custom CSS -->
-        <!-- Custom CSS -->
     <link th:href="@{/css/templates-layout.css}" rel="stylesheet">
+    <link th:href="@{/css/templates-layout-common.css}" rel="stylesheet">
 </head>
 <body>
     <!-- Navigation -->
@@ -77,9 +77,8 @@
                     
                     <!-- Show user menu if authenticated -->
                     <li class="nav-item dropdown" sec:authorize="isAuthenticated()">
-                        <a class="nav-link dropdown-toggle btn btn-warning text-dark px-3 py-2 rounded-pill" 
-                           href="#" id="userDropdown" role="button" data-bs-toggle="dropdown"
-                           style="font-weight: bold;">
+                        <a class="nav-link dropdown-toggle btn btn-warning text-dark px-3 py-2 rounded-pill user-dropdown-btn" 
+                           href="#" id="userDropdown" role="button" data-bs-toggle="dropdown">
                             <i class="fas fa-crown me-2"></i>
                             <span sec:authorize="hasRole('ADMIN')">ADMIN - </span>
                             <span sec:authentication="name">User</span>
@@ -102,9 +101,12 @@
                             </li>
                             <li><hr class="dropdown-divider"></li>
                             <li>
-                                <a class="dropdown-item" href="/logout">
-                                    <i class="fas fa-sign-out-alt me-2"></i> Đăng xuất
-                                </a>
+                                <form th:action="@{/logout}" method="post" class="d-inline">
+                                    <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}"/>
+                                    <button type="submit" class="dropdown-item text-danger">
+                                        <i class="fas fa-sign-out-alt me-2"></i> Đăng xuất
+                                    </button>
+                                </form>
                             </li>
                         </ul>
                     </li>

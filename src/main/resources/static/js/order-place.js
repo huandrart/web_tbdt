@@ -243,3 +243,4 @@ function animatePaymentChange() {
 document.addEventListener('DOMContentLoaded', function() {
     animatePaymentChange();
 });
+

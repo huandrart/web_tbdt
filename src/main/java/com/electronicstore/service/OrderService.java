@@ -170,14 +170,8 @@ public class OrderService {
                                    java.time.LocalDate fromDate, 
                                    java.time.LocalDate toDate, 
                                    Pageable pageable) {
-        // Simple implementation for now - can be enhanced with complex queries
-        if ((search == null || search.trim().isEmpty()) && 
-            (status == null || status.isEmpty()) && 
-            fromDate == null && toDate == null) {
-            return orderRepository.findAll(pageable);
-        }
-        
-        // For now, just return all orders - can be enhanced with specific search logic
+        // For now, return all orders - search functionality can be enhanced later
+        // This is a placeholder implementation
         return orderRepository.findAll(pageable);
     }
     

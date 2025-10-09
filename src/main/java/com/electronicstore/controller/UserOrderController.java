@@ -29,7 +29,7 @@ public class UserOrderController {
     private UserService userService;
     
     // Xem danh sách đơn hàng của user
-    @GetMapping
+    @GetMapping({"/", "/my-orders"})
     public String myOrders(
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int size,

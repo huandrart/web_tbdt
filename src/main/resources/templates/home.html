@@ -79,15 +79,18 @@
                                     </a>
                                 </li>
                                 <li>
-                                    <a class="dropdown-item" href="/orders">
+                                    <a class="dropdown-item" href="/orders/my-orders">
                                         <i class="fas fa-shopping-bag me-2"></i>Đơn hàng của tôi
                                     </a>
                                 </li>
                                 <li><hr class="dropdown-divider"></li>
                                 <li>
-                                    <a class="dropdown-item text-danger" href="/logout">
-                                        <i class="fas fa-sign-out-alt me-2"></i>Đăng xuất
-                                    </a>
+                                    <form th:action="@{/logout}" method="post" class="d-inline">
+                                        <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}"/>
+                                        <button type="submit" class="dropdown-item text-danger">
+                                            <i class="fas fa-sign-out-alt me-2"></i>Đăng xuất
+                                        </button>
+                                    </form>
                                 </li>
                             </ul>
                         </div>

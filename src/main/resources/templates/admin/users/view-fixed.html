@@ -6,61 +6,7 @@
     <title th:text="'Chi tiết người dùng - ' + ${user.fullName != null ? user.fullName : 'N/A'} + ' - Cửa hàng điện tử'">Chi tiết người dùng</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
-    <style>
-        .sidebar {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            min-height: 100vh;
-        }
-        .sidebar .nav-link {
-            color: rgba(255, 255, 255, 0.8);
-            transition: all 0.3s;
-            border-radius: 8px;
-            margin: 2px 0;
-        }
-        .sidebar .nav-link:hover,
-        .sidebar .nav-link.active {
-            color: white;
-            background: rgba(255, 255, 255, 0.1);
-            transform: translateX(5px);
-        }
-        .main-content {
-            background-color: #f8f9fa;
-            min-height: 100vh;
-        }
-        .card {
-            border: none;
-            border-radius: 15px;
-            box-shadow: 0 0 20px rgba(0,0,0,0.1);
-        }
-        .user-avatar-large {
-            width: 80px;
-            height: 80px;
-            border-radius: 50%;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: white;
-            font-weight: bold;
-            font-size: 2rem;
-            margin-bottom: 1rem;
-        }
-        .badge-role {
-            font-size: 0.75em;
-            padding: 0.5em 0.75em;
-            border-radius: 20px;
-        }
-        .role-user { background-color: #28a745; color: #fff; }
-        .role-admin { background-color: #dc3545; color: #fff; }
-        .role-super_admin { background-color: #6f42c1; color: #fff; }
-        .badge-status {
-            font-size: 0.75em;
-            padding: 0.5em 0.75em;
-            border-radius: 20px;
-        }
-        .status-active { background-color: #28a745; color: #fff; }
-        .status-blocked { background-color: #dc3545; color: #fff; }
-    </style>
+    <link th:href="@{/css/admin-users-view.css}" rel="stylesheet">
 </head>
 <body>
     <div class="container-fluid">
@@ -298,55 +244,6 @@
     <!-- Scripts -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-    
-    <script>
-        $(document).ready(function() {
-            // Password confirmation validation
-            $('#newPassword, #confirmPassword').on('input', function() {
-                const newPassword = $('#newPassword').val();
-                const confirmPassword = $('#confirmPassword').val();
-                const confirmBtn = $('#confirmResetBtn');
-                
-                if (newPassword.length >= 6 && confirmPassword.length >= 6) {
-                    if (newPassword === confirmPassword) {
-                        confirmBtn.prop('disabled', false);
-                        $('#confirmPassword').removeClass('is-invalid').addClass('is-valid');
-                    } else {
-                        confirmBtn.prop('disabled', true);
-                        $('#confirmPassword').removeClass('is-valid').addClass('is-invalid');
-                    }
-                } else {
-                    confirmBtn.prop('disabled', true);
-                    $('#confirmPassword').removeClass('is-valid is-invalid');
-                }
-            });
-            
-            // Reset form when modal is hidden
-            $('#resetPasswordModal').on('hidden.bs.modal', function() {
-                $('#newPassword, #confirmPassword').val('').removeClass('is-valid is-invalid');
-                $('#confirmResetBtn').prop('disabled', true);
-            });
-            
-            // Form submission confirmation
-            $('#resetPasswordModal form').on('submit', function(e) {
-                const newPassword = $('#newPassword').val();
-                const confirmPassword = $('#confirmPassword').val();
-                
-                if (newPassword !== confirmPassword) {
-                    e.preventDefault();
-                    alert('Mật khẩu xác nhận không khớp!');
-                    return false;
-                }
-                
-                if (newPassword.length < 6) {
-                    e.preventDefault();
-                    alert('Mật khẩu phải có ít nhất 6 ký tự!');
-                    return false;
-                }
-                
-                return confirm('Bạn có chắc chắn muốn đặt lại mật khẩu cho người dùng này?');
-            });
-        });
-    </script>
+    <script th:src="@{/js/admin-users-view.js}"></script>
 </body>
 </html>
