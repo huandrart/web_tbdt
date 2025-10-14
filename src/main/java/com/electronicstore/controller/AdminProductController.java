@@ -6,8 +6,6 @@ import com.electronicstore.service.ProductService;
 import com.electronicstore.service.CategoryService;
 import com.electronicstore.dto.response.ProductResponse;
 import com.electronicstore.dto.request.ProductRequest;
-import com.electronicstore.mapper.ProductMapper;
-import com.electronicstore.mapper.CategoryMapper;
 import com.electronicstore.service.FileStorageService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -32,54 +30,32 @@ public class AdminProductController {
     @Autowired
     private CategoryService categoryService;
     
-    @Autowired
-    private ProductMapper productMapper;
-    
-    @Autowired
-    private CategoryMapper categoryMapper;
     
     @Autowired
     private FileStorageService fileStorageService;
 
     @GetMapping
     public String listProducts(
-            @RequestParam(value = "search", required = false, defaultValue = "") String search,
             @RequestParam(value = "sortBy", required = false, defaultValue = "id") String sortBy,
             @RequestParam(value = "sortDir", required = false, defaultValue = "asc") String sortDir,
             @RequestParam(value = "page", required = false, defaultValue = "0") int page,
             @RequestParam(value = "size", required = false, defaultValue = "10") int size,
-            @RequestParam(value = "categoryId", required = false) Long categoryId,
-            @RequestParam(value = "status", required = false) String status,
             Model model
     ) {
         System.out.println("=== AdminProductController.listProducts START ===");
-        System.out.println("Parameters: search=" + search + ", sortBy=" + sortBy + ", sortDir=" + sortDir + 
-                          ", page=" + page + ", size=" + size + ", categoryId=" + categoryId + ", status=" + status);
+        System.out.println("Parameters: sortBy=" + sortBy + ", sortDir=" + sortDir + 
+                          ", page=" + page + ", size=" + size);
         
         try {
-            // Create pageable object
+            // Validate sort field
+            String validSortBy = validateSortField(sortBy);
             Sort.Direction direction = "desc".equalsIgnoreCase(sortDir) ? Sort.Direction.DESC : Sort.Direction.ASC;
-            Sort sort = Sort.by(direction, sortBy != null ? sortBy : "createdAt");
+            Sort sort = Sort.by(direction, validSortBy);
             Pageable pageable = PageRequest.of(page, size, sort);
             
-            // Get paginated products
-            Page<Product> productPage;
-            if (search != null && !search.trim().isEmpty()) {
-                System.out.println("Searching products with keyword: " + search);
-                productPage = productService.searchProducts(search, pageable);
-            } else if (categoryId != null) {
-                System.out.println("Filtering products by category: " + categoryId);
-                productPage = productService.findByCategory(categoryId, pageable);
-            } else if ("active".equals(status)) {
-                System.out.println("Filtering active products");
-                productPage = productService.searchProducts(null, null, true, pageable);
-            } else if ("inactive".equals(status)) {
-                System.out.println("Filtering inactive products");
-                productPage = productService.searchProducts(null, null, false, pageable);
-            } else {
-                System.out.println("Getting all products");
-                productPage = productService.findAll(pageable);
-            }
+            // Get all products with sorting
+            System.out.println("Getting all products with sorting: " + validSortBy + " " + direction);
+            Page<Product> productPage = productService.findAll(pageable);
             
             System.out.println("Found " + productPage.getTotalElements() + " products");
             
@@ -114,9 +90,6 @@ public class AdminProductController {
             
             // Set model attributes
             model.addAttribute("products", productResponsePage);
-            model.addAttribute("search", search);
-            model.addAttribute("categoryId", categoryId);
-            model.addAttribute("status", status);
             model.addAttribute("size", size);
             model.addAttribute("sortBy", sortBy);
             model.addAttribute("sortDir", sortDir);
@@ -421,5 +394,29 @@ public class AdminProductController {
             redirectAttributes.addFlashAttribute("errorMessage", "Lỗi khi thay đổi trạng thái sản phẩm: " + e.getMessage());
             return "redirect:/admin/products";
         }
+    }
+    
+    /**
+     * Validate and return valid sort field
+     */
+    private String validateSortField(String sortBy) {
+        if (sortBy == null || sortBy.trim().isEmpty()) {
+            return "id";
+        }
+        
+        // List of valid sort fields for products
+        String[] validSortFields = {
+            "id", "name", "price", "salePrice", "stockQuantity", 
+            "isActive", "isFeatured", "createdAt", "updatedAt", "brand", "model"
+        };
+        
+        for (String validField : validSortFields) {
+            if (validField.equals(sortBy)) {
+                return sortBy;
+            }
+        }
+        
+        // Default to id if invalid
+        return "id";
     }
 }

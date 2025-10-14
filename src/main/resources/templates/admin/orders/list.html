@@ -67,69 +67,6 @@
                 </div>
             </div>
             
-            <!-- Filters and Search -->
-            <div class="card card-modern mb-4">
-                <div class="card-header card-header-modern">
-                    <h5 class="mb-0">
-                        <i class="fas fa-filter me-2"></i>
-                        Bộ lọc và tìm kiếm
-                    </h5>
-                </div>
-                <div class="card-body">
-                    <form method="get" class="row g-3">
-                        <div class="col-md-3">
-                            <label class="form-label fw-semibold">
-                                <i class="fas fa-search me-1"></i>Tìm kiếm
-                            </label>
-                            <input type="text" class="form-control form-control-modern" name="search" 
-                                   th:value="${search}" placeholder="Mã đơn hàng, tên khách hàng...">
-                        </div>
-                        <div class="col-md-2">
-                            <label class="form-label fw-semibold">
-                                <i class="fas fa-flag me-1"></i>Trạng thái
-                            </label>
-                            <select class="form-select form-select-modern" name="status">
-                                <option value="">Tất cả trạng thái</option>
-                                <option value="PENDING" th:selected="${status == 'PENDING'}">Chờ xử lý</option>
-                                <option value="PROCESSING" th:selected="${status == 'PROCESSING'}">Đang xử lý</option>
-                                <option value="SHIPPED" th:selected="${status == 'SHIPPED'}">Đang giao</option>
-                                <option value="DELIVERED" th:selected="${status == 'DELIVERED'}">Đã giao</option>
-                                <option value="CANCELLED" th:selected="${status == 'CANCELLED'}">Đã hủy</option>
-                            </select>
-                        </div>
-                        <div class="col-md-2">
-                            <label class="form-label fw-semibold">
-                                <i class="fas fa-calendar me-1"></i>Từ ngày
-                            </label>
-                            <input type="date" class="form-control form-control-modern" name="fromDate" th:value="${fromDate}">
-                        </div>
-                        <div class="col-md-2">
-                            <label class="form-label fw-semibold">
-                                <i class="fas fa-calendar me-1"></i>Đến ngày
-                            </label>
-                            <input type="date" class="form-control form-control-modern" name="toDate" th:value="${toDate}">
-                        </div>
-                        <div class="col-md-2">
-                            <label class="form-label fw-semibold">
-                                <i class="fas fa-sort me-1"></i>Sắp xếp
-                            </label>
-                            <select class="form-select form-select-modern" name="sort">
-                                <option value="id" th:selected="${sort == 'id'}">ID</option>
-                                <option value="orderNumber" th:selected="${sort == 'orderNumber'}">Mã đơn hàng</option>
-                                <option value="totalAmount" th:selected="${sort == 'totalAmount'}">Tổng tiền</option>
-                                <option value="createdAt" th:selected="${sort == 'createdAt'}">Ngày tạo</option>
-                            </select>
-                        </div>
-                        <div class="col-md-1">
-                            <label class="form-label fw-semibold">&nbsp;</label>
-                            <button type="submit" class="btn btn-primary-modern btn-modern w-100">
-                                <i class="fas fa-search"></i>
-                            </button>
-                        </div>
-                    </form>
-                </div>
-            </div>
-            
             <!-- Orders Table -->
             <div class="card card-modern">
                 <div class="card-header card-header-modern">
@@ -145,7 +82,7 @@
                             <thead>
                                 <tr>
                                     <th class="sortable-header" style="width: 80px;">
-                                        <a href="?sort=id&direction=${reversedDirection}&search=${search}&status=${status}&fromDate=${fromDate}&toDate=${toDate}&page=${currentPage}&size=${size}" 
+                                        <a th:href="@{/admin/orders(sort='id', direction=${reversedDirection}, search=${search}, status=${status}, fromDate=${fromDate}, toDate=${toDate}, page=${currentPage}, size=${size})}" 
                                            class="text-decoration-none text-dark">
                                             ID
                                             <i th:if="${sort == 'id'}" 
@@ -154,7 +91,7 @@
                                         </a>
                                     </th>
                                     <th class="sortable-header">
-                                        <a href="?sort=orderNumber&direction=${reversedDirection}&search=${search}&status=${status}&fromDate=${fromDate}&toDate=${toDate}&page=${currentPage}&size=${size}" 
+                                        <a th:href="@{/admin/orders(sort='orderNumber', direction=${reversedDirection}, search=${search}, status=${status}, fromDate=${fromDate}, toDate=${toDate}, page=${currentPage}, size=${size})}" 
                                            class="text-decoration-none text-dark">
                                             Mã đơn hàng
                                             <i th:if="${sort == 'orderNumber'}" 
@@ -162,9 +99,17 @@
                                             <i th:unless="${sort == 'orderNumber'}" class="fas fa-sort sort-icon"></i>
                                         </a>
                                     </th>
-                                    <th>Khách hàng</th>
                                     <th class="sortable-header">
-                                        <a href="?sort=totalAmount&direction=${reversedDirection}&search=${search}&status=${status}&fromDate=${fromDate}&toDate=${toDate}&page=${currentPage}&size=${size}" 
+                                        <a th:href="@{/admin/orders(sort='customerName', direction=${reversedDirection}, search=${search}, status=${status}, fromDate=${fromDate}, toDate=${toDate}, page=${currentPage}, size=${size})}" 
+                                           class="text-decoration-none text-dark">
+                                            Khách hàng
+                                            <i th:if="${sort == 'customerName'}" 
+                                               th:class="${direction == 'asc'} ? 'fas fa-sort-up sort-icon active' : 'fas fa-sort-down sort-icon active'"></i>
+                                            <i th:unless="${sort == 'customerName'}" class="fas fa-sort sort-icon"></i>
+                                        </a>
+                                    </th>
+                                    <th class="sortable-header">
+                                        <a th:href="@{/admin/orders(sort='totalAmount', direction=${reversedDirection}, search=${search}, status=${status}, fromDate=${fromDate}, toDate=${toDate}, page=${currentPage}, size=${size})}" 
                                            class="text-decoration-none text-dark">
                                             Tổng tiền
                                             <i th:if="${sort == 'totalAmount'}" 
@@ -172,14 +117,31 @@
                                             <i th:unless="${sort == 'totalAmount'}" class="fas fa-sort sort-icon"></i>
                                         </a>
                                     </th>
-                                    <th>Trạng thái</th>
                                     <th class="sortable-header">
-                                        <a href="?sort=createdAt&direction=${reversedDirection}&search=${search}&status=${status}&fromDate=${fromDate}&toDate=${toDate}&page=${currentPage}&size=${size}" 
+                                        <a th:href="@{/admin/orders(sort='status', direction=${reversedDirection}, search=${search}, status=${status}, fromDate=${fromDate}, toDate=${toDate}, page=${currentPage}, size=${size})}" 
+                                           class="text-decoration-none text-dark">
+                                            Trạng thái
+                                            <i th:if="${sort == 'status'}" 
+                                               th:class="${direction == 'asc'} ? 'fas fa-sort-up sort-icon active' : 'fas fa-sort-down sort-icon active'"></i>
+                                            <i th:unless="${sort == 'status'}" class="fas fa-sort sort-icon"></i>
+                                        </a>
+                                    </th>
+                                    <th class="sortable-header">
+                                        <a th:href="@{/admin/orders(sort='createdAt', direction=${reversedDirection}, search=${search}, status=${status}, fromDate=${fromDate}, toDate=${toDate}, page=${currentPage}, size=${size})}" 
                                            class="text-decoration-none text-dark">
                                             Ngày tạo
                                             <i th:if="${sort == 'createdAt'}" 
                                                th:class="${direction == 'asc'} ? 'fas fa-sort-up sort-icon active' : 'fas fa-sort-down sort-icon active'"></i>
                                             <i th:unless="${sort == 'createdAt'}" class="fas fa-sort sort-icon"></i>
+                                        </a>
+                                    </th>
+                                    <th class="sortable-header">
+                                        <a th:href="@{/admin/orders(sort='updatedAt', direction=${reversedDirection}, search=${search}, status=${status}, fromDate=${fromDate}, toDate=${toDate}, page=${currentPage}, size=${size})}" 
+                                           class="text-decoration-none text-dark">
+                                            Cập nhật
+                                            <i th:if="${sort == 'updatedAt'}" 
+                                               th:class="${direction == 'asc'} ? 'fas fa-sort-up sort-icon active' : 'fas fa-sort-down sort-icon active'"></i>
+                                            <i th:unless="${sort == 'updatedAt'}" class="fas fa-sort sort-icon"></i>
                                         </a>
                                     </th>
                                     <th style="width: 150px;">Thao tác</th>
@@ -203,11 +165,14 @@
                                         <div class="fw-semibold text-success" th:text="${#numbers.formatDecimal(order.totalAmount, 0, 'COMMA', 0, 'POINT')} + ' ₫'">₫2,500,000</div>
                                     </td>
                                     <td>
-                                        <span th:class="'badge badge-modern ' + ${order.status == 'PENDING' ? 'bg-warning' : (order.status == 'CONFIRMED' ? 'bg-info' : (order.status == 'SHIPPING' ? 'bg-primary' : (order.status == 'DELIVERED' ? 'bg-success' : 'bg-danger')))}" 
-                                              th:text="${order.status == 'PENDING' ? 'Chờ xử lý' : (order.status == 'CONFIRMED' ? 'Đã xác nhận' : (order.status == 'SHIPPING' ? 'Đang giao' : (order.status == 'DELIVERED' ? 'Đã giao' : 'Đã hủy')))}">Đã giao</span>
+                                        <span th:class="'badge badge-modern ' + ${order.status == 'PENDING' ? 'bg-warning' : (order.status == 'CONFIRMED' ? 'bg-info' : (order.status == 'PROCESSING' ? 'bg-primary' : (order.status == 'SHIPPING' ? 'bg-primary' : (order.status == 'DELIVERED' ? 'bg-success' : (order.status == 'CANCELLED' ? 'bg-danger' : (order.status == 'RETURNED' ? 'bg-secondary' : 'bg-warning'))))))}" 
+                                              th:text="${order.status.displayName}">Chờ xác nhận</span>
                                     </td>
                                     <td>
                                         <small th:text="${#temporals.format(order.createdAt, 'dd/MM/yyyy HH:mm')}">25/12/2024 14:30</small>
+                                    </td>
+                                    <td>
+                                        <small th:text="${#temporals.format(order.updatedAt, 'dd/MM/yyyy HH:mm')}">25/12/2024 14:30</small>
                                     </td>
                                     <td>
                                         <div class="action-buttons">

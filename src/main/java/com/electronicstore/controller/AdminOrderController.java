@@ -1,11 +1,7 @@
 package com.electronicstore.controller;
 
 import com.electronicstore.entity.Order;
-import com.electronicstore.entity.OrderItem;
-import com.electronicstore.entity.User;
 import com.electronicstore.service.OrderService;
-import com.electronicstore.service.UserService;
-import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -27,9 +23,6 @@ public class AdminOrderController {
     @Autowired
     private OrderService orderService;
     
-    @Autowired
-    private UserService userService;
-    
     @GetMapping
     public String listOrders(
             @RequestParam(defaultValue = "0") int page,
@@ -42,8 +35,10 @@ public class AdminOrderController {
             @RequestParam(required = false) String toDate,
             Model model) {
         
+        // Validate sort field
+        String validSort = validateSortField(sort);
         Sort.Direction sortDirection = Sort.Direction.fromString(direction);
-        Pageable pageable = PageRequest.of(page, size, Sort.by(sortDirection, sort));
+        Pageable pageable = PageRequest.of(page, size, Sort.by(sortDirection, validSort));
         
         Page<Order> orders;
         
@@ -73,7 +68,7 @@ public class AdminOrderController {
         model.addAttribute("totalPages", orders.getTotalPages());
         model.addAttribute("totalItems", orders.getTotalElements());
         model.addAttribute("size", size);
-        model.addAttribute("sort", sort);
+        model.addAttribute("sort", validSort);
         model.addAttribute("direction", direction);
         model.addAttribute("reversedDirection", direction.equals("asc") ? "desc" : "asc");
         model.addAttribute("status", status);
@@ -154,9 +149,27 @@ public class AdminOrderController {
                 return "redirect:/admin/orders";
             }
             
-            // Convert string to OrderStatus enum
-            Order.OrderStatus orderStatus = Order.OrderStatus.valueOf(status.toUpperCase());
-            order.setStatus(orderStatus);
+            // Validate status
+            Order.OrderStatus currentStatus = order.getStatus();
+            Order.OrderStatus newStatus;
+            
+            try {
+                newStatus = Order.OrderStatus.valueOf(status.toUpperCase());
+            } catch (IllegalArgumentException e) {
+                redirectAttributes.addFlashAttribute("error", "Trạng thái không hợp lệ: " + status);
+                return "redirect:/admin/orders/view/" + id;
+            }
+            
+            // Validate status transition
+            if (!isValidStatusTransition(currentStatus, newStatus)) {
+                redirectAttributes.addFlashAttribute("error", 
+                    "Không thể chuyển từ trạng thái '" + currentStatus.getDisplayName() + 
+                    "' sang trạng thái '" + newStatus.getDisplayName() + "'");
+                return "redirect:/admin/orders/view/" + id;
+            }
+            
+            // Update order
+            order.setStatus(newStatus);
             if (notes != null && !notes.trim().isEmpty()) {
                 order.setNotes(notes);
             }
@@ -165,7 +178,8 @@ public class AdminOrderController {
             orderService.save(order);
             
             redirectAttributes.addFlashAttribute("success", 
-                "Trạng thái đơn hàng đã được cập nhật thành công!");
+                "Trạng thái đơn hàng đã được cập nhật từ '" + currentStatus.getDisplayName() + 
+                "' sang '" + newStatus.getDisplayName() + "' thành công!");
             
         } catch (Exception e) {
             redirectAttributes.addFlashAttribute("error", 
@@ -173,6 +187,36 @@ public class AdminOrderController {
         }
         
         return "redirect:/admin/orders/view/" + id;
+    }
+    
+    /**
+     * Validate if status transition is allowed
+     */
+    private boolean isValidStatusTransition(Order.OrderStatus from, Order.OrderStatus to) {
+        // Same status is always valid
+        if (from == to) {
+            return true;
+        }
+        
+        // Define valid transitions
+        switch (from) {
+            case PENDING:
+                return to == Order.OrderStatus.CONFIRMED || to == Order.OrderStatus.CANCELLED;
+            case CONFIRMED:
+                return to == Order.OrderStatus.PROCESSING || to == Order.OrderStatus.CANCELLED;
+            case PROCESSING:
+                return to == Order.OrderStatus.SHIPPING || to == Order.OrderStatus.CANCELLED;
+            case SHIPPING:
+                return to == Order.OrderStatus.DELIVERED || to == Order.OrderStatus.CANCELLED;
+            case DELIVERED:
+                return to == Order.OrderStatus.RETURNED;
+            case CANCELLED:
+                return false; // Cannot change from cancelled
+            case RETURNED:
+                return false; // Cannot change from returned
+            default:
+                return false;
+        }
     }
     
     @PostMapping("/delete/{id}")
@@ -288,5 +332,29 @@ public class AdminOrderController {
         }
         
         return "redirect:/admin/orders";
+    }
+    
+    /**
+     * Validate and return valid sort field
+     */
+    private String validateSortField(String sort) {
+        if (sort == null || sort.trim().isEmpty()) {
+            return "createdAt";
+        }
+        
+        // List of valid sort fields
+        String[] validSortFields = {
+            "id", "orderNumber", "customerName", "totalAmount", 
+            "status", "createdAt", "updatedAt", "paymentMethod"
+        };
+        
+        for (String validField : validSortFields) {
+            if (validField.equals(sort)) {
+                return sort;
+            }
+        }
+        
+        // Default to createdAt if invalid
+        return "createdAt";
     }
 }

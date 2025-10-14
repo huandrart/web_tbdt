@@ -6,6 +6,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -36,6 +37,40 @@ public class PaymentController {
         model.addAttribute("totalAmount", totalAmount);
         
         return "payment/momo";
+    }
+    
+    @GetMapping("/success/{orderId}")
+    public String paymentSuccess(@PathVariable Long orderId, 
+                                @RequestParam(required = false) String paymentMethod,
+                                Model model) {
+        
+        Optional<Order> orderOpt = orderService.findById(orderId);
+        if (orderOpt.isEmpty()) {
+            return "redirect:/orders";
+        }
+        
+        Order order = orderOpt.get();
+        model.addAttribute("order", order);
+        model.addAttribute("paymentMethod", paymentMethod);
+        
+        return "payment/success";
+    }
+    
+    @GetMapping("/cancel/{orderId}")
+    public String paymentCancel(@PathVariable Long orderId, 
+                               RedirectAttributes redirectAttributes) {
+        
+        Optional<Order> orderOpt = orderService.findById(orderId);
+        if (orderOpt.isPresent()) {
+            Order order = orderOpt.get();
+            order.setStatus(Order.OrderStatus.CANCELLED);
+            order.setPaymentStatus(Order.PaymentStatus.FAILED);
+            orderService.save(order);
+            
+            redirectAttributes.addFlashAttribute("error", "Thanh toán đã bị hủy!");
+        }
+        
+        return "redirect:/orders";
     }
     
     @PostMapping("/momo/process")

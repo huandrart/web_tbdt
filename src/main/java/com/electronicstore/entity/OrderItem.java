@@ -26,8 +26,15 @@ public class OrderItem {
     private Integer quantity;
     
     @DecimalMin(value = "0.0", inclusive = false, message = "Giá phải lớn hơn 0")
+    @Column(name = "price", precision = 12, scale = 2, nullable = false)
+    private BigDecimal price;
+    
+    @DecimalMin(value = "0.0", inclusive = false, message = "Giá đơn vị phải lớn hơn 0")
     @Column(name = "unit_price", precision = 12, scale = 2, nullable = false)
     private BigDecimal unitPrice;
+
+    
+
     
     @DecimalMin(value = "0.0", inclusive = false, message = "Tổng tiền phải lớn hơn 0")
     @Column(name = "total_price", precision = 12, scale = 2, nullable = false)
@@ -44,6 +51,7 @@ public class OrderItem {
         this.product = product;
         this.quantity = quantity;
         this.unitPrice = unitPrice;
+        this.price = unitPrice; // Set price same as unitPrice
         this.totalPrice = unitPrice.multiply(BigDecimal.valueOf(quantity));
     }
     
@@ -51,6 +59,9 @@ public class OrderItem {
     @PrePersist
     protected void onCreate() {
         createdAt = LocalDateTime.now();
+        if (unitPrice != null && price == null) {
+            price = unitPrice; // Set price same as unitPrice
+        }
         if (totalPrice == null && unitPrice != null && quantity != null) {
             totalPrice = unitPrice.multiply(BigDecimal.valueOf(quantity));
         }
@@ -97,12 +108,21 @@ public class OrderItem {
         calculateTotalPrice();
     }
     
+    public BigDecimal getPrice() {
+        return price;
+    }
+    
+    public void setPrice(BigDecimal price) {
+        this.price = price;
+    }
+    
     public BigDecimal getUnitPrice() {
         return unitPrice;
     }
     
     public void setUnitPrice(BigDecimal unitPrice) {
         this.unitPrice = unitPrice;
+        this.price = unitPrice; // Keep price in sync with unitPrice
         calculateTotalPrice();
     }
     

@@ -80,6 +80,20 @@ public class OrderService {
     
     public Order createOrder(User user, List<OrderItem> orderItems, String shippingAddress, 
                            String phone, String customerName, String notes) {
+        // Validate stock availability before creating order
+        for (OrderItem item : orderItems) {
+            Product product = item.getProduct();
+            if (product == null) {
+                throw new IllegalArgumentException("Sản phẩm không tồn tại");
+            }
+            
+            int currentStock = product.getStockQuantity() != null ? product.getStockQuantity() : 0;
+            if (currentStock < item.getQuantity()) {
+                throw new IllegalArgumentException("Không đủ hàng trong kho cho sản phẩm: " + product.getName() + 
+                    ". Tồn kho: " + currentStock + ", Yêu cầu: " + item.getQuantity());
+            }
+        }
+        
         Order order = new Order();
         order.setUser(user);
         order.setShippingAddress(shippingAddress);
@@ -99,12 +113,24 @@ public class OrderService {
         order.setTotalAmount(totalAmount);
         order.setOrderItems(orderItems);
         
-        // Update stock for each product
-        for (OrderItem item : orderItems) {
-            productService.updateStock(item.getProduct().getId(), item.getQuantity());
+        // Save order first
+        Order savedOrder = orderRepository.save(order);
+        
+        // Update stock for each product after order is saved
+        try {
+            for (OrderItem item : orderItems) {
+                Product product = item.getProduct();
+                int currentStock = product.getStockQuantity() != null ? product.getStockQuantity() : 0;
+                product.setStockQuantity(currentStock - item.getQuantity());
+                productService.save(product);
+            }
+        } catch (Exception e) {
+            // If stock update fails, delete the order and restore stock
+            orderRepository.delete(savedOrder);
+            throw new IllegalArgumentException("Không thể cập nhật tồn kho: " + e.getMessage());
         }
         
-        return orderRepository.save(order);
+        return savedOrder;
     }
     
     public Order updateStatus(Long orderId, Order.OrderStatus newStatus) {
@@ -135,17 +161,63 @@ public class OrderService {
             if (order.getStatus() == Order.OrderStatus.PENDING || 
                 order.getStatus() == Order.OrderStatus.CONFIRMED) {
                 
-                // Restore stock
+                // Restore stock for each order item
                 for (OrderItem item : order.getOrderItems()) {
                     Product product = item.getProduct();
-                    product.setStockQuantity(product.getStockQuantity() + item.getQuantity());
-                    productService.save(product);
+                    if (product != null) {
+                        int currentStock = product.getStockQuantity() != null ? product.getStockQuantity() : 0;
+                        product.setStockQuantity(currentStock + item.getQuantity());
+                        productService.save(product);
+                    }
                 }
                 
                 order.setStatus(Order.OrderStatus.CANCELLED);
+                order.setPaymentStatus(Order.PaymentStatus.REFUNDED);
                 orderRepository.save(order);
             } else {
-                throw new IllegalArgumentException("Không thể hủy đơn hàng ở trạng thái hiện tại");
+                throw new IllegalArgumentException("Không thể hủy đơn hàng ở trạng thái: " + order.getStatus().getDisplayName());
+            }
+        } else {
+            throw new IllegalArgumentException("Đơn hàng không tồn tại");
+        }
+    }
+    
+    public void restoreStockForOrder(Long orderId) {
+        Optional<Order> orderOpt = orderRepository.findById(orderId);
+        if (orderOpt.isPresent()) {
+            Order order = orderOpt.get();
+            
+            // Restore stock for each order item
+            for (OrderItem item : order.getOrderItems()) {
+                Product product = item.getProduct();
+                if (product != null) {
+                    int currentStock = product.getStockQuantity() != null ? product.getStockQuantity() : 0;
+                    product.setStockQuantity(currentStock + item.getQuantity());
+                    productService.save(product);
+                }
+            }
+        }
+    }
+    
+    public void updateStockForOrder(Long orderId) {
+        Optional<Order> orderOpt = orderRepository.findById(orderId);
+        if (orderOpt.isPresent()) {
+            Order order = orderOpt.get();
+            
+            // Update stock for each order item
+            for (OrderItem item : order.getOrderItems()) {
+                Product product = item.getProduct();
+                if (product != null) {
+                    int currentStock = product.getStockQuantity() != null ? product.getStockQuantity() : 0;
+                    int newStock = currentStock - item.getQuantity();
+                    
+                    if (newStock < 0) {
+                        throw new IllegalArgumentException("Không đủ hàng trong kho cho sản phẩm: " + product.getName());
+                    }
+                    
+                    product.setStockQuantity(newStock);
+                    productService.save(product);
+                }
             }
         }
     }

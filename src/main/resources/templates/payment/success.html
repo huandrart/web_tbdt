@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html lang="vi" xmlns:th="http://www.thymeleaf.org" 
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Thanh toán thành công - Electronic Store</title>
+    
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Font Awesome -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    
+    <style>
+        .success-container {
+            max-width: 600px;
+            margin: 50px auto;
+            padding: 40px;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            background: linear-gradient(135deg, #00b894 0%, #00a085 100%);
+            color: white;
+            text-align: center;
+        }
+        
+        .success-icon {
+            font-size: 4rem;
+            margin-bottom: 20px;
+            animation: bounce 2s infinite;
+        }
+        
+        @keyframes bounce {
+            0%, 20%, 50%, 80%, 100% {
+                transform: translateY(0);
+            }
+            40% {
+                transform: translateY(-10px);
+            }
+            60% {
+                transform: translateY(-5px);
+            }
+        }
+        
+        .order-info {
+            background: rgba(255,255,255,0.1);
+            border-radius: 10px;
+            padding: 20px;
+            margin: 20px 0;
+        }
+        
+        .btn-success-custom {
+            background: #00b894;
+            border: none;
+            color: white;
+            padding: 15px 30px;
+            border-radius: 25px;
+            font-weight: bold;
+            margin: 10px;
+            transition: all 0.3s;
+        }
+        
+        .btn-success-custom:hover {
+            background: #00a085;
+            color: white;
+            transform: translateY(-2px);
+        }
+    </style>
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="navbar navbar-expand-lg navbar-dark bg-primary sticky-top">
+        <div class="container">
+            <a class="navbar-brand" href="/">
+                <i class="fas fa-bolt me-2"></i>Electronic Store
+            </a>
+            
+            <div class="navbar-nav ms-auto">
+                <div class="nav-item dropdown">
+                    <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown">
+                        <i class="fas fa-user me-1"></i>
+                        <span sec:authentication="name">User</span>
+                    </a>
+                    <ul class="dropdown-menu">
+                        <li><a class="dropdown-item" href="/profile">
+                            <i class="fas fa-user me-2"></i>Thông tin cá nhân</a></li>
+                        <li><a class="dropdown-item" href="/orders/my-orders">
+                            <i class="fas fa-shopping-bag me-2"></i>Đơn hàng của tôi</a></li>
+                        <li><hr class="dropdown-divider"></li>
+                        <li>
+                            <form th:action="@{/logout}" method="post" class="d-inline">
+                                <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}"/>
+                                <button type="submit" class="dropdown-item text-danger">
+                                    <i class="fas fa-sign-out-alt me-2"></i>Đăng xuất
+                                </button>
+                            </form>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container">
+        <div class="success-container">
+            <!-- Success Icon -->
+            <div class="success-icon">
+                <i class="fas fa-check-circle"></i>
+            </div>
+            
+            <!-- Success Message -->
+            <h2 class="mb-3">Thanh toán thành công!</h2>
+            <p class="lead mb-4">Cảm ơn bạn đã mua sắm tại Electronic Store</p>
+            
+            <!-- Order Information -->
+            <div class="order-info">
+                <h5 class="mb-3">
+                    <i class="fas fa-receipt me-2"></i>Thông tin đơn hàng
+                </h5>
+                <div class="row text-start">
+                    <div class="col-md-6">
+                        <p><strong>Mã đơn hàng:</strong><br>
+                        <span class="fs-5" th:text="${order.orderNumber}">#ORD001</span></p>
+                    </div>
+                    <div class="col-md-6">
+                        <p><strong>Ngày đặt:</strong><br>
+                        <span th:text="${#temporals.format(order.createdAt, 'dd/MM/yyyy HH:mm')}">25/09/2025 14:30</span></p>
+                    </div>
+                    <div class="col-md-6">
+                        <p><strong>Tổng tiền:</strong><br>
+                        <span class="fs-5 fw-bold" th:text="${#numbers.formatDecimal(order.totalAmount, 0, 'COMMA', 0, 'POINT')} + ' ₫'">1,000,000 ₫</span></p>
+                    </div>
+                    <div class="col-md-6">
+                        <p><strong>Phương thức:</strong><br>
+                        <span th:text="${paymentMethod != null ? paymentMethod : 'MoMo'}">MoMo</span></p>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Next Steps -->
+            <div class="mb-4">
+                <h6 class="mb-3">Bước tiếp theo:</h6>
+                <div class="row text-start">
+                    <div class="col-12">
+                        <p><i class="fas fa-envelope me-2"></i>Chúng tôi sẽ gửi email xác nhận đơn hàng</p>
+                        <p><i class="fas fa-truck me-2"></i>Đơn hàng sẽ được xử lý và giao trong 1-3 ngày</p>
+                        <p><i class="fas fa-phone me-2"></i>Nhân viên sẽ liên hệ xác nhận trước khi giao hàng</p>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Action Buttons -->
+            <div class="mt-4">
+                <a th:href="@{/orders/{id}(id=${order.id})}" class="btn btn-success-custom">
+                    <i class="fas fa-eye me-2"></i>Xem chi tiết đơn hàng
+                </a>
+                
+                <a href="/orders/my-orders" class="btn btn-success-custom">
+                    <i class="fas fa-list me-2"></i>Xem tất cả đơn hàng
+                </a>
+                
+                <a href="/" class="btn btn-outline-light">
+                    <i class="fas fa-home me-2"></i>Về trang chủ
+                </a>
+            </div>
+            
+            <!-- Contact Info -->
+            <div class="mt-4 pt-3 border-top border-light">
+                <small>
+                    <i class="fas fa-headset me-1"></i>
+                    Cần hỗ trợ? Liên hệ hotline: <strong>(028) 1234 5678</strong>
+                </small>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    
+    <script>
+        // Auto redirect to order detail after 10 seconds
+        setTimeout(function() {
+            window.location.href = '/orders/' + [[${order.id}]];
+        }, 10000);
+        
+        // Show countdown
+        let countdown = 10;
+        const countdownElement = document.createElement('div');
+        countdownElement.className = 'mt-3';
+        countdownElement.innerHTML = '<small>Chuyển hướng tự động sau <span id="countdown">10</span> giây...</small>';
+        document.querySelector('.success-container').appendChild(countdownElement);
+        
+        const countdownInterval = setInterval(function() {
+            countdown--;
+            document.getElementById('countdown').textContent = countdown;
+            if (countdown <= 0) {
+                clearInterval(countdownInterval);
+            }
+        }, 1000);
+    </script>
+</body>
+</html>

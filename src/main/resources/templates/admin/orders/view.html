@@ -56,8 +56,8 @@
                                     
                                     <dt class="col-sm-4">Trạng thái:</dt>
                                     <dd class="col-sm-8">
-                                        <span th:class="'badge ' + ${order.status == 'PENDING' ? 'bg-warning' : (order.status == 'CONFIRMED' ? 'bg-info' : (order.status == 'SHIPPING' ? 'bg-primary' : (order.status == 'DELIVERED' ? 'bg-success' : 'bg-danger')))}" 
-                                              th:text="${order.status == 'PENDING' ? 'Chờ xử lý' : (order.status == 'CONFIRMED' ? 'Đã xác nhận' : (order.status == 'SHIPPING' ? 'Đang giao' : (order.status == 'DELIVERED' ? 'Đã giao' : 'Đã hủy')))}">Đã giao</span>
+                                        <span th:class="'badge ' + ${order.status == 'PENDING' ? 'bg-warning' : (order.status == 'CONFIRMED' ? 'bg-info' : (order.status == 'PROCESSING' ? 'bg-primary' : (order.status == 'SHIPPING' ? 'bg-primary' : (order.status == 'DELIVERED' ? 'bg-success' : (order.status == 'CANCELLED' ? 'bg-danger' : (order.status == 'RETURNED' ? 'bg-secondary' : 'bg-warning'))))))}" 
+                                              th:text="${order.status.displayName}">Chờ xác nhận</span>
                                     </dd>
                                     
                                     <dt class="col-sm-4">Ngày tạo:</dt>
@@ -161,32 +161,116 @@
                 <!-- Status Update -->
                 <div class="card">
                     <div class="card-header">
-                        <h5 class="mb-0">Cập nhật trạng thái</h5>
+                        <h5 class="mb-0">
+                            <i class="fas fa-edit me-2"></i>Cập nhật trạng thái
+                        </h5>
                     </div>
                     <div class="card-body">
+                        <!-- Current Status Info -->
+                        <div class="alert alert-info mb-3">
+                            <h6 class="alert-heading">
+                                <i class="fas fa-info-circle me-1"></i>Trạng thái hiện tại
+                            </h6>
+                            <p class="mb-0">
+                                <span th:class="'badge ' + ${order.status == 'PENDING' ? 'bg-warning' : (order.status == 'CONFIRMED' ? 'bg-info' : (order.status == 'PROCESSING' ? 'bg-primary' : (order.status == 'SHIPPING' ? 'bg-primary' : (order.status == 'DELIVERED' ? 'bg-success' : (order.status == 'CANCELLED' ? 'bg-danger' : (order.status == 'RETURNED' ? 'bg-secondary' : 'bg-warning'))))))}" 
+                                      th:text="${order.status.displayName}">Chờ xác nhận</span>
+                                <span class="ms-2 text-muted">
+                                    <i class="fas fa-clock me-1"></i>
+                                    Cập nhật lần cuối: <span th:text="${#temporals.format(order.updatedAt, 'dd/MM/yyyy HH:mm')}">25/12/2024 14:30</span>
+                                </span>
+                            </p>
+                        </div>
+                        
+                        <!-- Status Update Form -->
                         <form th:action="@{/admin/orders/update-status/{id}(id=${order.id})}" method="post">
                             <div class="mb-3">
-                                <label for="status" class="form-label">Trạng thái mới</label>
+                                <label for="status" class="form-label fw-semibold">
+                                    <i class="fas fa-arrow-right me-1"></i>Chuyển sang trạng thái
+                                </label>
                                 <select id="status" name="status" class="form-select" required>
-                                    <option value="PENDING" th:selected="${order.status == 'PENDING'}">Chờ xử lý</option>
+                                    <option value="PENDING" th:selected="${order.status == 'PENDING'}">Chờ xác nhận</option>
                                     <option value="CONFIRMED" th:selected="${order.status == 'CONFIRMED'}">Đã xác nhận</option>
-                                    <option value="SHIPPING" th:selected="${order.status == 'SHIPPING'}">Đang giao</option>
-                                    <option value="DELIVERED" th:selected="${order.status == 'DELIVERED'}">Đã giao</option>
+                                    <option value="PROCESSING" th:selected="${order.status == 'PROCESSING'}">Đang xử lý</option>
+                                    <option value="SHIPPING" th:selected="${order.status == 'SHIPPING'}">Đang giao hàng</option>
+                                    <option value="DELIVERED" th:selected="${order.status == 'DELIVERED'}">Đã giao hàng</option>
                                     <option value="CANCELLED" th:selected="${order.status == 'CANCELLED'}">Đã hủy</option>
+                                    <option value="RETURNED" th:selected="${order.status == 'RETURNED'}">Đã trả hàng</option>
                                 </select>
+                                <div class="form-text">
+                                    <i class="fas fa-lightbulb me-1"></i>
+                                    Chọn trạng thái mới để cập nhật đơn hàng
+                                </div>
                             </div>
                             <div class="mb-3">
-                                <label for="notes" class="form-label">Ghi chú</label>
-                                <textarea id="notes" name="notes" class="form-control" rows="3" th:value="${order.notes}"></textarea>
+                                <label for="notes" class="form-label fw-semibold">
+                                    <i class="fas fa-sticky-note me-1"></i>Ghi chú
+                                </label>
+                                <textarea id="notes" name="notes" class="form-control" rows="3" 
+                                          placeholder="Nhập ghi chú về việc thay đổi trạng thái (tùy chọn)..."
+                                          th:value="${order.notes}"></textarea>
+                                <div class="form-text">
+                                    <i class="fas fa-info-circle me-1"></i>
+                                    Ghi chú sẽ được lưu cùng với thông tin cập nhật trạng thái
+                                </div>
                             </div>
-                            <button type="submit" class="btn btn-primary w-100">
-                                <i class="fas fa-save"></i> Cập nhật trạng thái
-                            </button>
+                            <div class="d-grid gap-2">
+                                <button type="submit" class="btn btn-primary">
+                                    <i class="fas fa-save me-2"></i>Cập nhật trạng thái
+                                </button>
+                                <button type="button" class="btn btn-outline-secondary" onclick="resetForm()">
+                                    <i class="fas fa-undo me-2"></i>Đặt lại
+                                </button>
+                            </div>
                         </form>
                     </div>
                 </div>
             </div>
         </div>
     </div>
+
+    <!-- JavaScript -->
+    <script>
+        function resetForm() {
+            document.getElementById('status').value = '';
+            document.getElementById('notes').value = '';
+        }
+        
+        // Add confirmation for status changes
+        document.querySelector('form').addEventListener('submit', function(e) {
+            const currentStatus = '${order.status}';
+            const newStatus = document.getElementById('status').value;
+            
+            if (currentStatus !== newStatus) {
+                const statusNames = {
+                    'PENDING': 'Chờ xác nhận',
+                    'CONFIRMED': 'Đã xác nhận', 
+                    'PROCESSING': 'Đang xử lý',
+                    'SHIPPING': 'Đang giao hàng',
+                    'DELIVERED': 'Đã giao hàng',
+                    'CANCELLED': 'Đã hủy',
+                    'RETURNED': 'Đã trả hàng'
+                };
+                
+                const currentName = statusNames[currentStatus] || currentStatus;
+                const newName = statusNames[newStatus] || newStatus;
+                
+                if (!confirm(`Bạn có chắc chắn muốn chuyển đơn hàng từ trạng thái "${currentName}" sang "${newName}"?`)) {
+                    e.preventDefault();
+                }
+            }
+        });
+        
+        // Auto-save notes to localStorage
+        const notesTextarea = document.getElementById('notes');
+        notesTextarea.addEventListener('input', function() {
+            localStorage.setItem('order_notes_' + '${order.id}', this.value);
+        });
+        
+        // Load saved notes
+        const savedNotes = localStorage.getItem('order_notes_' + '${order.id}');
+        if (savedNotes && !notesTextarea.value) {
+            notesTextarea.value = savedNotes;
+        }
+    </script>
 </body>
 </html>

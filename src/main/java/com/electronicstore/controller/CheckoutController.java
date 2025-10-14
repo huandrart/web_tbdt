@@ -69,7 +69,6 @@ public class CheckoutController {
         BigDecimal total = subtotal.add(shippingFee);
         
         model.addAttribute("user", user);
-        
         model.addAttribute("cartItems", cartItemDTOs);
         model.addAttribute("subtotal", subtotal);
         model.addAttribute("shippingFee", shippingFee);
@@ -83,10 +82,26 @@ public class CheckoutController {
     public String processCheckout(@RequestParam("customerName") String customerName,
                                  @RequestParam("phone") String phone,
                                  @RequestParam("address") String address,
-                                 @RequestParam("paymentMethod") Order.PaymentMethod paymentMethod,
+                                 @RequestParam("paymentMethod") String paymentMethod,
                                  @RequestParam(value = "notes", required = false) String notes,
                                  Authentication authentication,
                                  RedirectAttributes redirectAttributes) {
+        
+        // Basic validation
+        if (customerName == null || customerName.trim().isEmpty()) {
+            redirectAttributes.addFlashAttribute("errorMessage", "Họ và tên không được để trống!");
+            return "redirect:/checkout";
+        }
+        
+        if (phone == null || phone.trim().isEmpty()) {
+            redirectAttributes.addFlashAttribute("errorMessage", "Số điện thoại không được để trống!");
+            return "redirect:/checkout";
+        }
+        
+        if (address == null || address.trim().isEmpty()) {
+            redirectAttributes.addFlashAttribute("errorMessage", "Địa chỉ giao hàng không được để trống!");
+            return "redirect:/checkout";
+        }
         
         if (authentication == null || !authentication.isAuthenticated()) {
             redirectAttributes.addFlashAttribute("errorMessage", "Bạn cần đăng nhập để đặt hàng!");
@@ -113,6 +128,15 @@ public class CheckoutController {
         }
         
         try {
+            // Validate payment method
+            Order.PaymentMethod paymentMethodEnum;
+            try {
+                paymentMethodEnum = Order.PaymentMethod.valueOf(paymentMethod);
+            } catch (IllegalArgumentException e) {
+                redirectAttributes.addFlashAttribute("errorMessage", "Phương thức thanh toán không hợp lệ!");
+                return "redirect:/checkout";
+            }
+            
             // Convert CartItems to OrderItems
             List<OrderItem> orderItems = new ArrayList<>();
             for (CartItem cartItem : cartItemDTOs) {
@@ -139,10 +163,35 @@ public class CheckoutController {
                 }
             }
             
-            // Create order
-            Order order = orderService.createOrder(user, orderItems, address, phone, customerName, notes);
-            order.setPaymentMethod(paymentMethod);
-            orderService.save(order);
+            // Create order first
+            Order order = new Order();
+            order.setUser(user);
+            order.setShippingAddress(address);
+            order.setPhone(phone);
+            order.setCustomerName(customerName);
+            order.setNotes(notes);
+            order.setStatus(Order.OrderStatus.PENDING);
+            order.setPaymentStatus(Order.PaymentStatus.PENDING);
+            order.setPaymentMethod(paymentMethodEnum);
+            
+            // Calculate total amount
+            BigDecimal totalAmount = BigDecimal.ZERO;
+            for (OrderItem item : orderItems) {
+                totalAmount = totalAmount.add(item.getTotalPrice());
+            }
+            order.setTotalAmount(totalAmount);
+            
+            // Save order first to get ID
+            order = orderService.save(order);
+            
+            // Set order reference for each order item
+            for (OrderItem item : orderItems) {
+                item.setOrder(order);
+            }
+            order.setOrderItems(orderItems);
+            
+            // Save order again with items
+            order = orderService.save(order);
             
             // Clear cart from database
             cartService.clearCart(user);
@@ -150,7 +199,12 @@ public class CheckoutController {
             redirectAttributes.addFlashAttribute("successMessage", 
                 "Đặt hàng thành công! Mã đơn hàng: " + order.getOrderNumber());
             
-            return "redirect:/checkout/success/" + order.getId();
+            // Redirect based on payment method
+            if (paymentMethodEnum == Order.PaymentMethod.E_WALLET) {
+                return "redirect:/payment/momo?orderId=" + order.getId() + "&totalAmount=" + order.getTotalAmount();
+            } else {
+                return "redirect:/payment/success/" + order.getId() + "?paymentMethod=" + paymentMethodEnum.name();
+            }
             
         } catch (Exception e) {
             redirectAttributes.addFlashAttribute("errorMessage", 

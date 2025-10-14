@@ -80,7 +80,6 @@
             </div>
         </div>
         
-        
         <!-- Products Table -->
         <div class="card-modern">
             <div class="card-header-modern">
@@ -96,7 +95,7 @@
                             <thead class="table-light">
                                 <tr>
                                     <th>
-                                        <a th:href="@{/admin/products(sort='id', direction=${sortDir == 'asc' ? 'desc' : 'asc'}, search=${search}, categoryId=${categoryId}, status=${status})}"
+                                        <a th:href="@{/admin/products(sortBy='id', sortDir=${sortDir == 'asc' ? 'desc' : 'asc'})}"
                                            class="text-decoration-none text-dark">
                                             ID
                                             <i th:if="${sortBy == 'id' and sortDir == 'asc'}" class="fas fa-sort-up text-primary"></i>
@@ -106,7 +105,7 @@
                                     </th>
                                     <th>Hình ảnh</th>
                                     <th>
-                                        <a th:href="@{/admin/products(sort='name', direction=${sortDir == 'asc' ? 'desc' : 'asc'}, search=${search}, categoryId=${categoryId}, status=${status})}"
+                                        <a th:href="@{/admin/products(sortBy='name', sortDir=${sortDir == 'asc' ? 'desc' : 'asc'})}"
                                            class="text-decoration-none text-dark">
                                             Tên sản phẩm
                                             <i th:if="${sortBy == 'name' and sortDir == 'asc'}" class="fas fa-sort-up text-primary"></i>
@@ -116,7 +115,7 @@
                                     </th>
                                     <th>Mô tả</th>
                                     <th>
-                                        <a th:href="@{/admin/products(sort='price', direction=${sortDir == 'asc' ? 'desc' : 'asc'}, search=${search}, categoryId=${categoryId}, status=${status})}"
+                                        <a th:href="@{/admin/products(sortBy='price', sortDir=${sortDir == 'asc' ? 'desc' : 'asc'})}"
                                            class="text-decoration-none text-dark">
                                             Giá
                                             <i th:if="${sortBy == 'price' and sortDir == 'asc'}" class="fas fa-sort-up text-primary"></i>
@@ -124,10 +123,18 @@
                                             <i th:if="${sortBy != 'price'}" class="fas fa-sort text-muted"></i>
                                         </a>
                                     </th>
-                                    <th>Tồn kho</th>
+                                    <th>
+                                        <a th:href="@{/admin/products(sortBy='stockQuantity', sortDir=${sortDir == 'asc' ? 'desc' : 'asc'})}"
+                                           class="text-decoration-none text-dark">
+                                            Tồn kho
+                                            <i th:if="${sortBy == 'stockQuantity' and sortDir == 'asc'}" class="fas fa-sort-up text-primary"></i>
+                                            <i th:if="${sortBy == 'stockQuantity' and sortDir == 'desc'}" class="fas fa-sort-down text-primary"></i>
+                                            <i th:if="${sortBy != 'stockQuantity'}" class="fas fa-sort text-muted"></i>
+                                        </a>
+                                    </th>
                                     <th>Danh mục</th>
                                     <th>
-                                        <a th:href="@{/admin/products(sort='isActive', direction=${sortDir == 'asc' ? 'desc' : 'asc'}, search=${search}, categoryId=${categoryId}, status=${status})}"
+                                        <a th:href="@{/admin/products(sortBy='isActive', sortDir=${sortDir == 'asc' ? 'desc' : 'asc'})}"
                                            class="text-decoration-none text-dark">
                                             Trạng thái
                                             <i th:if="${sortBy == 'isActive' and sortDir == 'asc'}" class="fas fa-sort-up text-primary"></i>
