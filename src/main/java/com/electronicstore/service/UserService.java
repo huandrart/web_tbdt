@@ -246,6 +246,18 @@ public class UserService implements UserDetailsService {
         return userRepository.countByRoleAndIsActiveTrue("USER");
     }
 
+    public long countByRole(UserRole role) {
+        return userRepository.countByRole(role);
+    }
+
+    public long count() {
+        return userRepository.count();
+    }
+
+    public long countByIsActive(boolean isActive) {
+        return userRepository.countByIsActive(isActive);
+    }
+
     public boolean validatePassword(String rawPassword, String encodedPassword) {
         return passwordEncoder.matches(rawPassword, encodedPassword);
     }

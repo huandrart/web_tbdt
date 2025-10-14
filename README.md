@@ -1,238 +1,257 @@
-# Electronic Store - Website Bán Thiết Bị Điện Tử
+# 🛒 Electronic Store Management System
 
-Một website bán thiết bị điện tử được xây dựng bằng Spring Boot, MySQL và Thymeleaf.
+A comprehensive Spring Boot application for managing an electronic store with full-featured e-commerce capabilities.
 
-## 🚀 Tính năng chính
+## ✨ Features
 
-### Khách hàng
-- 🏠 **Trang chủ**: Hiển thị sản phẩm nổi bật, phổ biến và danh mục
-- 🔍 **Tìm kiếm & Lọc**: Tìm kiếm theo tên, lọc theo danh mục, thương hiệu, giá
-- 📱 **Chi tiết sản phẩm**: Xem thông tin chi tiết, hình ảnh, đánh giá
-- 🛒 **Giỏ hàng**: Thêm, sửa, xóa sản phẩm trong giỏ
-- 📋 **Đặt hàng**: Thông tin giao hàng, thanh toán
-- 👤 **Tài khoản**: Đăng ký, đăng nhập, quản lý thông tin
-- ⭐ **Đánh giá**: Đánh giá và nhận xét sản phẩm
+### 🏪 **Core Features**
+- **User Management**: Registration, authentication, profile management
+- **Product Catalog**: Categories, products with images, search & filtering
+- **Shopping Cart**: Add/remove items, quantity management
+- **Order Processing**: Complete order lifecycle management
+- **Payment Integration**: Multiple payment methods support
+- **Admin Dashboard**: Comprehensive management interface
+- **Shipper Management**: Order delivery and tracking system
 
-### Quản trị viên
-- 📊 **Dashboard**: Thống kê doanh thu, đơn hàng, sản phẩm
-- 📦 **Quản lý sản phẩm**: CRUD sản phẩm, danh mục
-- 📋 **Quản lý đơn hàng**: Xem, cập nhật trạng thái đơn hàng
-- 👥 **Quản lý khách hàng**: Xem danh sách, thông tin khách hàng
-- 💬 **Quản lý đánh giá**: Duyệt và quản lý đánh giá sản phẩm
+### 🔐 **Security & Authentication**
+- **Role-based Access Control**: USER, ADMIN, SUPER_ADMIN, SHIPPER
+- **Password Encryption**: BCrypt security
+- **CSRF Protection**: Cross-site request forgery prevention
+- **Session Management**: Secure user sessions
 
-## 🛠 Công nghệ sử dụng
+### 📱 **User Interface**
+- **Responsive Design**: Mobile-first approach
+- **Modern UI**: Bootstrap 5.3 with custom styling
+- **Interactive Elements**: AJAX-powered features
+- **Multi-step Forms**: User-friendly form flows
 
-### Backend
-- **Java 17**
-- **Spring Boot 3.1.0**
-  - Spring Web
-  - Spring Data JPA
-  - Spring Security
-  - Spring Validation
-- **MySQL 8.0**
-- **Hibernate**
+## 🛠️ **Technologies Used**
 
-### Frontend
+### **Backend**
+- **Spring Boot 3.1.0** - Main framework
+- **Spring Security** - Authentication & authorization
+- **Spring Data JPA** - Data persistence
+- **Hibernate** - ORM framework
+- **MySQL 8.0** - Database
+- **Maven** - Dependency management
+
+### **Frontend**
 - **Thymeleaf** - Template engine
-- **Bootstrap 5.3** - CSS Framework
-- **Font Awesome 6.4** - Icons
-- **jQuery 3.6** - JavaScript
+- **Bootstrap 5.3** - CSS framework
+- **jQuery** - JavaScript library
+- **Font Awesome** - Icons
+- **Google Fonts** - Typography
 
-### Tools & Others
-- **Maven** - Build tool
-- **Spring Boot DevTools** - Development
-- **XAMPP** - Local MySQL server
+### **Development Tools**
+- **Spring Boot DevTools** - Hot reload
+- **H2 Database** - Development database
+- **Maven Wrapper** - Consistent builds
 
-## 📋 Yêu cầu hệ thống
+## 🚀 **Quick Start**
 
-- **Java 17+**
-- **Maven 3.6+**
-- **MySQL 8.0+** (hoặc XAMPP)
-- **IDE**: IntelliJ IDEA, Eclipse, hoặc VS Code
+### **Prerequisites**
+- Java 17 or higher
+- MySQL 8.0 or higher
+- Maven 3.6 or higher
 
-## 🚀 Cài đặt và chạy dự án
+### **Installation**
 
-### Bước 1: Cài đặt XAMPP
-1. Tải và cài đặt [XAMPP](https://www.apachefriends.org/)
-2. Khởi động **Apache** và **MySQL** trong XAMPP Control Panel
-3. Truy cập [http://localhost/phpmyadmin](http://localhost/phpmyadmin)
+1. **Clone the repository**
+   ```bash
+   git clone 
+   cd electronic-store
+   ```
 
-### Bước 2: Tạo cơ sở dữ liệu
-1. Mở phpMyAdmin
-2. Tạo database mới tên `electronic_store_db`
-3. Import file SQL `database/electronic_store_schema.sql` hoặc chạy script SQL
+2. **Database Setup**
+   ```sql
+   CREATE DATABASE electronic_store;
+   ```
+   - Run migration scripts in `database/` folder
+   - Update database credentials in `application.properties`
 
-```sql
-CREATE DATABASE electronic_store_db 
-CHARACTER SET utf8mb4 
-COLLATE utf8mb4_unicode_ci;
-```
-
-### Bước 3: Cấu hình kết nối database
-Kiểm tra file `src/main/resources/application.properties`:
-
-```properties
-# Database Configuration (XAMPP MySQL)
-spring.datasource.url=jdbc:mysql://localhost:3306/my_namedb ?useSSL=false&serverTimezone=UTC&createDatabaseIfNotExist=true
-spring.datasource.username=root
-spring.datasource.password=
-spring.datasource.driver-class-name=com.mysql.cj.jdbc.Driver
-
-# JPA Configuration
-spring.jpa.hibernate.ddl-auto=update
-spring.jpa.show-sql=true
-spring.jpa.properties.hibernate.dialect=org.hibernate.dialect.MySQL8Dialect
-```
-
-### Bước 4: Clone và build dự án
+3. **Run the application**
 ```bash
-# Clone dự án (nếu có Git repository)
-git clone [repository-url]
-cd electronic-store
-
-# Build dự án
-mvn clean install
-
-# Chạy ứng dụng
 mvn spring-boot:run
 ```
 
-### Bước 5: Truy cập ứng dụng
-- **Website**: [http://localhost:8080](http://localhost:8080)
-- **Database**: [http://localhost/phpmyadmin](http://localhost/phpmyadmin)
+4. **Access the application**
+   - **Homepage**: http://localhost:8080
+   - **Admin Panel**: http://localhost:8080/admin
+   - **API Docs**: http://localhost:8080/swagger-ui.html
 
-## 📊 Cấu trúc cơ sở dữ liệu
+## 📊 **Default Accounts**
 
-### Bảng chính
-- **categories**: Danh mục sản phẩm
-- **products**: Sản phẩm
-- **product_images**: Hình ảnh sản phẩm
-- **users**: Người dùng (khách hàng, admin)
-- **orders**: Đơn hàng
-- **order_items**: Chi tiết đơn hàng
-- **reviews**: Đánh giá sản phẩm
+### **Admin Account**
+- **Email**: admin1@electronicstore.com
+- **Password**: admin1
+- **Role**: ADMIN
 
-### ERD (Entity Relationship Diagram)
-```
-Categories (1) -----> (N) Products
-Users (1) -----> (N) Orders
-Users (1) -----> (N) Reviews
-Products (1) -----> (N) Reviews
-Products (1) -----> (N) Product_Images
-Products (1) -----> (N) Order_Items
-Orders (1) -----> (N) Order_Items
-```
+### **Test User Account**
+- **Email**: user@test.com
+- **Password**: user123
+- **Role**: USER
 
-## 🗂 Cấu trúc thư mục
+## 🗂️ **Project Structure**
 
 ```
 electronic-store/
-├── src/
-│   ├── main/
-│   │   ├── java/com/electronicstore/
-│   │   │   ├── controller/          # Controllers
-│   │   │   ├── entity/             # Entity classes
-│   │   │   ├── repository/         # JPA Repositories
-│   │   │   ├── service/            # Business logic
-│   │   │   ├── config/             # Configuration
-│   │   │   └── ElectronicStoreApplication.java
-│   │   └── resources/
-│   │       ├── templates/          # Thymeleaf templates
-│   │       ├── static/             # CSS, JS, images
-│   │       └── application.properties
-├── database/
-│   └── electronic_store_schema.sql # Database schema
-├── pom.xml                         # Maven dependencies
-└── README.md
+├── src/main/java/com/electronicstore/
+│   ├── config/          # Configuration classes
+│   ├── controller/      # REST & MVC controllers
+│   ├── entity/          # JPA entities
+│   ├── repository/      # Data repositories
+│   ├── service/         # Business logic
+│   ├── dto/            # Data transfer objects
+│   └── util/           # Utility classes
+├── src/main/resources/
+│   ├── static/         # Static assets (CSS, JS, images)
+│   ├── templates/      # Thymeleaf templates
+│   └── application.properties
+├── database/           # Database migration scripts
+├── uploads/           # User uploaded files
+└── logs/             # Application logs
 ```
 
-## 👤 Tài khoản mặc định
+## 🔧 **Configuration**
 
-### Admin
-- **Email**: admin@electronicstore.com
-- **Mật khẩu**: password
+### **Environment Variables**
+```bash
+# Database
+DB_USERNAME=your_db_username
+DB_PASSWORD=your_db_password
 
-### Manager
-- **Email**: manager@electronicstore.com
-- **Mật khẩu**: password
+# File Upload
+UPLOAD_DIR=/path/to/uploads
 
-### Customer
-- **Email**: customer1@example.com
-- **Mật khẩu**: password
-
-## 🌟 Dữ liệu mẫu
-
-Database đã bao gồm:
-- 8 danh mục sản phẩm
-- 14+ sản phẩm mẫu (Laptop, điện thoại, tablet, phụ kiện...)
-- Tài khoản admin và customer
-- Đơn hàng và đánh giá mẫu
-
-## 🔧 Customization
-
-### Thêm sản phẩm mới
-1. Truy cập admin panel
-2. Hoặc thêm trực tiếp vào database thông qua phpMyAdmin
-
-### Thay đổi giao diện
-- Chỉnh sửa file Thymeleaf trong `src/main/resources/templates/`
-- CSS tùy chỉnh trong các file template hoặc tạo file riêng
-
-### Cấu hình email
-Thêm vào `application.properties`:
-```properties
-# Email Configuration
-spring.mail.host=smtp.gmail.com
-spring.mail.port=587
-spring.mail.username=your-email@gmail.com
-spring.mail.password=your-password
-spring.mail.properties.mail.smtp.auth=true
-spring.mail.properties.mail.smtp.starttls.enable=true
+# Email (Optional)
+MAIL_USERNAME=your_email
+MAIL_PASSWORD=your_password
 ```
 
-## 🐛 Xử lý sự cố
+### **Production Deployment**
+1. Set `spring.profiles.active=prod`
+2. Configure production database
+3. Set up file storage
+4. Configure email settings
+5. Set up reverse proxy (Nginx/Apache)
 
-### Lỗi kết nối database
-1. Kiểm tra XAMPP MySQL đã khởi động
-2. Kiểm tra tên database và thông tin kết nối
-3. Kiểm tra firewall
+## 📈 **API Endpoints**
 
-### Lỗi port 8080 đã được sử dụng
-Thêm vào `application.properties`:
-```properties
-server.port=8081
+### **Public Endpoints**
+- `GET /` - Homepage
+- `GET /products` - Product catalog
+- `GET /about` - About page
+- `GET /contact` - Contact page
+- `POST /contact` - Submit contact form
+
+### **Authentication**
+- `GET /login` - Login page
+- `POST /login` - Process login
+- `GET /register` - Registration page
+- `POST /register` - Process registration
+- `GET /forgot-password` - Password reset
+- `POST /forgot-password` - Send reset email
+
+### **User Features**
+- `GET /profile` - User profile
+- `GET /cart` - Shopping cart
+- `POST /cart/add` - Add to cart
+- `GET /orders` - User orders
+- `POST /orders/place` - Place order
+
+### **Admin Features**
+- `GET /admin/dashboard` - Admin dashboard
+- `GET /admin/products` - Product management
+- `GET /admin/orders` - Order management
+- `GET /admin/users` - User management
+
+## 🧪 **Testing**
+
+### **Run Tests**
+```bash
+mvn test
 ```
 
-### Lỗi encoding tiếng Việt
-Đảm bảo database sử dụng `utf8mb4_unicode_ci`
+### **Test Coverage**
+```bash
+mvn jacoco:report
+```
 
-## 📈 Tối ưu hóa
+## 📝 **Database Schema**
 
-### Performance
-- Sử dụng pagination cho danh sách sản phẩm
-- Lazy loading cho relationships
-- Database indexing đã được setup
+### **Core Tables**
+- `users` - User accounts and profiles
+- `categories` - Product categories
+- `products` - Product information
+- `orders` - Order records
+- `order_items` - Order line items
+- `carts` - Shopping cart items
+- `reviews` - Product reviews
 
-### Security
-- Password encoding với BCrypt
-- CSRF protection
-- SQL injection prevention với JPA
+### **Migration Scripts**
+- `V1__create_users_table.sql`
+- `V2__create_categories_table.sql`
+- `V3__create_products_table.sql`
+- And more...
 
-## 🤝 Đóng góp
+## 🔒 **Security Features**
 
-1. Fork dự án
-2. Tạo feature branch (`git checkout -b feature/AmazingFeature`)
-3. Commit changes (`git commit -m 'Add some AmazingFeature'`)
-4. Push to branch (`git push origin feature/AmazingFeature`)
-5. Tạo Pull Request
+- **Password Hashing**: BCrypt with salt
+- **CSRF Protection**: Token-based validation
+- **SQL Injection Prevention**: Parameterized queries
+- **XSS Protection**: Input sanitization
+- **Session Security**: Secure session management
 
-## 📄 License
+## 📱 **Responsive Design**
 
-Dự án này được phân phối dưới [MIT License](LICENSE).
+- **Mobile First**: Optimized for mobile devices
+- **Tablet Support**: Responsive breakpoints
+- **Desktop Enhanced**: Full feature set on desktop
+- **Touch Friendly**: Touch-optimized interactions
 
-## 📞 Liên hệ
+## 🚀 **Performance Optimizations**
 
-- **Email**: developer@electronicstore.com
-- **GitHub**: [https://github.com/your-username/electronic-store](https://github.com/your-username/electronic-store)
+- **Database Indexing**: Optimized queries
+- **Lazy Loading**: Efficient data loading
+- **Caching**: Spring Cache integration
+- **Image Optimization**: Compressed images
+- **CDN Ready**: Static asset optimization
+
+## 🤝 **Contributing**
+
+1. Fork the repository
+2. Create a feature branch (`git checkout -b feature/amazing-feature`)
+3. Commit your changes (`git commit -m 'Add amazing feature'`)
+4. Push to the branch (`git push origin feature/amazing-feature`)
+5. Open a Pull Request
+
+### **Development Guidelines**
+- Follow Java naming conventions
+- Write unit tests for new features
+- Update documentation
+- Follow the existing code style
+
+## 📄 **License**
+
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+
+## 👥 **Authors**
+
+- **Huân Nguyễn** - *Initial work* - [YourGitHub](https://github.com/huandrart)
+
+## 🙏 **Acknowledgments**
+
+- Spring Boot team for the amazing framework
+- Bootstrap team for the UI components
+- MySQL team for the database
+- All contributors and testers
+
+## 📞 **Support**
+
+- **Email**: huandkdt@gmail.com
+- **Issues**: [GitHub Issues](https://github.com/huandrart/tmdt)
+- **Documentation**: [Wiki]
 
 ---
+
+**Made with ❤️ for the electronic store community**

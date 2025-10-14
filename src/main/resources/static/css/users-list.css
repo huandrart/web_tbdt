@@ -57,6 +57,7 @@
         
         .stats-card h2,
         .bg-success h2,
+        .bg-info h2,
         .bg-danger h2,
         .bg-warning h2 {
             font-size: 2.5rem;
@@ -66,6 +67,7 @@
         
         .stats-card h6,
         .bg-success h6,
+        .bg-info h6,
         .bg-danger h6,
         .bg-warning h6 {
             font-size: 0.9rem;
@@ -77,6 +79,7 @@
         .stats-card h2,
         .bg-success h2,
         .bg-danger h2,
+        .bg-info h2,
         .bg-warning h2 {
             animation: countUp 0.8s ease-out;
         }
@@ -115,6 +118,7 @@
             .stats-card h2,
             .bg-success h2,
             .bg-danger h2,
+            .bg-info h2,
             .bg-warning h2 {
                 font-size: 2rem;
             }
@@ -143,6 +147,7 @@
         }
         
         .role-user { background-color: #28a745; color: #fff; }
+        .role-shipper { background-color: #17a2b8; color: #fff; }
         .role-admin { background-color: #dc3545; color: #fff; }
         .role-super_admin { background-color: #6f42c1; color: #fff; }
         

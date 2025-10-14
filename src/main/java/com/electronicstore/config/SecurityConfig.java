@@ -22,8 +22,9 @@ public class SecurityConfig {
                 .requestMatchers("/", "/home", "/products/**", "/categories/**", 
                                "/css/**", "/js/**", "/images/**", "/favicon.ico",
                                "/register", "/login", "/forgot-password", "/reset-password",
-                               "/auth/**").permitAll()
+                               "/about", "/contact", "/auth/**", "/cart/**").permitAll()
                 .requestMatchers("/admin/**").hasAnyRole("ADMIN", "SUPER_ADMIN")
+                .requestMatchers("/shipper/**").hasRole("SHIPPER")
                 .requestMatchers("/profile/**", "/orders/**", "/reviews/**", "/order/**").hasAnyRole("USER", "ADMIN", "SUPER_ADMIN")
                 .anyRequest().authenticated()
             )
@@ -40,6 +41,9 @@ public class SecurityConfig {
                             .anyMatch(a -> a.getAuthority().equals("ROLE_ADMIN") || 
                                          a.getAuthority().equals("ROLE_SUPER_ADMIN"))) {
                         redirectURL = "/admin/dashboard";
+                    } else if (authentication.getAuthorities().stream()
+                            .anyMatch(a -> a.getAuthority().equals("ROLE_SHIPPER"))) {
+                        redirectURL = "/shipper";
                     } else {
                         redirectURL = "/home";
                     }

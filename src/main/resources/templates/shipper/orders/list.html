@@ -1,0 +1,258 @@
+<!DOCTYPE html>
+<html lang="vi" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Danh sách đơn hàng - Shipper</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link th:href="@{/css/shipper-orders.css}" rel="stylesheet">
+</head>
+<body>
+    <div class="container-fluid">
+        <div class="row">
+            <!-- Sidebar -->
+            <nav class="col-md-3 col-lg-2 d-md-block bg-primary sidebar collapse">
+                <div class="position-sticky pt-3">
+                    <div class="text-center mb-4">
+                        <h4 class="text-white">
+                            <i class="fas fa-truck me-2"></i>
+                            Shipper Panel
+                        </h4>
+                    </div>
+                    
+                    <ul class="nav flex-column">
+                        <li class="nav-item">
+                            <a class="nav-link text-white" th:href="@{/shipper}">
+                                <i class="fas fa-tachometer-alt me-2"></i>
+                                Dashboard
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link active text-white" th:href="@{/shipper/orders}">
+                                <i class="fas fa-list me-2"></i>
+                                Đơn hàng
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link text-white" th:href="@{/logout}">
+                                <i class="fas fa-sign-out-alt me-2"></i>
+                                Đăng xuất
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+            </nav>
+
+            <!-- Main content -->
+            <main class="col-md-9 ms-sm-auto col-lg-10 px-md-4">
+                <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+                    <h1 class="h2">
+                        <i class="fas fa-list me-2"></i>
+                        Danh sách đơn hàng
+                    </h1>
+                </div>
+
+                <!-- Filter -->
+                <div class="card mb-4">
+                    <div class="card-body">
+                        <form method="get" class="row g-3">
+                            <div class="col-md-3">
+                                <label class="form-label fw-semibold">
+                                    <i class="fas fa-filter me-1"></i>Trạng thái
+                                </label>
+                                <select class="form-select" name="status">
+                                    <option value="">Tất cả trạng thái</option>
+                                    <option value="PENDING" th:selected="${status == 'PENDING'}">Chờ xác nhận</option>
+                                    <option value="PROCESSING" th:selected="${status == 'PROCESSING'}">Đang xử lý</option>
+                                    <option value="SHIPPING" th:selected="${status == 'SHIPPING'}">Đang giao hàng</option>
+                                    <option value="DELIVERED" th:selected="${status == 'DELIVERED'}">Đã giao hàng</option>
+                                    <option value="CANCELLED" th:selected="${status == 'CANCELLED'}">Đã hủy</option>
+                                    <option value="RETURNED" th:selected="${status == 'RETURNED'}">Đã trả hàng</option>
+                                </select>
+                            </div>
+                            <div class="col-md-2">
+                                <label class="form-label fw-semibold">
+                                    <i class="fas fa-sort me-1"></i>Sắp xếp theo
+                                </label>
+                                <select class="form-select" name="sortBy">
+                                    <option value="createdAt" th:selected="${sortBy == 'createdAt'}">Ngày tạo</option>
+                                    <option value="orderNumber" th:selected="${sortBy == 'orderNumber'}">Mã đơn hàng</option>
+                                    <option value="customerName" th:selected="${sortBy == 'customerName'}">Khách hàng</option>
+                                    <option value="totalAmount" th:selected="${sortBy == 'totalAmount'}">Tổng tiền</option>
+                                </select>
+                            </div>
+                            <div class="col-md-1">
+                                <label class="form-label fw-semibold">
+                                    <i class="fas fa-arrow-up me-1"></i>Thứ tự
+                                </label>
+                                <select class="form-select" name="sortDir">
+                                    <option value="desc" th:selected="${sortDir == 'desc'}">Giảm dần</option>
+                                    <option value="asc" th:selected="${sortDir == 'asc'}">Tăng dần</option>
+                                </select>
+                            </div>
+                            <div class="col-md-1">
+                                <label class="form-label fw-semibold">&nbsp;</label>
+                                <button type="submit" class="btn btn-primary w-100">
+                                    <i class="fas fa-search"></i>
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+
+                <!-- Orders Table -->
+                <div class="card">
+                    <div class="card-header">
+                        <h5 class="mb-0">
+                            <i class="fas fa-list"></i>
+                            Danh sách đơn hàng
+                            <span class="badge bg-primary ms-2" th:text="${totalItems}">0</span>
+                        </h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="table-responsive">
+                            <table class="table table-hover">
+                                <thead class="table-light">
+                                    <tr>
+                                        <th>
+                                            <a th:href="@{/shipper/orders(sortBy='id', sortDir=${sortDir == 'asc' ? 'desc' : 'asc'}, status=${status})}"
+                                               class="text-decoration-none text-dark">
+                                                ID
+                                                <i th:if="${sortBy == 'id' and sortDir == 'asc'}" class="fas fa-sort-up text-primary"></i>
+                                                <i th:if="${sortBy == 'id' and sortDir == 'desc'}" class="fas fa-sort-down text-primary"></i>
+                                                <i th:if="${sortBy != 'id'}" class="fas fa-sort text-muted"></i>
+                                            </a>
+                                        </th>
+                                        <th>
+                                            <a th:href="@{/shipper/orders(sortBy='orderNumber', sortDir=${sortDir == 'asc' ? 'desc' : 'asc'}, status=${status})}"
+                                               class="text-decoration-none text-dark">
+                                                Mã đơn hàng
+                                                <i th:if="${sortBy == 'orderNumber' and sortDir == 'asc'}" class="fas fa-sort-up text-primary"></i>
+                                                <i th:if="${sortBy == 'orderNumber' and sortDir == 'desc'}" class="fas fa-sort-down text-primary"></i>
+                                                <i th:if="${sortBy != 'orderNumber'}" class="fas fa-sort text-muted"></i>
+                                            </a>
+                                        </th>
+                                        <th>
+                                            <a th:href="@{/shipper/orders(sortBy='customerName', sortDir=${sortDir == 'asc' ? 'desc' : 'asc'}, status=${status})}"
+                                               class="text-decoration-none text-dark">
+                                                Khách hàng
+                                                <i th:if="${sortBy == 'customerName' and sortDir == 'asc'}" class="fas fa-sort-up text-primary"></i>
+                                                <i th:if="${sortBy == 'customerName' and sortDir == 'desc'}" class="fas fa-sort-down text-primary"></i>
+                                                <i th:if="${sortBy != 'customerName'}" class="fas fa-sort text-muted"></i>
+                                            </a>
+                                        </th>
+                                        <th>
+                                            <a th:href="@{/shipper/orders(sortBy='totalAmount', sortDir=${sortDir == 'asc' ? 'desc' : 'asc'}, status=${status})}"
+                                               class="text-decoration-none text-dark">
+                                                Tổng tiền
+                                                <i th:if="${sortBy == 'totalAmount' and sortDir == 'asc'}" class="fas fa-sort-up text-primary"></i>
+                                                <i th:if="${sortBy == 'totalAmount' and sortDir == 'desc'}" class="fas fa-sort-down text-primary"></i>
+                                                <i th:if="${sortBy != 'totalAmount'}" class="fas fa-sort text-muted"></i>
+                                            </a>
+                                        </th>
+                                        <th>
+                                            <a th:href="@{/shipper/orders(sortBy='status', sortDir=${sortDir == 'asc' ? 'desc' : 'asc'}, status=${status})}"
+                                               class="text-decoration-none text-dark">
+                                                Trạng thái
+                                                <i th:if="${sortBy == 'status' and sortDir == 'asc'}" class="fas fa-sort-up text-primary"></i>
+                                                <i th:if="${sortBy == 'status' and sortDir == 'desc'}" class="fas fa-sort-down text-primary"></i>
+                                                <i th:if="${sortBy != 'status'}" class="fas fa-sort text-muted"></i>
+                                            </a>
+                                        </th>
+                                        <th>
+                                            <a th:href="@{/shipper/orders(sortBy='createdAt', sortDir=${sortDir == 'asc' ? 'desc' : 'asc'}, status=${status})}"
+                                               class="text-decoration-none text-dark">
+                                                Ngày tạo
+                                                <i th:if="${sortBy == 'createdAt' and sortDir == 'asc'}" class="fas fa-sort-up text-primary"></i>
+                                                <i th:if="${sortBy == 'createdAt' and sortDir == 'desc'}" class="fas fa-sort-down text-primary"></i>
+                                                <i th:if="${sortBy != 'createdAt'}" class="fas fa-sort text-muted"></i>
+                                            </a>
+                                        </th>
+                                        <th>Thao tác</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <!-- Debug info -->
+                                    <tr th:if="${orders != null and orders.content != null}">
+                                        <td colspan="7" class="text-center bg-info text-white">
+                                            DEBUG: Found <span th:text="${orders.content.size()}">0</span> orders out of <span th:text="${orders.totalElements}">0</span> total
+                                        </td>
+                                    </tr>
+                                    <tr th:each="order : ${orders.content}">
+                                        <td>
+                                            <span class="badge bg-light text-dark" th:text="'#' + ${order.id}">#1</span>
+                                        </td>
+                                        <td>
+                                            <span class="fw-semibold" th:text="${order.orderNumber}">#ORD001</span>
+                                        </td>
+                                        <td>
+                                            <div>
+                                                <div class="fw-semibold" th:text="${order.user != null ? order.user.fullName : 'N/A'}">Nguyễn Văn A</div>
+                                                <small class="text-muted" th:text="${order.user != null ? order.user.email : 'N/A'}">nguyenvana@email.com</small>
+                                            </div>
+                                        </td>
+                                        <td>
+                                            <div class="fw-semibold text-success" th:text="${order.totalAmount != null ? #numbers.formatDecimal(order.totalAmount, 0, 'COMMA', 0, 'POINT') + ' ₫' : 'N/A'}">₫2,500,000</div>
+                                        </td>
+                                        <td>
+                                            <span th:class="'badge badge-modern ' + ${order.status == 'PENDING' ? 'bg-warning' : (order.status == 'PROCESSING' ? 'bg-info' : (order.status == 'SHIPPING' ? 'bg-primary' : (order.status == 'DELIVERED' ? 'bg-success' : (order.status == 'CANCELLED' ? 'bg-danger' : (order.status == 'RETURNED' ? 'bg-secondary' : 'bg-warning')))))}" 
+                                                  th:text="${order.status.displayName}">Chờ xác nhận</span>
+                                        </td>
+                                        <td>
+                                            <small th:text="${order.createdAt != null ? #temporals.format(order.createdAt, 'dd/MM/yyyy HH:mm') : 'N/A'}">25/12/2024 14:30</small>
+                                        </td>
+                                        <td>
+                                            <div class="action-buttons">
+                                                <a th:href="@{/shipper/orders/{id}(id=${order.id})}" class="btn btn-outline-info btn-sm" title="Xem chi tiết">
+                                                    <i class="fas fa-eye"></i>
+                                                </a>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+
+                        <!-- Empty State -->
+                        <div th:if="${orders.content.isEmpty()}" class="empty-state">
+                            <i class="fas fa-shopping-cart"></i>
+                            <h4>Không có đơn hàng nào</h4>
+                            <p>Hiện tại không có đơn hàng nào cần xử lý</p>
+                        </div>
+
+                        <!-- Pagination -->
+                        <nav th:if="${totalPages > 1}">
+                            <ul class="pagination justify-content-center">
+                                <li class="page-item" th:classappend="${currentPage == 0} ? 'disabled'">
+                                    <a class="page-link" 
+                                       th:href="@{/shipper/orders(sortBy=${sortBy}, sortDir=${sortDir}, status=${status}, page=${currentPage - 1})}">
+                                        <i class="fas fa-chevron-left"></i>
+                                    </a>
+                                </li>
+                                
+                                <li class="page-item" 
+                                    th:each="pageNum : ${#numbers.sequence(0, totalPages - 1)}"
+                                    th:classappend="${pageNum == currentPage} ? 'active'">
+                                    <a class="page-link" 
+                                       th:href="@{/shipper/orders(sortBy=${sortBy}, sortDir=${sortDir}, status=${status}, page=${pageNum})}"
+                                       th:text="${pageNum + 1}">1</a>
+                                </li>
+                                
+                                <li class="page-item" th:classappend="${currentPage == totalPages - 1} ? 'disabled'">
+                                    <a class="page-link" 
+                                       th:href="@{/shipper/orders(sortBy=${sortBy}, sortDir=${sortDir}, status=${status}, page=${currentPage + 1})}">
+                                        <i class="fas fa-chevron-right"></i>
+                                    </a>
+                                </li>
+                            </ul>
+                        </nav>
+                    </div>
+                </div>
+            </main>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

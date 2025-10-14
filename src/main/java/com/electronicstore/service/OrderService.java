@@ -262,4 +262,28 @@ public class OrderService {
     public Page<Order> findByUserAndStatus(User user, Order.OrderStatus status, Pageable pageable) {
         return orderRepository.findByUserAndStatus(user, status, pageable);
     }
+    
+    public Page<Order> findByStatus(Order.OrderStatus status, Pageable pageable) {
+        return orderRepository.findByStatus(status, pageable);
+    }
+    
+    public long countDeliveredToday() {
+        return orderRepository.countDeliveredToday();
+    }
+    
+    public long countDeliveredTodayByShipper(User shipper) {
+        return orderRepository.countDeliveredTodayByShipper(shipper);
+    }
+    
+    public Page<Order> findByStatusIn(List<Order.OrderStatus> statuses, Pageable pageable) {
+        return orderRepository.findByStatusIn(statuses, pageable);
+    }
+
+    public Page<Order> findByStatusWithUser(Order.OrderStatus status, Pageable pageable) {
+        return orderRepository.findByStatusWithUser(status, pageable);
+    }
+
+    public Order findByIdDirect(Long id) {
+        return orderRepository.findById(id).orElse(null);
+    }
 }

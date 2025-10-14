@@ -121,6 +121,19 @@ public class AdminUserController {
             model.addAttribute("role", role);
             model.addAttribute("status", status);
             
+            // Add statistics
+            long totalUsers = userService.count();
+            long activeUsers = userService.countByIsActive(true);
+            long blockedUsers = userService.countByIsActive(false);
+            long adminUsers = userService.countByRole(UserRole.ADMIN);
+            long shipperUsers = userService.countByRole(UserRole.SHIPPER);
+            
+            model.addAttribute("totalUsers", totalUsers);
+            model.addAttribute("activeUsers", activeUsers);
+            model.addAttribute("blockedUsers", blockedUsers);
+            model.addAttribute("adminUsers", adminUsers);
+            model.addAttribute("shipperUsers", shipperUsers);
+            
             return "admin/users/list";
         } catch (Exception e) {
             System.err.println("Error in listUsers: " + e.getMessage());
@@ -539,5 +552,63 @@ public class AdminUserController {
         }
         
         return "redirect:/admin/users/view/" + id;
+    }
+    
+    @PostMapping("/{id}/update-role")
+    public String updateUserRole(
+            @PathVariable Long id,
+            @RequestParam UserRole newRole,
+            RedirectAttributes redirectAttributes
+    ) {
+        try {
+            User user = userService.findById(id);
+            if (user == null) {
+                redirectAttributes.addFlashAttribute("error", "Không tìm thấy người dùng");
+                return "redirect:/admin/users";
+            }
+            
+            // Validate role transition
+            if (!isValidRoleTransition(user.getRole(), newRole)) {
+                redirectAttributes.addFlashAttribute("error", 
+                    "Không thể chuyển từ vai trò " + user.getRole().getDisplayName() + 
+                    " sang " + newRole.getDisplayName());
+                return "redirect:/admin/users/view/" + id;
+            }
+            
+            // Update user role
+            user.setRole(newRole);
+            userService.save(user);
+            
+            String message = "Cập nhật vai trò thành công: " + newRole.getDisplayName();
+            redirectAttributes.addFlashAttribute("success", message);
+            
+            return "redirect:/admin/users/view/" + id;
+            
+        } catch (Exception e) {
+            redirectAttributes.addFlashAttribute("error", 
+                "Có lỗi xảy ra khi cập nhật vai trò: " + e.getMessage());
+            return "redirect:/admin/users/view/" + id;
+        }
+    }
+    
+    /**
+     * Validate role transition
+     * Only allow certain role transitions for security
+     */
+    private boolean isValidRoleTransition(UserRole currentRole, UserRole newRole) {
+        // Can't change SUPER_ADMIN role
+        if (currentRole == UserRole.SUPER_ADMIN) {
+            return false;
+        }
+        
+        // Can't promote to SUPER_ADMIN (only through direct database)
+        if (newRole == UserRole.SUPER_ADMIN) {
+            return false;
+        }
+        
+        // Allow transitions between USER, SHIPPER, ADMIN
+        return newRole == UserRole.USER || 
+               newRole == UserRole.SHIPPER || 
+               newRole == UserRole.ADMIN;
     }
 }

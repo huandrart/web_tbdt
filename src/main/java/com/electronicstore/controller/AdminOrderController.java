@@ -201,8 +201,6 @@ public class AdminOrderController {
         // Define valid transitions
         switch (from) {
             case PENDING:
-                return to == Order.OrderStatus.CONFIRMED || to == Order.OrderStatus.CANCELLED;
-            case CONFIRMED:
                 return to == Order.OrderStatus.PROCESSING || to == Order.OrderStatus.CANCELLED;
             case PROCESSING:
                 return to == Order.OrderStatus.SHIPPING || to == Order.OrderStatus.CANCELLED;

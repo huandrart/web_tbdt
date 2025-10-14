@@ -13,6 +13,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import java.math.BigDecimal;
 import java.util.List;
 
@@ -184,12 +185,40 @@ public class HomeController {
     }
     
     @GetMapping("/about")
-    public String about() {
+    public String about(Model model) {
+        model.addAttribute("pageTitle", "Giới thiệu - Electronic Store");
         return "about";
     }
     
     @GetMapping("/contact")
-    public String contact() {
+    public String contact(Model model) {
+        model.addAttribute("pageTitle", "Liên hệ - Electronic Store");
         return "contact";
+    }
+    
+    @PostMapping("/contact")
+    public String submitContact(@RequestParam String name,
+                               @RequestParam String email,
+                               @RequestParam String subject,
+                               @RequestParam String message,
+                               RedirectAttributes redirectAttributes) {
+        try {
+            // TODO: Gửi email thông báo cho admin
+            // Tạm thời chỉ log thông tin
+            System.out.println("Contact form submission:");
+            System.out.println("Name: " + name);
+            System.out.println("Email: " + email);
+            System.out.println("Subject: " + subject);
+            System.out.println("Message: " + message);
+            
+            redirectAttributes.addFlashAttribute("success", 
+                "Cảm ơn bạn đã liên hệ! Chúng tôi sẽ phản hồi trong thời gian sớm nhất.");
+            
+        } catch (Exception e) {
+            redirectAttributes.addFlashAttribute("error", 
+                "Có lỗi xảy ra khi gửi tin nhắn. Vui lòng thử lại sau.");
+        }
+        
+        return "redirect:/contact";
     }
 }

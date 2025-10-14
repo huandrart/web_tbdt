@@ -32,11 +32,11 @@
             <div class="collapse navbar-collapse" id="navbarNav">
                 <!-- Search Bar -->
                 <div class="mx-auto" style="max-width: 400px;">
-                    <form class="d-flex" action="/search" method="get">
+                    <form class="d-flex" th:action="@{/products}" method="get">
                         <div class="input-group">
-                            <input type="search" class="form-control search-bar" name="q" 
+                            <input type="search" class="form-control search-bar" name="keyword" 
                                    placeholder="Tìm kiếm sản phẩm..." 
-                                   th:value="${searchQuery}">
+                                   th:value="${keyword}">
                             <button class="btn btn-outline-light" type="submit">
                                 <i class="fas fa-search"></i>
                             </button>
@@ -230,6 +230,12 @@
                                                         <i class="fas fa-times me-1"></i>Hủy
                                                     </button>
                                                 </form>
+                                            </span>
+                                            <span th:if="${order.status.name() == 'DELIVERED' and order.shipper != null}">
+                                                <a th:href="@{/shipper-reviews/create/{id}(id=${order.id})}" 
+                                                   class="btn btn-sm btn-warning ms-1">
+                                                    <i class="fas fa-star me-1"></i>Đánh giá
+                                                </a>
                                             </span>
                                         </td>
                                     </tr>

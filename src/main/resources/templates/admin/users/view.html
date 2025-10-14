@@ -179,7 +179,13 @@
                                             <p><strong>Số điện thoại:</strong> <span th:text="${user.phone != null ? user.phone : 'N/A'}">N/A</span></p>
                                         </div>
                                         <div class="col-md-6">
-                                            <p><strong>Vai trò:</strong> <span th:text="${user.role.displayName}">N/A</span></p>
+                                            <p><strong>Vai trò:</strong> 
+                                                <span class="badge" 
+                                                      th:classappend="${user.role.name() == 'USER'} ? 'bg-primary' : 
+                                                                      (${user.role.name() == 'SHIPPER'} ? 'bg-info' : 
+                                                                      (${user.role.name() == 'ADMIN'} ? 'bg-warning' : 'bg-danger'))"
+                                                      th:text="${user.role.displayName}">N/A</span>
+                                            </p>
                                             <p><strong>Trạng thái:</strong> 
                                                 <span th:classappend="${user.isActive} ? 'status-active' : 'status-blocked'"
                                                       th:text="${user.isActive} ? 'Hoạt động' : 'Bị khóa'">
@@ -194,6 +200,52 @@
                                             <p><strong>Địa chỉ:</strong> <span th:text="${user.address != null ? user.address : 'N/A'}">N/A</span></p>
                                         </div>
                                     </div>
+                                </div>
+                            </div>
+
+                            <!-- Role Management -->
+                            <div class="card mb-4" th:if="${user.role.name() != 'SUPER_ADMIN' and currentUser != null and (currentUser.role.name() == 'ADMIN' or currentUser.role.name() == 'SUPER_ADMIN')}">
+                                <div class="card-header">
+                                    <h5 class="mb-0">
+                                        <i class="fas fa-user-shield me-2"></i>
+                                        Quản lý vai trò
+                                    </h5>
+                                </div>
+                                <div class="card-body">
+                                    <form th:action="@{/admin/users/{id}/update-role(id=${user.id})}" method="post">
+                                        <div class="row">
+                                            <div class="col-md-8">
+                                                <label class="form-label fw-bold">Vai trò hiện tại:</label>
+                                                <div class="mb-3">
+                                                    <span class="badge fs-6" 
+                                                          th:classappend="${user.role.name() == 'USER'} ? 'bg-primary' : 
+                                                                          (${user.role.name() == 'SHIPPER'} ? 'bg-info' : 'bg-warning')"
+                                                          th:text="${user.role.displayName}">USER</span>
+                                                </div>
+                                                
+                                                <label for="newRole" class="form-label fw-bold">Chọn vai trò mới:</label>
+                                                <select class="form-select" id="newRole" name="newRole" required>
+                                                    <option value="">-- Chọn vai trò --</option>
+                                                    <option value="USER" th:selected="${user.role.name() == 'USER'}">Người dùng</option>
+                                                    <option value="SHIPPER" th:selected="${user.role.name() == 'SHIPPER'}">Người giao hàng</option>
+                                                    <option value="ADMIN" th:selected="${user.role.name() == 'ADMIN'}" 
+                                                            th:if="${currentUser != null and currentUser.role.name() == 'SUPER_ADMIN'}">Quản trị viên</option>
+                                                </select>
+                                                
+                                                <div class="form-text">
+                                                    <i class="fas fa-info-circle me-1"></i>
+                                                    <strong>Lưu ý:</strong> Thay đổi vai trò sẽ ảnh hưởng đến quyền truy cập của người dùng.
+                                                </div>
+                                            </div>
+                                            <div class="col-md-4 d-flex align-items-end">
+                                                <button type="submit" class="btn btn-warning w-100"
+                                                        onclick="return confirm('Bạn có chắc muốn thay đổi vai trò của người dùng này?')">
+                                                    <i class="fas fa-save me-2"></i>
+                                                    Cập nhật vai trò
+                                                </button>
+                                            </div>
+                                        </div>
+                                    </form>
                                 </div>
                             </div>
 

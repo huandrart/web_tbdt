@@ -52,7 +52,8 @@
         }
         
         .role-admin { background-color: #dc3545; color: #fff; }
-        .role-user { background-color: #28a745; color: #fff; }
+        .role-user, .role-shipper { background-color: #28a745; color: #fff; }
+        
         
         .badge-status {
             font-size: 0.9em;

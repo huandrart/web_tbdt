@@ -189,7 +189,6 @@
                                 </label>
                                 <select id="status" name="status" class="form-select" required>
                                     <option value="PENDING" th:selected="${order.status == 'PENDING'}">Chờ xác nhận</option>
-                                    <option value="CONFIRMED" th:selected="${order.status == 'CONFIRMED'}">Đã xác nhận</option>
                                     <option value="PROCESSING" th:selected="${order.status == 'PROCESSING'}">Đang xử lý</option>
                                     <option value="SHIPPING" th:selected="${order.status == 'SHIPPING'}">Đang giao hàng</option>
                                     <option value="DELIVERED" th:selected="${order.status == 'DELIVERED'}">Đã giao hàng</option>
@@ -243,7 +242,6 @@
             if (currentStatus !== newStatus) {
                 const statusNames = {
                     'PENDING': 'Chờ xác nhận',
-                    'CONFIRMED': 'Đã xác nhận', 
                     'PROCESSING': 'Đang xử lý',
                     'SHIPPING': 'Đang giao hàng',
                     'DELIVERED': 'Đã giao hàng',

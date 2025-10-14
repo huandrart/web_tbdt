@@ -22,6 +22,10 @@ public class Order {
     @JoinColumn(name = "user_id", nullable = false)
     private User user;
     
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "shipper_id")
+    private User shipper;
+    
     @NotNull(message = "Tổng tiền không được để trống")
     @DecimalMin(value = "0.0", inclusive = false, message = "Tổng tiền phải lớn hơn 0")
     @Column(name = "total_amount", precision = 12, scale = 2, nullable = false)
@@ -186,6 +190,14 @@ public class Order {
     
     public void setUser(User user) {
         this.user = user;
+    }
+    
+    public User getShipper() {
+        return shipper;
+    }
+    
+    public void setShipper(User shipper) {
+        this.shipper = shipper;
     }
     
     public BigDecimal getTotalAmount() {

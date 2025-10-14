@@ -2,8 +2,9 @@ package com.electronicstore.entity;
 
 public enum UserRole {
     USER("USER", "Người dùng", 1),
-    ADMIN("ADMIN", "Quản trị viên", 2),
-    SUPER_ADMIN("SUPER_ADMIN", "Siêu quản trị", 3);
+    SHIPPER("SHIPPER", "Người giao hàng", 2),
+    ADMIN("ADMIN", "Quản trị viên", 3),
+    SUPER_ADMIN("SUPER_ADMIN", "Siêu quản trị", 4);
     
     private final String code;
     private final String displayName;

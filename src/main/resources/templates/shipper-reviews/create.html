@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="vi" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Đánh giá shipper</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link th:href="@{/css/shipper-review.css}" rel="stylesheet">
+</head>
+<body>
+    <div class="container mt-5">
+        <div class="row justify-content-center">
+            <div class="col-md-8">
+                <div class="card shadow">
+                    <div class="card-header bg-primary text-white">
+                        <h4 class="mb-0">
+                            <i class="fas fa-star me-2"></i>
+                            Đánh giá shipper
+                        </h4>
+                    </div>
+                    <div class="card-body">
+                        <!-- Order Info -->
+                        <div class="alert alert-info">
+                            <h6 class="alert-heading">
+                                <i class="fas fa-info-circle me-2"></i>
+                                Thông tin đơn hàng
+                            </h6>
+                            <p class="mb-1"><strong>Mã đơn hàng:</strong> <span th:text="${order.orderNumber}">ORD-001</span></p>
+                            <p class="mb-1"><strong>Shipper:</strong> <span th:text="${order.shipper.fullName}">Nguyễn Văn B</span></p>
+                            <p class="mb-0"><strong>Ngày giao:</strong> <span th:text="${#temporals.format(order.updatedAt, 'dd/MM/yyyy HH:mm')}">01/01/2024 10:00</span></p>
+                        </div>
+
+                        <!-- Review Form -->
+                        <form th:action="@{/shipper-reviews/create}" method="post">
+                            <input type="hidden" name="orderId" th:value="${order.id}">
+                            
+                            <div class="mb-4">
+                                <label class="form-label fw-bold">
+                                    <i class="fas fa-star me-2"></i>
+                                    Đánh giá shipper
+                                </label>
+                                <div class="rating-input">
+                                    <input type="radio" name="rating" value="5" id="star5" required>
+                                    <label for="star5" class="star">★</label>
+                                    
+                                    <input type="radio" name="rating" value="4" id="star4">
+                                    <label for="star4" class="star">★</label>
+                                    
+                                    <input type="radio" name="rating" value="3" id="star3">
+                                    <label for="star3" class="star">★</label>
+                                    
+                                    <input type="radio" name="rating" value="2" id="star2">
+                                    <label for="star2" class="star">★</label>
+                                    
+                                    <input type="radio" name="rating" value="1" id="star1">
+                                    <label for="star1" class="star">★</label>
+                                </div>
+                                <div class="rating-labels mt-2">
+                                    <small class="text-muted">
+                                        <span id="rating-text">Chọn số sao để đánh giá</span>
+                                    </small>
+                                </div>
+                            </div>
+
+                            <div class="mb-4">
+                                <label for="comment" class="form-label fw-bold">
+                                    <i class="fas fa-comment me-2"></i>
+                                    Bình luận (tùy chọn)
+                                </label>
+                                <textarea class="form-control" id="comment" name="comment" rows="4" 
+                                          placeholder="Chia sẻ trải nghiệm của bạn về shipper..."></textarea>
+                                <div class="form-text">Tối đa 500 ký tự</div>
+                            </div>
+
+                            <div class="d-flex gap-2">
+                                <button type="submit" class="btn btn-primary">
+                                    <i class="fas fa-paper-plane me-2"></i>
+                                    Gửi đánh giá
+                                </button>
+                                <a th:href="@{/orders/my-orders}" class="btn btn-outline-secondary">
+                                    <i class="fas fa-arrow-left me-2"></i>
+                                    Quay lại
+                                </a>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        // Star rating functionality
+        const stars = document.querySelectorAll('.rating-input input[type="radio"]');
+        const ratingText = document.getElementById('rating-text');
+        
+        const ratingLabels = {
+            1: 'Rất không hài lòng',
+            2: 'Không hài lòng', 
+            3: 'Bình thường',
+            4: 'Hài lòng',
+            5: 'Rất hài lòng'
+        };
+        
+        stars.forEach(star => {
+            star.addEventListener('change', function() {
+                const rating = this.value;
+                ratingText.textContent = ratingLabels[rating];
+                
+                // Update visual feedback
+                stars.forEach(s => {
+                    const label = s.nextElementSibling;
+                    if (parseInt(s.value) <= parseInt(rating)) {
+                        label.classList.add('active');
+                    } else {
+                        label.classList.remove('active');
+                    }
+                });
+            });
+        });
+        
+        // Character count for comment
+        const commentTextarea = document.getElementById('comment');
+        const formText = commentTextarea.nextElementSibling;
+        
+        commentTextarea.addEventListener('input', function() {
+            const length = this.value.length;
+            formText.textContent = `${length}/500 ký tự`;
+            
+            if (length > 500) {
+                formText.classList.add('text-danger');
+                this.classList.add('is-invalid');
+            } else {
+                formText.classList.remove('text-danger');
+                this.classList.remove('is-invalid');
+            }
+        });
+    </script>
+</body>
+</html>

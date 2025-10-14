@@ -1,6 +1,7 @@
 package com.electronicstore.repository;
 
 import com.electronicstore.entity.User;
+import com.electronicstore.entity.UserRole;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 
@@ -20,6 +21,10 @@ public interface UserRepository extends JpaRepository<User, Long> {
     List<User> findByRoleAndIsActiveTrue(String role);
     
     long countByRoleAndIsActiveTrue(String role);
+    
+    long countByRole(UserRole role);
+    
+    long countByIsActive(boolean isActive);
 
     // Sửa lại role cho đúng với ENUM('USER','ADMIN')
     @Query("SELECT u FROM User u WHERE u.role = 'USER' AND u.isActive = true")

@@ -49,4 +49,18 @@ public interface OrderRepository extends JpaRepository<Order, Long> {
     long countByUser(User user);
     
     Page<Order> findByUserAndStatus(User user, Order.OrderStatus status, Pageable pageable);
+    
+    Page<Order> findByStatus(Order.OrderStatus status, Pageable pageable);
+    
+    @Query("SELECT COUNT(o) FROM Order o WHERE o.status = 'DELIVERED' AND DATE(o.updatedAt) = CURRENT_DATE")
+    long countDeliveredToday();
+    
+    @Query("SELECT COUNT(o) FROM Order o WHERE o.status = 'DELIVERED' AND o.shipper = :shipper AND DATE(o.updatedAt) = CURRENT_DATE")
+    long countDeliveredTodayByShipper(@Param("shipper") User shipper);
+    
+    @Query("SELECT o FROM Order o WHERE o.status IN :statuses ORDER BY o.createdAt DESC")
+    Page<Order> findByStatusIn(@Param("statuses") List<Order.OrderStatus> statuses, Pageable pageable);
+    
+    @Query("SELECT o FROM Order o LEFT JOIN FETCH o.user WHERE o.status = :status ORDER BY o.createdAt DESC")
+    Page<Order> findByStatusWithUser(@Param("status") Order.OrderStatus status, Pageable pageable);
 }

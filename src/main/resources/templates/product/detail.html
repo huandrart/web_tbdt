@@ -32,11 +32,11 @@
             <div class="collapse navbar-collapse" id="navbarNav">
                 <!-- Search Bar -->
                 <div class="mx-auto" style="max-width: 400px;">
-                    <form class="d-flex" action="/search" method="get">
+                    <form class="d-flex" th:action="@{/products}" method="get">
                         <div class="input-group">
-                            <input type="search" class="form-control search-bar" name="q" 
+                            <input type="search" class="form-control search-bar" name="keyword" 
                                    placeholder="Tìm kiếm sản phẩm..." 
-                                   th:value="${searchQuery}">
+                                   th:value="${keyword}">
                             <button class="btn btn-outline-light" type="submit">
                                 <i class="fas fa-search"></i>
                             </button>

@@ -6,55 +6,63 @@
         let currentStep = 1;
         let countdownTimer;
         
-        // Email form submission
-        document.getElementById('emailForm').addEventListener('submit', function(e) {
-            e.preventDefault();
-            const email = document.getElementById('email').value;
-            
-            // Simulate API call
-            setTimeout(() => {
-                document.getElementById('emailDisplay').textContent = email;
+        // Initialize based on server state
+        document.addEventListener('DOMContentLoaded', function() {
+            // Check if we have email from server (step 2)
+            const emailDisplay = document.getElementById('emailDisplay');
+            if (emailDisplay && emailDisplay.textContent.trim()) {
                 showStep(2);
                 startCountdown();
-            }, 1000);
+            }
+            
+            // Check if we have verified flag (step 3)
+            const verifiedFlag = document.querySelector('input[name="verified"]');
+            if (verifiedFlag && verifiedFlag.value === 'true') {
+                showStep(3);
+            }
+        });
+        
+        // Email form submission
+        document.getElementById('emailForm').addEventListener('submit', function(e) {
+            // Let form submit normally to server
+            // Server will handle validation and redirect back with flash attributes
         });
         
         // Verification form submission
         document.getElementById('verificationForm').addEventListener('submit', function(e) {
-            e.preventDefault();
-            
             // Get verification code
             const codes = document.querySelectorAll('#step2 input[type="text"]');
             const verificationCode = Array.from(codes).map(input => input.value).join('');
             
             if (verificationCode.length !== 6) {
+                e.preventDefault();
                 alert('Vui lòng nhập đầy đủ mã xác minh');
                 return;
             }
             
-            // Simulate verification
-            setTimeout(() => {
-                showStep(3);
-            }, 1000);
+            // Add verification code to form
+            const hiddenInput = document.createElement('input');
+            hiddenInput.type = 'hidden';
+            hiddenInput.name = 'code';
+            hiddenInput.value = verificationCode;
+            this.appendChild(hiddenInput);
+            
+            // Let form submit normally to server
         });
         
         // Reset password form submission
         document.getElementById('resetPasswordForm').addEventListener('submit', function(e) {
-            e.preventDefault();
-            
             const newPassword = document.getElementById('newPassword').value;
             const confirmPassword = document.getElementById('confirmNewPassword').value;
             
             if (newPassword !== confirmPassword) {
+                e.preventDefault();
                 document.getElementById('confirmNewPassword').classList.add('is-invalid');
                 document.getElementById('confirmPasswordError').textContent = 'Mật khẩu xác nhận không khớp';
                 return;
             }
             
-            // Simulate password reset
-            setTimeout(() => {
-                showStep('success');
-            }, 1000);
+            // Let form submit normally to server
         });
         
         // Show step function
