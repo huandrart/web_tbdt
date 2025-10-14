@@ -187,6 +187,23 @@
 
             <!-- Products List -->
             <div class="col-lg-9">
+                <!-- Breadcrumb -->
+                <nav aria-label="breadcrumb" class="mb-3">
+                    <ol class="breadcrumb">
+                        <li class="breadcrumb-item">
+                            <a href="/" class="text-decoration-none">
+                                <i class="fas fa-home me-1"></i>Trang chủ
+                            </a>
+                        </li>
+                        <li class="breadcrumb-item" th:if="${selectedCategory != null}">
+                            <a href="/products" class="text-decoration-none">Sản phẩm</a>
+                        </li>
+                        <li class="breadcrumb-item active" th:if="${selectedCategory != null}" 
+                            th:text="${selectedCategory.name}">Category</li>
+                        <li class="breadcrumb-item active" th:if="${selectedCategory == null}">Sản phẩm</li>
+                    </ol>
+                </nav>
+                
                 <!-- Search Results Info -->
                 <div class="d-flex justify-content-between align-items-center mb-4">
                     <div>
@@ -195,9 +212,11 @@
                                 Kết quả tìm kiếm cho "<span th:text="${keyword}"></span>"
                             </span>
                             <span th:if="${selectedCategory != null}">
+                                <i class="fas fa-tag me-2"></i>
                                 <span th:text="${selectedCategory.name}"></span>
                             </span>
                             <span th:if="${keyword == null && selectedCategory == null}">
+                                <i class="fas fa-box me-2"></i>
                                 Tất cả sản phẩm
                             </span>
                         </h4>

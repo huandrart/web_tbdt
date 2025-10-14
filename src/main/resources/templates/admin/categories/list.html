@@ -58,7 +58,7 @@
       <!-- Main Content -->
       <div class="col-md-10 main-content p-4">
         <!-- Header -->
-        <div class="d-flex justify-content-between align-items-center mb-4">
+        <div class="page-header d-flex justify-content-between align-items-center mb-4">
           <h1 class="h2">Quản lý danh mục</h1>
           <div class="d-flex align-items-center">
             <a th:href="@{/admin/categories/new}" class="btn btn-primary me-3">
@@ -82,6 +82,7 @@
           <span th:text="${error}"></span>
           <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
         </div>
+
 
         <!-- Categories Table -->
         <div class="card">

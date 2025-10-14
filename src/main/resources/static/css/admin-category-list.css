@@ -3,11 +3,55 @@
 .sidebar {
     background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
     min-height: 100vh;
+    position: fixed;
+    top: 0;
+    left: 0;
+    z-index: 1000;
+    overflow-y: auto;
 }
 
 .main-content {
     background-color: #f8f9fa;
     min-height: 100vh;
+    margin-left: 16.666667%; /* col-md-3 = 25% of 12 columns */
+    padding-top: 0;
+}
+
+.page-header {
+    position: sticky;
+    top: 0;
+    background-color: #f8f9fa;
+    z-index: 999;
+    padding: 1rem 0;
+    border-bottom: 1px solid #dee2e6;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+    .sidebar {
+        position: fixed;
+        top: 0;
+        left: -100%;
+        width: 80%;
+        transition: left 0.3s ease;
+        z-index: 1050;
+    }
+    
+    .sidebar.show {
+        left: 0;
+    }
+    
+    .main-content {
+        margin-left: 0;
+        width: 100%;
+    }
+    
+    .page-header {
+        position: sticky;
+        top: 0;
+        z-index: 1040;
+    }
 }
 
 .category-card {
@@ -17,9 +61,10 @@
     transition: transform 0.3s ease;
 }
 
-.category-card:hover {
-    transform: translateY(-2px);
-}
+        .category-card:hover {
+            transform: translateY(-2px);
+        }
+        
 
 .btn-danger-modern {
     background: linear-gradient(45deg, #ff6b6b, #ee5a52);

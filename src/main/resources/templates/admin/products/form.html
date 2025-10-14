@@ -17,6 +17,14 @@
             <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
         </div>
 
+        <!-- Category Selected Message -->
+        <div th:if="${selectedCategory != null}" class="alert alert-info alert-dismissible fade show" role="alert">
+            <i class="fas fa-info-circle me-2"></i>
+            <strong>Danh mục đã chọn:</strong> <span th:text="${selectedCategory.name}"></span>
+            <br>
+            <small>Bạn đang thêm sản phẩm vào danh mục này. Danh mục đã được chọn sẵn trong form bên dưới.</small>
+        </div>
+
         <form th:action="${isEditMode ? '/admin/products/' + product.id + '/edit' : '/admin/products/new'}"
               th:object="${product}" method="post" enctype="multipart/form-data">
             <input type="hidden" th:field="*{id}" th:if="${isEditMode}" />

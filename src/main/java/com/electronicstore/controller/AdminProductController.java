@@ -154,10 +154,26 @@ public class AdminProductController {
     }
 
     @GetMapping("/new")
-    public String showCreateForm(Model model) {
-        model.addAttribute("product", new ProductRequest());
+    public String showCreateForm(@RequestParam(value = "categoryId", required = false) Long categoryId,
+                                Model model) {
+        ProductRequest productRequest = new ProductRequest();
+        
+        // Nếu có categoryId, set category cho product
+        if (categoryId != null) {
+            Category category = categoryService.findById(categoryId);
+            if (category != null) {
+                productRequest.setCategoryId(categoryId);
+                model.addAttribute("selectedCategory", category);
+                model.addAttribute("pageTitle", "Thêm sản phẩm mới - " + category.getName());
+            } else {
+                model.addAttribute("pageTitle", "Thêm sản phẩm mới");
+            }
+        } else {
+            model.addAttribute("pageTitle", "Thêm sản phẩm mới");
+        }
+        
+        model.addAttribute("product", productRequest);
         model.addAttribute("categories", categoryService.findActiveCategories());
-        model.addAttribute("pageTitle", "Thêm sản phẩm mới");
         model.addAttribute("submitButtonText", "Thêm mới");
         model.addAttribute("isEditMode", false);
         return "admin/products/form";

@@ -1,5 +1,48 @@
 /* templates/products.html styles */
 
+/* Breadcrumb */
+.breadcrumb {
+    background-color: #f8f9fa;
+    border-radius: 8px;
+    padding: 0.75rem 1rem;
+}
+
+.breadcrumb-item a {
+    color: #0d6efd;
+    text-decoration: none;
+}
+
+.breadcrumb-item a:hover {
+    text-decoration: underline;
+}
+
+.text-info {
+    font-weight: 500;
+}
+
+h4 i {
+    color: #0d6efd;
+}
+
+h4 i:hover {
+    color: #0b5ed7;
+}
+
+h4 i:hover:hover {
+    color: #0a58ca;
+}
+
+h4 i:hover:hover:hover {
+    color: #084298;
+}
+
+h4 i:hover:hover:hover:hover {
+    color: #063d7a;
+}
+
+h4 i:hover:hover:hover:hover:hover {
+    color: #052c65;
+}
 
         .product-card {
             transition: transform 0.3s;

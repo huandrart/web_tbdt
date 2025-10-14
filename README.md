@@ -73,7 +73,7 @@ Kiểm tra file `src/main/resources/application.properties`:
 
 ```properties
 # Database Configuration (XAMPP MySQL)
-spring.datasource.url=jdbc:mysql://localhost:3306/electronic_store_db?useSSL=false&serverTimezone=UTC&createDatabaseIfNotExist=true
+spring.datasource.url=jdbc:mysql://localhost:3306/my_namedb ?useSSL=false&serverTimezone=UTC&createDatabaseIfNotExist=true
 spring.datasource.username=root
 spring.datasource.password=
 spring.datasource.driver-class-name=com.mysql.cj.jdbc.Driver

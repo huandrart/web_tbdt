@@ -80,63 +80,6 @@
             </div>
         </div>
         
-        <!-- Filters -->
-        <div class="card-modern mb-4">
-            <div class="card-header-modern">
-                <h5 class="mb-0">
-                    <i class="fas fa-filter"></i>
-                    Bộ lọc
-                </h5>
-            </div>
-            <div class="card-body">
-                <form method="get" action="/admin/products" class="row g-3">
-                    <div class="col-md-3">
-                        <label for="search" class="form-label">Tìm kiếm</label>
-                        <input type="text" class="form-control-modern" id="search" name="search" 
-                               th:value="${search}" placeholder="Tên sản phẩm, mô tả...">
-                    </div>
-                    <div class="col-md-2">
-                        <label for="category" class="form-label">Danh mục</label>
-                        <select class="form-select-modern" id="category" name="categoryId">
-                            <option value="">Tất cả danh mục</option>
-                            <option th:each="category : ${categories}" 
-                                    th:value="${category.id}" 
-                                    th:text="${category.name}"
-                                    th:selected="${categoryId == category.id}">Danh mục</option>
-                        </select>
-                    </div>
-                    <div class="col-md-2">
-                        <label for="status" class="form-label">Trạng thái</label>
-                        <select class="form-select-modern" id="status" name="status">
-                            <option value="">Tất cả trạng thái</option>
-                            <option value="active" th:selected="${status == 'active'}">Hoạt động</option>
-                            <option value="inactive" th:selected="${status == 'inactive'}">Không hoạt động</option>
-                        </select>
-                    </div>
-                    <div class="col-md-2">
-                        <label for="sort" class="form-label">Sắp xếp</label>
-                        <select class="form-select-modern" id="sort" name="sortBy">
-                            <option value="id" th:selected="${sortBy == 'id'}">ID</option>
-                            <option value="name" th:selected="${sortBy == 'name'}">Tên</option>
-                            <option value="price" th:selected="${sortBy == 'price'}">Giá</option>
-                        </select>
-                    </div>
-                    <div class="col-md-2">
-                        <label for="direction" class="form-label">Thứ tự</label>
-                        <select class="form-select-modern" id="direction" name="sortDir">
-                            <option value="asc" th:selected="${sortDir == 'asc'}">Tăng dần</option>
-                            <option value="desc" th:selected="${sortDir == 'desc'}">Giảm dần</option>
-                        </select>
-                    </div>
-                    <div class="col-md-1">
-                        <label class="form-label">&nbsp;</label>
-                        <button type="submit" class="btn btn-primary-modern w-100">
-                            <i class="fas fa-search"></i>
-                        </button>
-                    </div>
-                </form>
-            </div>
-        </div>
         
         <!-- Products Table -->
         <div class="card-modern">
@@ -150,27 +93,47 @@
                 <div th:if="${products != null and !products.empty}">
                     <div class="table-responsive">
                         <table class="table table-modern mb-0">
-                            <thead>
+                            <thead class="table-light">
                                 <tr>
-                                    <th class="sortable-header">
-                                        ID
-                                        <i class="fas fa-sort sort-icon" th:classappend="${sortBy == 'id'} ? 'active' : ''"></i>
+                                    <th>
+                                        <a th:href="@{/admin/products(sort='id', direction=${sortDir == 'asc' ? 'desc' : 'asc'}, search=${search}, categoryId=${categoryId}, status=${status})}"
+                                           class="text-decoration-none text-dark">
+                                            ID
+                                            <i th:if="${sortBy == 'id' and sortDir == 'asc'}" class="fas fa-sort-up text-primary"></i>
+                                            <i th:if="${sortBy == 'id' and sortDir == 'desc'}" class="fas fa-sort-down text-primary"></i>
+                                            <i th:if="${sortBy != 'id'}" class="fas fa-sort text-muted"></i>
+                                        </a>
                                     </th>
                                     <th>Hình ảnh</th>
-                                    <th class="sortable-header">
-                                        Tên sản phẩm
-                                        <i class="fas fa-sort sort-icon" th:classappend="${sortBy == 'name'} ? 'active' : ''"></i>
+                                    <th>
+                                        <a th:href="@{/admin/products(sort='name', direction=${sortDir == 'asc' ? 'desc' : 'asc'}, search=${search}, categoryId=${categoryId}, status=${status})}"
+                                           class="text-decoration-none text-dark">
+                                            Tên sản phẩm
+                                            <i th:if="${sortBy == 'name' and sortDir == 'asc'}" class="fas fa-sort-up text-primary"></i>
+                                            <i th:if="${sortBy == 'name' and sortDir == 'desc'}" class="fas fa-sort-down text-primary"></i>
+                                            <i th:if="${sortBy != 'name'}" class="fas fa-sort text-muted"></i>
+                                        </a>
                                     </th>
                                     <th>Mô tả</th>
-                                    <th class="sortable-header">
-                                        Giá
-                                        <i class="fas fa-sort sort-icon" th:classappend="${sortBy == 'price'} ? 'active' : ''"></i>
+                                    <th>
+                                        <a th:href="@{/admin/products(sort='price', direction=${sortDir == 'asc' ? 'desc' : 'asc'}, search=${search}, categoryId=${categoryId}, status=${status})}"
+                                           class="text-decoration-none text-dark">
+                                            Giá
+                                            <i th:if="${sortBy == 'price' and sortDir == 'asc'}" class="fas fa-sort-up text-primary"></i>
+                                            <i th:if="${sortBy == 'price' and sortDir == 'desc'}" class="fas fa-sort-down text-primary"></i>
+                                            <i th:if="${sortBy != 'price'}" class="fas fa-sort text-muted"></i>
+                                        </a>
                                     </th>
                                     <th>Tồn kho</th>
                                     <th>Danh mục</th>
-                                    <th class="sortable-header">
-                                        Trạng thái
-                                        <i class="fas fa-sort sort-icon"></i>
+                                    <th>
+                                        <a th:href="@{/admin/products(sort='isActive', direction=${sortDir == 'asc' ? 'desc' : 'asc'}, search=${search}, categoryId=${categoryId}, status=${status})}"
+                                           class="text-decoration-none text-dark">
+                                            Trạng thái
+                                            <i th:if="${sortBy == 'isActive' and sortDir == 'asc'}" class="fas fa-sort-up text-primary"></i>
+                                            <i th:if="${sortBy == 'isActive' and sortDir == 'desc'}" class="fas fa-sort-down text-primary"></i>
+                                            <i th:if="${sortBy != 'isActive'}" class="fas fa-sort text-muted"></i>
+                                        </a>
                                     </th>
                                     <th>Thao tác</th>
                                 </tr>

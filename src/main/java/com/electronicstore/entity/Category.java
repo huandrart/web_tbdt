@@ -39,6 +39,9 @@ public class Category {
     @OneToMany(mappedBy = "category", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private List<Product> products = new ArrayList<>();
     
+    @Transient
+    private Long productCount;
+    
     // Constructors
     public Category() {}
     
@@ -122,6 +125,14 @@ public class Category {
     
     public void setProducts(List<Product> products) {
         this.products = products;
+    }
+    
+    public Long getProductCount() {
+        return productCount;
+    }
+    
+    public void setProductCount(Long productCount) {
+        this.productCount = productCount;
     }
     
     @Override

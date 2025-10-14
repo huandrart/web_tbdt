@@ -28,14 +28,51 @@
             background: linear-gradient(180deg, #667eea 0%, #764ba2 100%);
             color: white;
             position: fixed;
-            height: 100vh;
-            overflow-y: auto;
-            z-index: 1050;
-            transition: all 0.3s ease;
-            left: 0;
             top: 0;
+            left: 0;
+            z-index: 1000;
+            overflow-y: auto;
+            height: 100vh;
+            transition: all 0.3s ease;
             box-shadow: 2px 0 10px rgba(0,0,0,0.1);
             display: block !important;
+        }
+        
+        .page-header {
+            position: sticky;
+            top: 0;
+            background-color: #f8f9fa;
+            z-index: 999;
+            padding: 1rem 0;
+            border-bottom: 1px solid #dee2e6;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        
+        /* Responsive adjustments */
+        @media (max-width: 768px) {
+            .sidebar {
+                position: fixed;
+                top: 0;
+                left: -100%;
+                width: 80%;
+                transition: left 0.3s ease;
+                z-index: 1050;
+            }
+            
+            .sidebar.show {
+                left: 0;
+            }
+            
+            .main-content {
+                margin-left: 0;
+                width: 100%;
+            }
+            
+            .page-header {
+                position: sticky;
+                top: 0;
+                z-index: 1040;
+            }
         }
         
         .sidebar-header {

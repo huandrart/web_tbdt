@@ -50,6 +50,14 @@ public class CategoryService {
         return categoryRepository.findByName(name);
     }
     
+    public long countProductsByCategory(Category category) {
+        return categoryRepository.countProductsByCategory(category);
+    }
+    
+    public List<Category> findActiveCategoriesWithProducts() {
+        return categoryRepository.findActiveCategoriesWithProducts();
+    }
+    
     public Category findByNameDirect(String name) {
         Optional<Category> category = categoryRepository.findByName(name);
         return category.orElse(null);

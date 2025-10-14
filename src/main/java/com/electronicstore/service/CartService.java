@@ -25,4 +25,3 @@ public interface CartService {
     
     Long sumQuantityByUser(User user);
 }
-

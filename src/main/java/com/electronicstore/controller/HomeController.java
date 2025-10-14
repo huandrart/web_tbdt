@@ -15,7 +15,6 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import java.math.BigDecimal;
 import java.util.List;
-import java.util.Optional;
 
 @Controller
 public class HomeController {
@@ -39,14 +38,46 @@ public class HomeController {
         Pageable popularPageable = PageRequest.of(0, 8);
         List<Product> popularProducts = productService.findPopularProducts(popularPageable);
         
-        // Lấy danh mục
-        List<Category> categories = categoryService.findActiveCategoriesOrderByName();
+        // Lấy danh mục có sản phẩm
+        List<Category> categories = categoryService.findActiveCategoriesWithProducts();
+        
+        // Tính số sản phẩm cho mỗi danh mục
+        for (Category category : categories) {
+            long productCount = categoryService.countProductsByCategory(category);
+            category.setProductCount(productCount);
+        }
         
         model.addAttribute("featuredProducts", featuredProducts);
         model.addAttribute("popularProducts", popularProducts);
         model.addAttribute("categories", categories);
         
         return "index";
+    }
+    
+    @GetMapping("/home-page")
+    public String homePage(Model model) {
+        // Lấy sản phẩm nổi bật
+        Pageable featuredPageable = PageRequest.of(0, 8);
+        List<Product> featuredProducts = productService.findFeaturedProductsWithPagination(featuredPageable).getContent();
+        
+        // Lấy sản phẩm phổ biến
+        Pageable popularPageable = PageRequest.of(0, 8);
+        List<Product> popularProducts = productService.findPopularProducts(popularPageable);
+        
+        // Lấy danh mục có sản phẩm
+        List<Category> categories = categoryService.findActiveCategoriesWithProducts();
+        
+        // Tính số sản phẩm cho mỗi danh mục
+        for (Category category : categories) {
+            long productCount = categoryService.countProductsByCategory(category);
+            category.setProductCount(productCount);
+        }
+        
+        model.addAttribute("featuredProducts", featuredProducts);
+        model.addAttribute("popularProducts", popularProducts);
+        model.addAttribute("categories", categories);
+        
+        return "home";
     }
     
     @GetMapping("/products")
@@ -87,8 +118,8 @@ public class HomeController {
             productPage = productService.findActiveProductsWithPagination(pageable);
         }
         
-        // Lấy danh sách danh mục và thương hiệu cho filter
-        List<Category> categories = categoryService.findActiveCategoriesOrderByName();
+        // Lấy danh sách danh mục có sản phẩm và thương hiệu cho filter
+        List<Category> categories = categoryService.findActiveCategoriesWithProducts();
         List<String> brands = productService.findAllBrands();
         
         model.addAttribute("productPage", productPage);
@@ -147,6 +178,7 @@ public class HomeController {
         model.addAttribute("productPage", productPage);
         model.addAttribute("currentPage", page);
         model.addAttribute("totalPages", productPage.getTotalPages());
+        model.addAttribute("productCount", productPage.getTotalElements());
         
         return "category-products";
     }

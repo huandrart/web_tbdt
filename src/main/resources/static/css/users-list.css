@@ -4,6 +4,18 @@
         .sidebar {
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             min-height: 100vh;
+            position: fixed;
+            top: 0;
+            left: 0;
+            z-index: 1000;
+            overflow-y: auto;
+        }
+        
+        .main-content {
+            background-color: #f8f9fa;
+            min-height: 100vh;
+            margin-left: 16.666667%; /* col-md-2 = 16.666667% of 12 columns */
+            padding-top: 0;
         }
         
         .sidebar .nav-link {
@@ -20,15 +32,96 @@
             transform: translateX(5px);
         }
         
-        .main-content {
-            background-color: #f8f9fa;
-            min-height: 100vh;
-        }
         
         .card {
             border: none;
             border-radius: 15px;
             box-shadow: 0 0 20px rgba(0,0,0,0.1);
+        }
+        
+        .stats-card {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            transition: transform 0.3s ease;
+        }
+        
+        .stats-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 25px rgba(0,0,0,0.15);
+        }
+        
+        .stats-icon {
+            font-size: 2.5rem;
+            opacity: 0.8;
+        }
+        
+        .stats-card h2,
+        .bg-success h2,
+        .bg-danger h2,
+        .bg-warning h2 {
+            font-size: 2.5rem;
+            font-weight: 700;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        
+        .stats-card h6,
+        .bg-success h6,
+        .bg-danger h6,
+        .bg-warning h6 {
+            font-size: 0.9rem;
+            font-weight: 500;
+            opacity: 0.9;
+        }
+        
+        /* Animation for numbers */
+        .stats-card h2,
+        .bg-success h2,
+        .bg-danger h2,
+        .bg-warning h2 {
+            animation: countUp 0.8s ease-out;
+        }
+        
+        @keyframes countUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        /* Responsive adjustments */
+        @media (max-width: 768px) {
+            .sidebar {
+                position: fixed;
+                top: 0;
+                left: -100%;
+                width: 80%;
+                transition: left 0.3s ease;
+                z-index: 1050;
+            }
+            
+            .sidebar.show {
+                left: 0;
+            }
+            
+            .main-content {
+                margin-left: 0;
+                width: 100%;
+            }
+            
+            .stats-card h2,
+            .bg-success h2,
+            .bg-danger h2,
+            .bg-warning h2 {
+                font-size: 2rem;
+            }
+            
+            .stats-icon {
+                font-size: 2rem;
+            }
         }
         
         .user-avatar {

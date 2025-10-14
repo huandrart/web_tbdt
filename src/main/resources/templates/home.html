@@ -135,7 +135,46 @@
     </section>
 
     <!-- Categories Section -->
-   
+    <section id="categories" class="py-5">
+        <div class="container">
+            <div class="text-center mb-5">
+                <h2 class="section-title">Danh mục sản phẩm</h2>
+                <p class="text-muted">Khám phá các danh mục sản phẩm đa dạng</p>
+            </div>
+            
+            <div class="row">
+                <div th:each="category : ${categories}" class="col-lg-3 col-md-4 col-sm-6 mb-4">
+                    <div class="card category-card h-100 text-center">
+                        <div class="card-body">
+                            <div class="category-icon mb-3">
+                                <i th:class="${'fas fa-3x text-primary ' + 
+                                    (#strings.contains(category.name.toLowerCase(), 'laptop') ? 'fa-laptop' :
+                                     #strings.contains(category.name.toLowerCase(), 'phone') ? 'fa-mobile-alt' :
+                                     #strings.contains(category.name.toLowerCase(), 'tablet') ? 'fa-tablet-alt' :
+                                     #strings.contains(category.name.toLowerCase(), 'headphone') ? 'fa-headphones' :
+                                     #strings.contains(category.name.toLowerCase(), 'camera') ? 'fa-camera' :
+                                     #strings.contains(category.name.toLowerCase(), 'tv') ? 'fa-tv' :
+                                     #strings.contains(category.name.toLowerCase(), 'watch') ? 'fa-clock' :
+                                     'fa-laptop-code')}"></i>
+                            </div>
+                            <h5 class="card-title" th:text="${category.name}">Category Name</h5>
+                            <p class="card-text text-muted" th:text="${category.description}">Category Description</p>
+                            <div class="mb-3">
+                                <small class="text-info">
+                                    <i class="fas fa-box me-1"></i>
+                                    <span th:text="${category.productCount != null ? category.productCount : 0}">0</span> sản phẩm
+                                </small>
+                            </div>
+                            <a th:href="@{/category/{id}(id=${category.id})}" class="btn btn-outline-primary">
+                                Xem sản phẩm
+                                <i class="fas fa-arrow-right ms-1"></i>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
 
     <!-- Featured Products Section -->
     <section id="products" class="py-5 bg-light">

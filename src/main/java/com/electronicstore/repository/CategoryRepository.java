@@ -22,6 +22,12 @@ public interface CategoryRepository extends JpaRepository<Category, Long> {
     @Query("SELECT c FROM Category c LEFT JOIN FETCH c.products WHERE c.id = :id")
     Optional<Category> findByIdWithProducts(Long id);
     
+    @Query("SELECT COUNT(p) FROM Product p WHERE p.category = :category AND p.isActive = true")
+    long countProductsByCategory(Category category);
+    
+    @Query("SELECT DISTINCT c FROM Category c JOIN c.products p WHERE c.isActive = true AND p.isActive = true ORDER BY c.name")
+    List<Category> findActiveCategoriesWithProducts();
+    
     boolean existsByName(String name);
     
     // Search and filter methods

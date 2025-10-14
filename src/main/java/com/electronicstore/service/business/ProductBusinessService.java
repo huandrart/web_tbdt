@@ -7,7 +7,6 @@ import com.electronicstore.entity.Product;
 import com.electronicstore.mapper.CategoryMapper;
 import com.electronicstore.mapper.ProductMapper;
 import com.electronicstore.service.CategoryService;
-import com.electronicstore.service.FileStorageService;
 import com.electronicstore.service.ProductService;
 import com.electronicstore.viewmodel.ProductFormViewModel;
 import com.electronicstore.viewmodel.ProductListViewModel;
@@ -34,8 +33,6 @@ public class ProductBusinessService {
     @Autowired
     private CategoryService categoryService;
     
-    @Autowired
-    private FileStorageService fileStorageService;
     
     @Autowired
     private ProductMapper productMapper;

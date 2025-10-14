@@ -6,7 +6,6 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
-
 import org.springframework.security.web.SecurityFilterChain;
 
 @Configuration
@@ -15,8 +14,6 @@ public class SecurityConfig {
     
     @Autowired
     private UserService userService;
-    
-
     
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
@@ -62,7 +59,6 @@ public class SecurityConfig {
                 .permitAll()
             )
             .userDetailsService(userService);
-            // .csrf(csrf -> csrf.disable()); // Enable CSRF for login form
         
         return http.build();
     }
