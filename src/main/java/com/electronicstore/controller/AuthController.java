@@ -8,7 +8,6 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
-import java.util.Optional;
 
 @Controller
 public class AuthController {
@@ -22,8 +21,40 @@ public class AuthController {
     }
     
     @GetMapping("/register")
-    public String registerForm() {
+    public String registerForm(Model model) {
+        model.addAttribute("user", new User());
         return "auth/register";
+    }
+    
+    @PostMapping("/register")
+    public String registerUser(@ModelAttribute("user") User user,
+                              @RequestParam("confirmPassword") String confirmPassword,
+                              RedirectAttributes redirectAttributes) {
+        try {
+            // Kiểm tra mật khẩu xác nhận
+            if (!user.getPassword().equals(confirmPassword)) {
+                redirectAttributes.addFlashAttribute("error", "Mật khẩu xác nhận không khớp!");
+                return "redirect:/register";
+            }
+            
+            // Kiểm tra độ dài mật khẩu
+            if (user.getPassword().length() < 6) {
+                redirectAttributes.addFlashAttribute("error", "Mật khẩu phải có ít nhất 6 ký tự!");
+                return "redirect:/register";
+            }
+            
+            // Tạo user mới
+            userService.createUser(user);
+            
+            return "redirect:/email-verification";
+            
+        } catch (IllegalArgumentException e) {
+            redirectAttributes.addFlashAttribute("error", e.getMessage());
+            return "redirect:/register";
+        } catch (Exception e) {
+            redirectAttributes.addFlashAttribute("error", "Có lỗi xảy ra trong quá trình đăng ký: " + e.getMessage());
+            return "redirect:/register";
+        }
     }
     
     @GetMapping("/forgot-password")
@@ -31,80 +62,57 @@ public class AuthController {
         return "auth/forgot-password";
     }
     
+    @GetMapping("/email-verification")
+    public String emailVerificationPage() {
+        return "auth/email-verification";
+    }
+    
     @PostMapping("/forgot-password")
     public String sendResetCode(@RequestParam String email, 
                                RedirectAttributes redirectAttributes) {
         try {
-            // Kiểm tra email có tồn tại không
-            Optional<User> userOpt = userService.findByEmail(email);
-            if (userOpt.isEmpty()) {
-                redirectAttributes.addFlashAttribute("error", 
-                    "Email không tồn tại trong hệ thống!");
-                return "redirect:/auth/forgot-password";
-            }
+            // Sử dụng UserService để tạo reset token và gửi email
+            userService.generatePasswordResetToken(email);
             
-            User user = userOpt.get();
-            
-            // Kiểm tra tài khoản có bị khóa không
-            if (!user.getIsActive()) {
-                redirectAttributes.addFlashAttribute("error", 
-                    "Tài khoản đã bị khóa. Vui lòng liên hệ quản trị viên!");
-                return "redirect:/auth/forgot-password";
-            }
-            
-            // TODO: Gửi mã xác thực qua email
-            // Tạm thời sử dụng mã cố định để test
-            String resetCode = "123456";
-            
-            // Lưu mã reset vào session hoặc database
-            // Ở đây tạm thời lưu vào session
-            redirectAttributes.addFlashAttribute("resetCode", resetCode);
-            redirectAttributes.addFlashAttribute("email", email);
             redirectAttributes.addFlashAttribute("success", 
-                "Mã xác thực đã được gửi đến email của bạn!");
+                "Email đặt lại mật khẩu đã được gửi đến địa chỉ email của bạn!");
             
-            return "redirect:/auth/forgot-password";
+            return "redirect:/login";
             
+        } catch (IllegalArgumentException e) {
+            redirectAttributes.addFlashAttribute("error", e.getMessage());
+            return "redirect:/forgot-password";
         } catch (Exception e) {
             redirectAttributes.addFlashAttribute("error", 
                 "Có lỗi xảy ra: " + e.getMessage());
-            return "redirect:/auth/forgot-password";
+            return "redirect:/forgot-password";
         }
     }
     
-    @PostMapping("/verify-code")
-    public String verifyCode(@RequestParam String email,
-                           @RequestParam String code,
-                           RedirectAttributes redirectAttributes) {
+    @GetMapping("/reset-password")
+    public String resetPasswordForm(@RequestParam("token") String token, 
+                                   Model model,
+                                   RedirectAttributes redirectAttributes) {
         try {
-            // Lấy mã reset từ session
-            String sessionCode = (String) redirectAttributes.getFlashAttributes().get("resetCode");
-            
-            // Kiểm tra mã xác thực
-            if (sessionCode == null || !sessionCode.equals(code)) {
+            // Kiểm tra token có hợp lệ không
+            if (!userService.validateResetToken(token)) {
                 redirectAttributes.addFlashAttribute("error", 
-                    "Mã xác thực không đúng!");
-                redirectAttributes.addFlashAttribute("email", email);
-                return "redirect:/auth/forgot-password";
+                    "Liên kết đặt lại mật khẩu không hợp lệ hoặc đã hết hạn!");
+                return "redirect:/forgot-password";
             }
             
-            // Mã đúng, chuyển đến bước đặt mật khẩu mới
-            redirectAttributes.addFlashAttribute("email", email);
-            redirectAttributes.addFlashAttribute("verified", true);
-            redirectAttributes.addFlashAttribute("success", 
-                "Mã xác thực đúng! Vui lòng đặt mật khẩu mới.");
-            
-            return "redirect:/auth/forgot-password";
+            model.addAttribute("token", token);
+            return "auth/reset-password";
             
         } catch (Exception e) {
             redirectAttributes.addFlashAttribute("error", 
                 "Có lỗi xảy ra: " + e.getMessage());
-            return "redirect:/auth/forgot-password";
+            return "redirect:/forgot-password";
         }
     }
     
     @PostMapping("/reset-password")
-    public String resetPassword(@RequestParam String email,
+    public String resetPassword(@RequestParam String token,
                               @RequestParam String newPassword,
                               @RequestParam String confirmPassword,
                               RedirectAttributes redirectAttributes) {
@@ -113,43 +121,70 @@ public class AuthController {
             if (!newPassword.equals(confirmPassword)) {
                 redirectAttributes.addFlashAttribute("error", 
                     "Mật khẩu xác nhận không khớp!");
-                redirectAttributes.addFlashAttribute("email", email);
-                redirectAttributes.addFlashAttribute("verified", true);
-                return "redirect:/auth/forgot-password";
+                redirectAttributes.addFlashAttribute("token", token);
+                return "redirect:/reset-password?token=" + token;
             }
             
             // Kiểm tra độ dài mật khẩu
             if (newPassword.length() < 6) {
                 redirectAttributes.addFlashAttribute("error", 
                     "Mật khẩu phải có ít nhất 6 ký tự!");
-                redirectAttributes.addFlashAttribute("email", email);
-                redirectAttributes.addFlashAttribute("verified", true);
-                return "redirect:/auth/forgot-password";
+                redirectAttributes.addFlashAttribute("token", token);
+                return "redirect:/reset-password?token=" + token;
             }
             
-            // Tìm user và cập nhật mật khẩu
-            Optional<User> userOpt = userService.findByEmail(email);
-            if (userOpt.isEmpty()) {
-                redirectAttributes.addFlashAttribute("error", 
-                    "Email không tồn tại!");
-                return "redirect:/auth/forgot-password";
-            }
-            
-            User user = userOpt.get();
-            user.setPassword(newPassword); // UserService sẽ encode password
-            userService.update(user);
+            // Sử dụng UserService để reset password
+            userService.resetPassword(token, newPassword);
             
             redirectAttributes.addFlashAttribute("success", 
                 "Đặt lại mật khẩu thành công! Bạn có thể đăng nhập với mật khẩu mới.");
             
             return "redirect:/login";
             
+        } catch (IllegalArgumentException e) {
+            redirectAttributes.addFlashAttribute("error", e.getMessage());
+            return "redirect:/forgot-password";
         } catch (Exception e) {
             redirectAttributes.addFlashAttribute("error", 
                 "Có lỗi xảy ra: " + e.getMessage());
-            redirectAttributes.addFlashAttribute("email", email);
-            redirectAttributes.addFlashAttribute("verified", true);
-            return "redirect:/auth/forgot-password";
+            redirectAttributes.addFlashAttribute("token", token);
+            return "redirect:/reset-password?token=" + token;
         }
+    }
+    
+    @GetMapping("/verify-email")
+    public String verifyEmail(@RequestParam("token") String token, 
+                             RedirectAttributes redirectAttributes) {
+        try {
+            boolean verified = userService.verifyEmail(token);
+            
+            if (verified) {
+                redirectAttributes.addFlashAttribute("success", "Email đã được xác thực thành công! Bạn có thể đăng nhập ngay.");
+            } else {
+                redirectAttributes.addFlashAttribute("error", "Liên kết xác thực không hợp lệ hoặc đã hết hạn!");
+            }
+            
+            return "redirect:/login";
+            
+        } catch (Exception e) {
+            redirectAttributes.addFlashAttribute("error", "Có lỗi xảy ra trong quá trình xác thực: " + e.getMessage());
+            return "redirect:/login";
+        }
+    }
+    
+    @PostMapping("/resend-verification")
+    public String resendVerificationEmail(@RequestParam("email") String email,
+                                         RedirectAttributes redirectAttributes) {
+        try {
+            userService.resendVerificationEmail(email);
+            redirectAttributes.addFlashAttribute("success", "Email xác thực đã được gửi lại! Vui lòng kiểm tra hộp thư.");
+            
+        } catch (IllegalArgumentException e) {
+            redirectAttributes.addFlashAttribute("error", e.getMessage());
+        } catch (Exception e) {
+            redirectAttributes.addFlashAttribute("error", "Có lỗi xảy ra: " + e.getMessage());
+        }
+        
+        return "redirect:/login";
     }
 }

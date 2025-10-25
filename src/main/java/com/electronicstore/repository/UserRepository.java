@@ -35,4 +35,10 @@ public interface UserRepository extends JpaRepository<User, Long> {
 
     @Query("SELECT COUNT(u) FROM User u WHERE u.role = 'USER' AND u.isActive = true")
     long countActiveCustomers();
+    
+    // Email verification methods
+    Optional<User> findByVerificationToken(String token);
+    
+    // Password reset methods
+    Optional<User> findByResetToken(String token);
 }

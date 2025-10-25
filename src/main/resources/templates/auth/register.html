@@ -32,14 +32,14 @@
                 <!-- Body -->
                 <div class="register-body">
                     <!-- Alerts -->
-                    <div th:if="${param.error}" class="alert alert-danger">
+                    <div th:if="${error}" class="alert alert-danger">
                         <i class="fas fa-exclamation-circle me-2"></i>
-                        Có lỗi xảy ra trong quá trình đăng ký!
+                        <span th:text="${error}"></span>
                     </div>
                     
-                    <div th:if="${param.success}" class="alert alert-success">
+                    <div th:if="${success}" class="alert alert-success">
                         <i class="fas fa-check-circle me-2"></i>
-                        Tài khoản đã được tạo thành công!
+                        <span th:text="${success}"></span>
                     </div>
                     
                     <form th:action="@{/register}" th:object="${user}" method="post">

@@ -22,6 +22,7 @@ public class SecurityConfig {
                 .requestMatchers("/", "/home", "/products/**", "/categories/**", 
                                "/css/**", "/js/**", "/images/**", "/favicon.ico",
                                "/register", "/login", "/forgot-password", "/reset-password",
+                               "/verify-email", "/resend-verification", "/email-verification",
                                "/about", "/contact", "/auth/**", "/cart/**").permitAll()
                 .requestMatchers("/admin/**").hasAnyRole("ADMIN", "SUPER_ADMIN")
                 .requestMatchers("/shipper/**").hasRole("SHIPPER")

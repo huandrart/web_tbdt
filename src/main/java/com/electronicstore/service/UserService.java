@@ -22,6 +22,9 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import java.util.regex.Pattern;
+import java.util.UUID;
+import java.time.LocalDateTime;
+import org.springframework.beans.factory.annotation.Value;
 
 @Service
 @Transactional
@@ -37,6 +40,12 @@ public class UserService implements UserDetailsService {
     
     @Autowired
     private PasswordEncoder passwordEncoder;
+    
+    @Autowired
+    private EmailService emailService;
+    
+    @Value("${app.email.reset.expiration}")
+    private int resetExpirationHours;
 
     // Spring Security UserDetailsService implementation
     @Override
@@ -80,8 +89,24 @@ public class UserService implements UserDetailsService {
             user.setPassword(passwordEncoder.encode(user.getPassword()));
         }
 
-        user.setIsActive(true);
+        // Tạo verification token
+        String verificationToken = UUID.randomUUID().toString();
+        user.setVerificationToken(verificationToken);
+        user.setVerificationTokenExpires(LocalDateTime.now().plusHours(24));
+        user.setEmailVerified(false);
+        user.setIsActive(false); // Tạm thời khóa tài khoản cho đến khi verify email
+
         User saved = userRepository.save(user);
+        
+        // Gửi email verification
+        try {
+            emailService.sendVerificationEmail(user.getEmail(), user.getFullName(), verificationToken);
+            log.debug("Verification email sent to: {}", user.getEmail());
+        } catch (Exception e) {
+            log.error("Failed to send verification email to: {}", user.getEmail(), e);
+            // Không throw exception để không làm fail registration
+        }
+        
         log.debug("User saved with ID: {}", saved.getId());
         return saved;
     }
@@ -228,10 +253,59 @@ public class UserService implements UserDetailsService {
     }
 
     public void softDeleteById(Long id) {
-        userRepository.findById(id).ifPresent(u -> {
-            u.setIsActive(false);
-            userRepository.save(u);
-        });
+        // Implementation for soft delete
+    }
+    
+    // Email verification methods
+    public boolean verifyEmail(String token) {
+        Optional<User> userOpt = userRepository.findByVerificationToken(token);
+        
+        if (userOpt.isEmpty()) {
+            return false;
+        }
+        
+        User user = userOpt.get();
+        
+        // Kiểm tra token có hết hạn không
+        if (user.getVerificationTokenExpires() == null || 
+            user.getVerificationTokenExpires().isBefore(LocalDateTime.now())) {
+            return false;
+        }
+        
+        // Verify email và kích hoạt tài khoản
+        user.setEmailVerified(true);
+        user.setIsActive(true);
+        user.setVerificationToken(null);
+        user.setVerificationTokenExpires(null);
+        
+        userRepository.save(user);
+        log.debug("Email verified for user: {}", user.getEmail());
+        return true;
+    }
+    
+    public void resendVerificationEmail(String email) {
+        Optional<User> userOpt = userRepository.findByEmail(email);
+        
+        if (userOpt.isEmpty()) {
+            throw new IllegalArgumentException("Email không tồn tại");
+        }
+        
+        User user = userOpt.get();
+        
+        if (Boolean.TRUE.equals(user.getEmailVerified())) {
+            throw new IllegalArgumentException("Email đã được xác thực");
+        }
+        
+        // Tạo token mới
+        String verificationToken = UUID.randomUUID().toString();
+        user.setVerificationToken(verificationToken);
+        user.setVerificationTokenExpires(LocalDateTime.now().plusHours(24));
+        
+        userRepository.save(user);
+        
+        // Gửi email verification
+        emailService.sendVerificationEmail(user.getEmail(), user.getFullName(), verificationToken);
+        log.debug("Verification email resent to: {}", user.getEmail());
     }
 
     public boolean existsByEmail(String email) {
@@ -271,5 +345,92 @@ public class UserService implements UserDetailsService {
         }
         user.setPassword(passwordEncoder.encode(newPassword));
         userRepository.save(user);
+    }
+    
+    // Password reset methods
+    public void generatePasswordResetToken(String email) {
+        Optional<User> userOpt = userRepository.findByEmail(email);
+        
+        if (userOpt.isEmpty()) {
+            throw new IllegalArgumentException("Email không tồn tại trong hệ thống");
+        }
+        
+        User user = userOpt.get();
+        
+        // Kiểm tra tài khoản có bị khóa không
+        if (!Boolean.TRUE.equals(user.getIsActive())) {
+            throw new IllegalArgumentException("Tài khoản đã bị khóa. Vui lòng liên hệ quản trị viên!");
+        }
+        
+        // Tạo reset token
+        String resetToken = UUID.randomUUID().toString();
+        user.setResetToken(resetToken);
+        user.setResetTokenExpires(LocalDateTime.now().plusHours(resetExpirationHours));
+        
+        userRepository.save(user);
+        
+        // Gửi email reset password
+        try {
+            emailService.sendPasswordResetEmail(user.getEmail(), user.getFullName(), resetToken);
+            log.debug("Password reset email sent to: {}", user.getEmail());
+        } catch (Exception e) {
+            log.error("Failed to send password reset email to: {}", user.getEmail(), e);
+            // Xóa token nếu gửi email thất bại
+            user.setResetToken(null);
+            user.setResetTokenExpires(null);
+            userRepository.save(user);
+            throw new RuntimeException("Không thể gửi email đặt lại mật khẩu", e);
+        }
+    }
+    
+    public boolean validateResetToken(String token) {
+        Optional<User> userOpt = userRepository.findByResetToken(token);
+        
+        if (userOpt.isEmpty()) {
+            return false;
+        }
+        
+        User user = userOpt.get();
+        
+        // Kiểm tra token có hết hạn không
+        if (user.getResetTokenExpires() == null || 
+            user.getResetTokenExpires().isBefore(LocalDateTime.now())) {
+            // Xóa token hết hạn
+            user.setResetToken(null);
+            user.setResetTokenExpires(null);
+            userRepository.save(user);
+            return false;
+        }
+        
+        return true;
+    }
+    
+    public void resetPassword(String token, String newPassword) {
+        Optional<User> userOpt = userRepository.findByResetToken(token);
+        
+        if (userOpt.isEmpty()) {
+            throw new IllegalArgumentException("Token không hợp lệ");
+        }
+        
+        User user = userOpt.get();
+        
+        // Kiểm tra token có hết hạn không
+        if (user.getResetTokenExpires() == null || 
+            user.getResetTokenExpires().isBefore(LocalDateTime.now())) {
+            // Xóa token hết hạn
+            user.setResetToken(null);
+            user.setResetTokenExpires(null);
+            userRepository.save(user);
+            throw new IllegalArgumentException("Token đã hết hạn");
+        }
+        
+        // Cập nhật mật khẩu mới
+        user.setPassword(passwordEncoder.encode(newPassword));
+        user.setResetToken(null);
+        user.setResetTokenExpires(null);
+        user.setUpdatedAt(LocalDateTime.now());
+        
+        userRepository.save(user);
+        log.debug("Password reset successfully for user: {}", user.getEmail());
     }
 }

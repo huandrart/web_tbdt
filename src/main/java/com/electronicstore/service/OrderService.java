@@ -283,7 +283,4 @@ public class OrderService {
         return orderRepository.findByStatusWithUser(status, pageable);
     }
 
-    public Order findByIdDirect(Long id) {
-        return orderRepository.findById(id).orElse(null);
-    }
 }

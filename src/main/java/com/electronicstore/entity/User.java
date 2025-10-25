@@ -55,6 +55,23 @@ public class User {
     @Column(name = "updated_at")
     private LocalDateTime updatedAt;
     
+    // Email verification fields
+    @Column(name = "email_verified")
+    private Boolean emailVerified = false;
+    
+    @Column(name = "verification_token")
+    private String verificationToken;
+    
+    @Column(name = "verification_token_expires")
+    private LocalDateTime verificationTokenExpires;
+    
+    // Password reset fields
+    @Column(name = "reset_token")
+    private String resetToken;
+    
+    @Column(name = "reset_token_expires")
+    private LocalDateTime resetTokenExpires;
+    
     // Constructors
     public User() {}
     
@@ -185,6 +202,46 @@ public class User {
     
     public void setUpdatedAt(LocalDateTime updatedAt) {
         this.updatedAt = updatedAt;
+    }
+    
+    public Boolean getEmailVerified() {
+        return emailVerified;
+    }
+    
+    public void setEmailVerified(Boolean emailVerified) {
+        this.emailVerified = emailVerified;
+    }
+    
+    public String getVerificationToken() {
+        return verificationToken;
+    }
+    
+    public void setVerificationToken(String verificationToken) {
+        this.verificationToken = verificationToken;
+    }
+    
+    public LocalDateTime getVerificationTokenExpires() {
+        return verificationTokenExpires;
+    }
+    
+    public void setVerificationTokenExpires(LocalDateTime verificationTokenExpires) {
+        this.verificationTokenExpires = verificationTokenExpires;
+    }
+    
+    public String getResetToken() {
+        return resetToken;
+    }
+    
+    public void setResetToken(String resetToken) {
+        this.resetToken = resetToken;
+    }
+    
+    public LocalDateTime getResetTokenExpires() {
+        return resetTokenExpires;
+    }
+    
+    public void setResetTokenExpires(LocalDateTime resetTokenExpires) {
+        this.resetTokenExpires = resetTokenExpires;
     }
     
     // Utility methods
