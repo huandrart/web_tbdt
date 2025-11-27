@@ -50,10 +50,52 @@ public class ProductBusinessService {
                           ", sortBy=" + sortBy + ", sortDir=" + sortDir + ", page=" + page + 
                           ", size=" + size + ", status=" + status + ", categoryId=" + categoryId);
         
-        // Create pageable object
-        Sort.Direction direction = "desc".equalsIgnoreCase(sortDir) ? Sort.Direction.DESC : Sort.Direction.ASC;
-        Sort sort = Sort.by(direction, sortBy != null ? sortBy : "createdAt");
-        Pageable pageable = PageRequest.of(page, size, sort);
+        // --- SỬA TỪ ĐÂY ---
+
+            // Mặc định ban đầu
+            Sort.Direction direction = Sort.Direction.DESC;
+            String property = "createdAt";
+
+            if (StringUtils.hasText(sortBy)) {
+                // Trường hợp 1: URL gửi lên dạng "name-asc", "price-desc" (có dấu gạch ngang)
+                if (sortBy.contains("-")) {
+                    String[] parts = sortBy.split("-");
+                    property = parts[0]; // Lấy phần "name" hoặc "price"
+                    
+                    // Kiểm tra chiều sắp xếp
+                    if (parts.length > 1 && "asc".equalsIgnoreCase(parts[1])) {
+                        direction = Sort.Direction.ASC;
+                    } else {
+                        direction = Sort.Direction.DESC;
+                    }
+                } 
+                // Trường hợp 2: URL gửi lên dạng "name_asc" (nếu frontend dùng dấu gạch dưới)
+                else if (sortBy.contains("_")) {
+                    String[] parts = sortBy.split("_");
+                    property = parts[0];
+                    if (parts.length > 1 && "asc".equalsIgnoreCase(parts[1])) {
+                        direction = Sort.Direction.ASC;
+                    } else {
+                        direction = Sort.Direction.DESC;
+                    }
+                }
+                // Trường hợp 3: Chỉ gửi tên trường (ít gặp với frontend của bạn)
+                else {
+                    property = sortBy;
+                    direction = "asc".equalsIgnoreCase(sortDir) ? Sort.Direction.ASC : Sort.Direction.DESC;
+                }
+            }
+
+            // Xử lý map tên đặc biệt (Nếu frontend gửi "newest" thay vì "createdAt-desc")
+            if ("newest".equalsIgnoreCase(property)) {
+                property = "createdAt";
+                direction = Sort.Direction.DESC;
+            }
+
+            Sort sort = Sort.by(direction, property);
+            Pageable pageable = PageRequest.of(page, size, sort);
+
+            // --- HẾT PHẦN SỬA ---
         
         // Get paginated products
         Page<Product> productPage;

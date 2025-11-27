@@ -14,6 +14,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
+import org.springframework.data.domain.Sort;
 import java.math.BigDecimal;
 import java.util.List;
 
@@ -166,13 +167,44 @@ public class HomeController {
     @GetMapping("/category/{id}")  
     public String categoryPage(@PathVariable Long id, Model model,
                               @RequestParam(defaultValue = "0") int page,
-                              @RequestParam(defaultValue = "12") int size) {
+                              @RequestParam(defaultValue = "12") int size,
+                              @RequestParam(required = false) String sort) { // <-- THÊM BIẾN SORT
+        
         Category category = categoryService.findById(id);
         if (category == null) {
             return "redirect:/";
         }
         
-        Pageable pageable = PageRequest.of(page, size);
+        // 1. Xử lý Logic Sắp xếp
+        Sort sorting = Sort.unsorted();
+        if (sort != null && !sort.isEmpty()) {
+            switch (sort) {
+                case "price-asc":
+                    sorting = Sort.by("price").ascending();
+                    break;
+                case "price-desc":
+                    sorting = Sort.by("price").descending();
+                    break;
+                case "name-asc":
+                    sorting = Sort.by("name").ascending();
+                    break;
+                case "name-desc":
+                    sorting = Sort.by("name").descending();
+                    break;
+                case "newest":
+                    // Lưu ý: Đảm bảo trong Entity Product có trường "createdAt" hoặc "id"
+                    sorting = Sort.by("id").descending(); 
+                    break;
+                default:
+                    sorting = Sort.unsorted();
+                    break;
+            }
+        }
+
+        // 2. Tạo PageRequest với thông tin sắp xếp
+        Pageable pageable = PageRequest.of(page, size, sorting);
+        
+        // 3. Gọi Service lấy dữ liệu
         Page<Product> productPage = productService.findByCategoryAndIsActiveTrue(category, pageable);
         
         model.addAttribute("category", category);
@@ -180,6 +212,9 @@ public class HomeController {
         model.addAttribute("currentPage", page);
         model.addAttribute("totalPages", productPage.getTotalPages());
         model.addAttribute("productCount", productPage.getTotalElements());
+        
+        // Trả lại giá trị sort để Frontend giữ trạng thái select box
+        model.addAttribute("currentSort", sort); 
         
         return "category-products";
     }

@@ -101,7 +101,7 @@ public class UserOrderController {
         Optional<Order> orderOpt = orderService.findById(id);
         if (orderOpt.isEmpty()) {
             redirectAttributes.addFlashAttribute("error", "Đơn hàng không tồn tại!");
-            return "redirect:/orders";
+            return "redirect:/orders/my-orders";
         }
         
         Order order = orderOpt.get();
@@ -109,7 +109,7 @@ public class UserOrderController {
         // Kiểm tra xem đơn hàng có thuộc về user hiện tại không
         if (!order.getUser().getId().equals(currentUser.getId())) {
             redirectAttributes.addFlashAttribute("error", "Bạn không có quyền hủy đơn hàng này!");
-            return "redirect:/orders";
+            return "redirect:/orders/my-orders";
         }
         
         try {
@@ -121,7 +121,7 @@ public class UserOrderController {
             redirectAttributes.addFlashAttribute("error", "Có lỗi xảy ra khi hủy đơn hàng!");
         }
         
-        return "redirect:/orders";
+        return "redirect:/orders/my-orders";
     }
     
     // Utility method để lấy user hiện tại

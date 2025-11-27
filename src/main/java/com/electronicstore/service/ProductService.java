@@ -32,7 +32,8 @@ public class ProductService {
     }
     
     public Page<Product> findActiveProductsWithPagination(Pageable pageable) {
-        return productRepository.findByIsActiveTrueOrderByCreatedAtDesc(pageable);
+    // Sử dụng hàm này để sort theo tham số pageable truyền vào
+        return productRepository.findByIsActiveTrue(pageable);
     }
     
     public Product findById(Long id) {

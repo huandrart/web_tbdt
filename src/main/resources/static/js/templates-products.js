@@ -85,26 +85,42 @@ document.addEventListener('DOMContentLoaded', function() {
         });
 
     };
+    function addToCart(productId) {
+            const quantity = document.getElementById('quantity').value;
+            const csrfToken = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
+            
+            $.ajax({
+                url: '/cart/add',
+                method: 'POST',
+                headers: {
+                    'X-CSRF-TOKEN': csrfToken
+                },
+                data: {
+                    productId: productId,
+                    quantity: quantity
+                },
+                success: function(response) {
+                    const result = typeof response === 'string' ? JSON.parse(response) : response;
+                    if (result.success) {
+                        showToast(result.message || 'Đã thêm sản phẩm vào giỏ hàng!', 'success');
+                        updateCartCount();
+                    } else {
+                        showToast(result.message || 'Có lỗi xảy ra', 'error');
+                    }
+                },
+                error: function() {
+                    showToast('Có lỗi xảy ra khi thêm sản phẩm', 'error');
+                }
+            });
+        }
 
 
 
-    function updateCartCount() {
-
-        $.ajax({
-
-            url: '/cart/count', method: 'GET',
-
-            success: function(data) {
-
-                const el = document.getElementById('cartCount');
-
-                if (el) el.textContent = data.count || 0;
-
-            }
-
-        });
-
-    }
+     function updateCartCount() {
+            $.get('/cart/count', function(count) {
+                document.getElementById('cartCount').textContent = count;
+            });
+        }
 
 
 
@@ -227,26 +243,52 @@ document.addEventListener('DOMContentLoaded', function() {
         });
 
     }
+console.log('Category Products JS loaded');
 
-    
-
-    // Giữ lại chức năng sort
-
+    // ==========================================
+    // 1. XỬ LÝ SẮP XẾP (SORTING)
+    // ==========================================
     const sortSelect = document.getElementById('sortBy');
 
     if (sortSelect) {
+        // A. Tự động chọn option đang active dựa trên URL
+        // Khi tải lại trang, kiểm tra xem trên URL có tham số 'sort' không để set lại select box
+        const params = new URLSearchParams(window.location.search);
+        const currentSort = params.get('sort'); // Lấy giá trị ?sort=...
+        
+        if (currentSort) {
+            sortSelect.value = currentSort;
+        }
 
+        // B. Sự kiện khi người dùng thay đổi lựa chọn
         sortSelect.addEventListener('change', function() {
+            const sortValue = this.value;
+            
+            // Lấy URL hiện tại
+            const url = new URL(window.location.href);
+            
+            if (sortValue) {
+                // Thêm hoặc cập nhật tham số 'sort'
+                url.searchParams.set('sort', sortValue);
+            } else {
+                // Nếu chọn mặc định, xóa tham số sort
+                url.searchParams.delete('sort');
+            }
 
-            const url = new URL(window.location);
+            // Quan trọng: Khi đổi kiểu sắp xếp, nên reset về trang 1 (page 0)
+            // để tránh lỗi đang ở trang 5 mà sort lại chỉ có 2 trang kết quả
+            url.searchParams.delete('page'); 
 
-            url.searchParams.set('sortBy', this.value);
-
+            // Chuyển hướng trình duyệt sang URL mới
             window.location.href = url.toString();
-
         });
-
     }
+    
+
+    
 
 });
 
+
+
+    

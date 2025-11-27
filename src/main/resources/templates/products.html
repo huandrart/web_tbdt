@@ -48,7 +48,7 @@
                     <li class="nav-item">
                         <a class="nav-link" href="/cart">
                             <i class="fas fa-shopping-cart me-1"></i>Giỏ hàng
-                            <span class="badge bg-danger ms-1" id="cartCount">0</span>
+                            <span class="badge bg-danger ms-1" id="cartCount"></span>
                         </a>
                     </li>
                     <li class="nav-item" sec:authorize="isAuthenticated()">
@@ -168,13 +168,13 @@
                         </div>
 
                         <!-- Brand Filter -->
-                        <div class="mb-4">
+                         <!-- <div class="mb-4">
                             <h6>Thương hiệu</h6>
                             <select class="form-select form-select-sm" name="brand">
                                 <option value="">Tất cả thương hiệu</option>
                                 <option th:each="brand : ${brands}" th:value="${brand}" th:text="${brand}"></option>
                             </select>
-                        </div>
+                        </div> -->
 
                         <input type="hidden" name="keyword" th:value="${keyword}">
                         
@@ -372,5 +372,6 @@
     
     <!-- Custom JavaScript -->
     <script th:src="@{/js/templates-products.js}"></script>
+    
 </body>
 </html>

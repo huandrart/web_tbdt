@@ -6,7 +6,7 @@ import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
-
+import org.hibernate.annotations.BatchSize;
 @Entity
 @Table(name = "products")
 public class Product {

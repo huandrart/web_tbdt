@@ -65,7 +65,7 @@ public class CheckoutController {
                 .map(CartItem::getTotalPrice)
                 .reduce(BigDecimal.ZERO, BigDecimal::add);
         
-        BigDecimal shippingFee = BigDecimal.valueOf(30000); // 30,000 VND
+        BigDecimal shippingFee = BigDecimal.valueOf(0); // 30,000 VND
         BigDecimal total = subtotal.add(shippingFee);
         
         model.addAttribute("user", user);

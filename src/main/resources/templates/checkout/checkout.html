@@ -46,7 +46,16 @@
                                 <div class="col-md-6 mb-3">
                                     <label for="phone" class="form-label">Số điện thoại <span class="text-danger">*</span></label>
                                     <input type="tel" class="form-control" id="phone" name="phone" 
-                                           th:value="${user.phone}" required>
+                                        th:value="${user.phone}" required
+                                        pattern="0[0-9]{9,10}" 
+                                        minlength="10" 
+                                        maxlength="11"
+                                        inputmode="numeric"
+                                        oninput="this.value = this.value.replace(/[^0-9]/g, '')"
+                                        title="Số điện thoại phải bắt đầu bằng số 0 và có 10-11 số">
+                                    <div class="invalid-feedback">
+                                        Số điện thoại phải bắt đầu bằng số 0 và có độ dài 10-11 số.
+                                    </div>
                                 </div>
                                 <div class="col-12 mb-3">
                                     <label for="address" class="form-label">Địa chỉ giao hàng <span class="text-danger">*</span></label>
@@ -155,7 +164,7 @@
                         </div>
                         <div class="d-flex justify-content-between mb-2">
                             <span>Phí vận chuyển:</span>
-                            <span th:text="${#numbers.formatDecimal(shippingFee, 0, 'COMMA', 0, 'POINT')} + ' ₫'">30,000 ₫</span>
+                            <span th:text="${#numbers.formatDecimal(shippingFee, 0, 'COMMA', 0, 'POINT')} + ' ₫'">miễn phí</span>
                         </div>
                         <div class="d-flex justify-content-between mb-2">
                             <span>Thuế VAT (10%):</span>
@@ -164,7 +173,7 @@
                         <hr>
                         <div class="d-flex justify-content-between fw-bold fs-5 text-primary">
                             <span>Tổng cộng:</span>
-                            <span th:text="${#numbers.formatDecimal(total, 0, 'COMMA', 0, 'POINT')} + ' ₫'">0 ₫</span>
+                            <span th:text="${#numbers.formatDecimal(subtotal + shippingFee + (subtotal * 0.1), 0, 'COMMA', 0, 'POINT')} + ' ₫'">0 ₫</span>
                         </div>
                         
                         <!-- Checkout Button -->

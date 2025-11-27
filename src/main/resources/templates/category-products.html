@@ -46,7 +46,7 @@
                     <li class="nav-item">
                         <a class="nav-link" href="/cart">
                             <i class="fas fa-shopping-cart me-1"></i>Giỏ hàng
-                            <span class="badge bg-danger ms-1" id="cartCount">0</span>
+                            <span class="badge bg-danger ms-1" id="cartCount"></span>
                         </a>
                     </li>
                     <li class="nav-item" sec:authorize="isAuthenticated()">
@@ -80,7 +80,7 @@
                                     </a>
                                 </li>
                                 <li>
-                                    <a class="dropdown-item" href="/orders">
+                                    <a class="dropdown-item" href="/orders/my-orders">
                                         <i class="fas fa-shopping-bag me-2"></i>Đơn hàng của tôi
                                     </a>
                                 </li>
@@ -334,6 +334,6 @@
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     
     <!-- Custom JavaScript -->
-    <script th:src="@{/js/templates-category-products.js}"></script>
+    <script th:src="@{/js/templates-products.js}"></script>
 </body>
 </html>
