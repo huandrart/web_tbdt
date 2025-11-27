@@ -31,9 +31,9 @@ public class ProductService {
         return productRepository.findByIsActiveTrue();
     }
     
+    // CODE ĐÚNG:
     public Page<Product> findActiveProductsWithPagination(Pageable pageable) {
-    // Sử dụng hàm này để sort theo tham số pageable truyền vào
-        return productRepository.findByIsActiveTrue(pageable);
+        return productRepository.findByIsActiveTrue(pageable); // SỬA THÀNH CÁI NÀY
     }
     
     public Product findById(Long id) {
@@ -202,4 +202,5 @@ public class ProductService {
             productRepository.save(product);
         }
     }
+    
 }

@@ -90,10 +90,37 @@ public class HomeController {
             @RequestParam(required = false) String brand,
             @RequestParam(required = false) BigDecimal minPrice,
             @RequestParam(required = false) BigDecimal maxPrice,
+            @RequestParam(required = false) String sort, 
             @RequestParam(required = false) String keyword,
             Model model) {
         
-        Pageable pageable = PageRequest.of(page, size);
+
+        Sort sorting = Sort.unsorted();
+        if (sort != null && !sort.isEmpty()) {
+            switch (sort) {
+                case "price-asc":
+                    sorting = Sort.by("price").ascending();
+                    break;
+                case "price-desc":
+                    sorting = Sort.by("price").descending(); // Sẽ chạy
+                    break;
+                case "name-asc":
+                    // SỬA: Thay "name" bằng tên chính xác trong Entity (ví dụ "productName" hoặc giữ nguyên nếu đúng)
+                    sorting = Sort.by("name").ascending(); 
+                    break;
+                case "name-desc":
+                    sorting = Sort.by("name").descending();
+                    break;
+            }
+        }
+
+        System.out.println("2. Đối tượng Sort sau khi xử lý: " + sorting.toString());
+
+        Pageable pageable = PageRequest.of(page, size, sorting);
+           
+            
+        
+      
         Page<Product> productPage;
         
         if (keyword != null && !keyword.trim().isEmpty()) {
