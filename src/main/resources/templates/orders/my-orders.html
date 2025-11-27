@@ -231,7 +231,8 @@
                                                     </button>
                                                 </form>
                                             </span>
-                                            <span th:if="${order.status.name() == 'DELIVERED' and order.shipper != null}">
+                                            
+                                            <span th:if="${order.status.name() == 'DELIVERED' }">
                                                 <a th:href="@{/shipper-reviews/create/{id}(id=${order.id})}" 
                                                    class="btn btn-sm btn-warning ms-1">
                                                     <i class="fas fa-star me-1"></i>Đánh giá
@@ -258,7 +259,7 @@
                             <nav>
                                 <ul class="pagination">
                                     <li class="page-item" th:classappend="${currentPage == 0} ? 'disabled'">
-                                        <a class="page-link" th:href="@{/orders(page=${currentPage - 1}, size=${size}, status=${status})}">
+                                        <a class="page-link" th:href="@{/orders/my-orders(page=${currentPage - 1}, size=${size}, status=${status})}">
                                             <i class="fas fa-chevron-left"></i>
                                         </a>
                                     </li>
@@ -267,12 +268,12 @@
                                         class="page-item" 
                                         th:classappend="${pageNum == currentPage} ? 'active'">
                                         <a class="page-link" 
-                                           th:href="@{/orders(page=${pageNum}, size=${size}, status=${status})}"
+                                           th:href="@{/orders/my-orders(page=${pageNum}, size=${size}, status=${status})}"
                                            th:text="${pageNum + 1}">1</a>
                                     </li>
                                     
                                     <li class="page-item" th:classappend="${currentPage == totalPages - 1} ? 'disabled'">
-                                        <a class="page-link" th:href="@{/orders(page=${currentPage + 1}, size=${size}, status=${status})}">
+                                        <a class="page-link" th:href="@{/orders/my-orders(page=${currentPage + 1}, size=${size}, status=${status})}">
                                             <i class="fas fa-chevron-right"></i>
                                         </a>
                                     </li>

@@ -20,6 +20,11 @@ public class EmailService {
     
     @Value("${app.email.reset.expiration}")
     private int resetExpirationHours;
+
+    // --- THÊM MỚI: Lấy link Ngrok từ application.properties ---
+    @Value("${app.base-url}")
+    private String baseUrl;
+    // ----------------------------------------------------------
     
     public void sendVerificationEmail(String toEmail, String fullName, String verificationToken) {
         try {
@@ -28,7 +33,9 @@ public class EmailService {
             message.setTo(toEmail);
             message.setSubject("Xác thực tài khoản - Electronic Store");
             
-            String verificationUrl = "http://localhost:8080/verify-email?token=" + verificationToken;
+            // --- SỬA ĐỔI: Dùng baseUrl thay cho localhost:8080 ---
+            String verificationUrl = baseUrl + "/verify-email?token=" + verificationToken;
+            // -----------------------------------------------------
             
             String emailBody = String.format("""
                 Xin chào %s,
@@ -66,7 +73,9 @@ public class EmailService {
             message.setTo(toEmail);
             message.setSubject("Đặt lại mật khẩu - Electronic Store");
             
-            String resetUrl = "http://localhost:8080/reset-password?token=" + resetToken;
+            // --- SỬA ĐỔI: Dùng baseUrl thay cho localhost:8080 ---
+            String resetUrl = baseUrl + "/reset-password?token=" + resetToken;
+            // -----------------------------------------------------
             
             String emailBody = String.format("""
                 Xin chào %s,

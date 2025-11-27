@@ -202,12 +202,11 @@
                             
                             <!-- Rating -->
                             <div class="rating mb-2">
-                                <i class="fas fa-star"></i>
-                                <i class="fas fa-star"></i>
-                                <i class="fas fa-star"></i>
-                                <i class="fas fa-star"></i>
-                                <i class="fas fa-star-half-alt"></i>
-                                <small class="text-muted ms-2">4.5 (25)</small>
+                                <small class="text-warning">
+                                    <i th:each="i : ${#numbers.sequence(1, 5)}" 
+                                    th:class="${product.rating >= i} ? 'fas fa-star' : 'far fa-star'"></i>
+                                </small>
+                                <small class="text-muted ms-2" th:text="'(' + ${product.reviewCount} + ')'">(0)</small>
                             </div>
                             
                             <!-- Price -->
